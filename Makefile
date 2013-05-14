@@ -7,7 +7,7 @@ INSTALLATIONDIR = /usr/local/bin
 
 OBJS = $(FRONTEND)/program.o \
 		System/Alarm.o System/Control.o System/Printer.o System/Server.o System/connection.o \
-		Monitor/Client.o Monitor/Network.o \
+		Monitor/Client.o Monitor/Network.o Monitor/toFile.o \
 		Data/Database.o Data/ReactorData.o \
 		Util/LinkedList.o Util/Trie.o \
 		
