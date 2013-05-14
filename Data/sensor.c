@@ -8,7 +8,7 @@
 
 int _sensseed;
 
-void getSensorValue(int const amount, int*const values, unsigned int const maxval)
+void setNewSensorValue(int const amount, int*const values, unsigned int const maxval)
 {
     int i;
     int count = 0;
@@ -19,8 +19,8 @@ void getSensorValue(int const amount, int*const values, unsigned int const maxva
     
     for (i = 0; i < amount; i++) 
     {
-        //Set new random number in randomValues
-        values[count] = (rand()%maxval + 1);
+        //Add new random value to old value
+        values[count] += (rand()%maxval + 1);
         count++;
     }
 }
