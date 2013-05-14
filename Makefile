@@ -2,6 +2,7 @@ CC = gcc
 CFLAGS = -O3 -pedantic-errors -Wall -Wextra -Werror -std=c99
 CFLAGS = -Wall -std=c99
 FRONTEND = CLI
+LINT = splint
 TARGET = ReaktorServer$(FRONTEND)
 INSTALLATIONDIR = /usr/local/bin
 
@@ -27,4 +28,5 @@ $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS)
 
 %.o: %c
-	 $(CC) $(CFLAGS) -o $@ @<
+	$(LINT) %c
+	$(CC) $(CFLAGS) -o $@ @<

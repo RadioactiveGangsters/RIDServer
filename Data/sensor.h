@@ -11,5 +11,9 @@
 #include<stdio.h>
 #include<time.h>
 
+typedef struct
+{
+}Sensor;
+
 #endif	/* SENSOR_H */
 

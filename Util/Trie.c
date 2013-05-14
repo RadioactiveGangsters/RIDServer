@@ -12,25 +12,30 @@ Trie triee(char id[static 1],void const*const e)
 
 Trie*travp(Trie const*const root,char const*const id)
 {
+	//can't traverse rootless trie
 	if(root==NULL)
 		return NULL;
 	const int diff=strcmp(root->id,id);
+	// Can't traverse to parent of root.
 	if(!diff)
 		return NULL;
+	Trie**hook;
+	// Find the one closest to the id
 	if(diff<0)
 	{
-		if(!strcmp(root->l->id,id))
-			return root;
-		else
-			return travp(root->l,id);
+		hook=&root->l;
 	}
 	else
 	{
-		if(!strcmp(root->g->id,id))
-			return root;
-		else
-			return travp(root->g,id);
+		hook=&root->g;
 	}
+	// Check if we're on the parent right now
+	if(!strcmp((*hook)->id,id))
+		// This is the parent
+		return root;
+	else
+		// Look for the parent some more.
+		return travp(*hook,id);
 }
 
 Trie*trav(Trie const*const root,char const*const id)
@@ -96,7 +101,9 @@ Trie*trierm(Trie*const root,char const*const id)
 	// No suitable parent found
 	if(phook==NULL)
 		return NULL;
-	Trie**target;
+	
+	Trie** target;
+	//seek the item itself
 	if(!strcmp(phook->l->id,id))
 		target=&phook->l;
 	else if(!strcmp(phook->g->id,id))
@@ -104,7 +111,9 @@ Trie*trierm(Trie*const root,char const*const id)
 	else
 		return NULL;
 	
+	// Relink the tree so we don't lose nodes
 	if(!trielink((*target)->g,(*target)->l)) return NULL;
 
+	// Remove the item from the trie
 	return *target=(*target)->g;
 }
