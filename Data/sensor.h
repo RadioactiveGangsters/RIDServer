@@ -13,6 +13,7 @@
 
 typedef struct
 {
+	char const*const id;
 }Sensor;
 
 #endif	/* SENSOR_H */

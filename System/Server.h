@@ -3,8 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "connection.h"
+#include "Log.h"
 
-int InitServer( const int argc, char **argv);
-int StartServer( void );
+int InitServer(const int, char const*const*const);
+int StartServer(void);
 
 #endif

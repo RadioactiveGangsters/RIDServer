@@ -1,3 +1,6 @@
+#ifndef RIDSCONN_H
+#define RIDSCONN_H
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <stdio.h>
@@ -7,4 +10,11 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
+#include "Log.h"
+
+int socklisten(void);
+
+#endif

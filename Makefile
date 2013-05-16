@@ -1,32 +1,37 @@
 CC = gcc
-CFLAGS = -O3 -pedantic-errors -Wall -Wextra -Werror -std=c99
-CFLAGS = -Wall -std=c99
+CFLAGS = -pipe -O3 -pedantic-errors -Wall -Wextra -Werror -std=c99 -x c
+CFLAGS = -pipe -Wall -std=c99 -pedantic
 FRONTEND = CLI
 LINT = splint
+LINTFLAGS = +quiet +posix-strict-lib +weak
 TARGET = ReaktorServer$(FRONTEND)
 INSTALLATIONDIR = /usr/local/bin
+.SUFFIXES:
 
 OBJS = $(FRONTEND)/program.o \
-		System/Alarm.o System/Control.o System/Printer.o System/Server.o System/connection.o \
+		System/Server.o System/connection.o System/Log.o\
 		Monitor/Client.o Monitor/Network.o Monitor/toFile.o \
-		Data/Database.o Data/ReactorData.o \
-		Util/LinkedList.o Util/Trie.o \
+		Data/Database.o Data/ReactorData.o Data/sensor.o \
+		Util/LinkedList.o Util/Trie.o
 		
 
-.PHONY: all
-all: $(TARGET)
+.PHONY : all
+all : $(TARGET)
 
-.PHONY: install
-install: $(TARGET)
+.PHONY : install
+install : $(TARGET)
 	cp $(TARGET) $(INSTALLATIONDIR)
 
-.PHONY: clean
-clean:
-	rm $(OBJS)
+.PHONY : clean
+clean :
+	-rm $(OBJS)
 
-$(TARGET): $(OBJS)
-	$(CC) -o $(TARGET) $(OBJS)
+$(TARGET) : $(OBJS)
+	$(CC) $(CFLAGS) -fwhole-program -o $(TARGET) $(OBJS)
 
-%.o: %c
-	$(LINT) %c
-	$(CC) $(CFLAGS) -o $@ @<
+%.o : %.c %.h.gch
+	-$(LINT) $(LINTFLAGS) $<
+	$(CC) $(CFLAGS) -o $@ -c $< 
+
+%.h.gch : %.h
+	$(CC) $(CFLAGS) -o $@ -c $^

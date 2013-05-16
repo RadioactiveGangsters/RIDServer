@@ -1,9 +1,9 @@
 #include "connection.h"
 
-int main()
+int socklisten()
 {
     int server_sockfd, client_sockfd;
-    int server_len, client_len;
+    socklen_t server_len, client_len;
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
 
@@ -13,44 +13,45 @@ int main()
     server_address.sin_addr.s_addr = inet_addr( "127.0.0.1" );
     server_address.sin_port = htons( 10000 );
 
-    server_len = sizeof( server_address );
+    server_len = (socklen_t)sizeof( server_address );
 
         if( bind( server_sockfd, ( struct sockaddr *)&server_address, server_len ) != 0 )
         {
                 perror("oops: server-tcp-single");
-                exit( 1 );
+                return EXIT_FAILURE;
         }
 
-    listen( server_sockfd, 5 );
+    if( listen( server_sockfd, 5 ) ) return EXIT_FAILURE;
 
-    signal( SIGCHLD, SIG_IGN );
+    if( signal( SIGCHLD, SIG_IGN ) == SIG_ERR ) return EXIT_FAILURE;
 
     while( 1 )
     {
         char ch;
-        printf( "server wait...\n" );
+        Log(4,"server wait...\n" );
 
-        client_len = sizeof( client_address );
+        client_len = (socklen_t)sizeof( client_address );
         client_sockfd = accept( server_sockfd, ( struct sockaddr *)&client_address, &client_len );
 
-        printf( "Client connected \n" );
+        Log(3, "Client connected \n" );
 
         if( fork() == 0 )
         {
-            read( client_sockfd, &ch, 1 );
-            printf( "Client send = %c\n", ch );
+            if( read( client_sockfd, &ch, 1 ) ) break; 
+            Log(2, "Client send = %c\n", ch );
 
             ch++;
 
-            sleep( 5 );
+            if( sleep( 5 ) ) break;
 
-            printf( "Server send = %c\n", ch );
-            write( client_sockfd, &ch, 1 );
-            close( client_sockfd );
-            exit (0 );
+            Log(2, "Server send = %c\n", ch );
+            if( write( client_sockfd, &ch, 1 ) ) continue;
+            (void)close( client_sockfd );
+            return EXIT_SUCCESS;
         }
         else
-            close( client_sockfd );
+            (void)close( client_sockfd );
 
     }
+    return EXIT_FAILURE;
 }

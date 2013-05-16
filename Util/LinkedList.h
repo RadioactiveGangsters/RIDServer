@@ -1,17 +1,18 @@
-#ifndef LINKEDLIST_H
-#define LINKEDLIST_H
-#include<stdlib.h>
+#ifndef RLINKEDLIST_H
+#define RLINKEDLIST_H
+
+#include <stdlib.h>
 
 typedef struct _LLNODE 
 {
 	void*e;
 	struct _LLNODE*n;
-}LLNODE;
+} LLNODE;
 
-LLNODE lle(void const*const e);
+LLNODE*lle(void*const);
 
-void lladd(LLNODE*const list, void const*const e);
+void lladd(LLNODE*const, void*const);
 
-LLNODE*llrm(LLNODE*const list, void const*const e);
+LLNODE*llrm(LLNODE*const, void const*const);
 
 #endif

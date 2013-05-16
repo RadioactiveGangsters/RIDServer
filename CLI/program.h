@@ -1,11 +1,15 @@
 #ifndef FRONTEND_H
 #define	FRONTEND_H
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-#include"../System/Server.h"
+#include "../System/Log.h"
+#include "../System/Server.h"
 
-int main(int argc,char**argv);
+int main(int,char**);
+
+void console(const int,char const*const,...);
 
 #endif

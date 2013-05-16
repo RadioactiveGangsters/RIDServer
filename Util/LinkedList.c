@@ -1,37 +1,28 @@
 #include"LinkedList.h"
 
-LLNODE lle(void const*const e)
+LLNODE*lle(void*const e)
 {
-	LLNODE x;
-	x.e=e;
-	x.n=NULL;
+	LLNODE*x = (LLNODE*)malloc(sizeof(LLNODE));
+	x->e=e;
+	x->n=NULL;
 	return x;
 }
 
-void lladd(LLNODE*const list, void const*const e)
+void lladd(LLNODE*list, void*const e)
 {
-	if(list==NULL)
-	{
-		*list=lle(e);
-		return;
-	}
+	if(list==NULL)return;
 	LLNODE*x=list;
-	while(x->n!=NULL)
-	{
-		x=x->n;
-	}
-	x->n=e;
+	while(x->n!=NULL)x=x->n;
+	x->n=lle(e);
 }
 
 LLNODE*llrm(LLNODE*const list, void const*const e)
 {
-	if(list==NULL)
-		return NULL;
-	LLNODE*x = list;
+	if(list==NULL)return NULL;
+	LLNODE*x=list;
 	while(x->n!=e)
 	{
-		if(x->n==NULL)
-			return NULL;
+		if(x->n==NULL)return NULL;
 		x=x->n;
 	}
 	LLNODE*r=x->n;
