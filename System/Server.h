@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "connection.h"
+#include "../Monitor/connection.h"
 #include "Log.h"
+#include "../Data/Database.h"
 
 int InitServer(const int, char const*const*const);
 int StartServer(void);

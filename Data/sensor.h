@@ -7,14 +7,16 @@
 #ifndef SENSOR_H
 #define	SENSOR_H
 
-#include<stdlib.h>
-#include<stdio.h>
-#include<time.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
+#define SENSOR_HNAMELEN 256
 
 typedef struct
 {
-	char const*const id;
-}Sensor;
+	char name[SENSOR_HNAMELEN];
+} Sensor;
 
 #endif	/* SENSOR_H */
 

@@ -3,6 +3,7 @@
 
 #include "sensor.h"
 #include "../Util/Trie.h"
+#include "ReactorData.h"
 
 int OpenDatabase(void);
 

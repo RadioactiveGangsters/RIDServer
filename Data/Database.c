@@ -9,9 +9,15 @@ int startDB()
 		// TODO: clear entire trie;
 		tbl=NULL;
 	}
+
+	return LoadSensors();
 }
 
 Sensor*registerSensor(Sensor const*const s)
 {
-	return trieadd(tbl,s->id,s)->e;
+	if(!tbl)
+	{
+		return tbl=triee(s->name,s)->e;
+	}
+	else return trieadd(tbl,s->name,s)->e;
 }
