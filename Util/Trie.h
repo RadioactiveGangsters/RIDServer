@@ -1,7 +1,8 @@
 #ifndef TRIE_H
 #define TRIE_H
 
-#include<string.h>
+#include <string.h>
+#include <stdlib.h>
 
 typedef struct _Trie
 {
@@ -11,17 +12,17 @@ typedef struct _Trie
 	struct _Trie*g;
 } Trie;
 
-Trie triee(char id[128],void const*const e);
+Trie*triee(char*const id,void*const);
 
-Trie*travp(Trie const*const root,char const*const id);
+Trie*const travp(Trie*const root,char const*const id);
 
-Trie*trav(Trie const*const root,char const*const id);
-
-
-Trie*trieadd(Trie*const root,char const*const id,void const*const e);
+Trie*const trav(Trie*const root,char const*const id);
 
 
-Trie*trielink(Trie*const root,Trie const*const e);
+Trie*trieadd(Trie*const,char*const,void*const);
+
+
+Trie*trielink(Trie*const root,Trie*const e);
 
 Trie*trierm(Trie*const root,char const*const id);
 #endif
