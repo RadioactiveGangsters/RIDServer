@@ -1,12 +1,9 @@
 #include "program.h"
-#include <stdarg.h>
 
-void console(const int ll,char const*const le,...)
+void console(const int ll,char const*const le,va_list ap)
 {
-	va_list ap;
-	va_start(ap,le);
 	vprintf(le,ap);
-	va_end(ap);
+	fflush(stdout);
 }
 
 int main(int argc,char**argv)
@@ -15,7 +12,7 @@ int main(int argc,char**argv)
 	InitServer(argc,argv);
 	// TODO: check if successful.
 	(void)StartServer();
-	console(3,"Done.\n");
+	printf("Done.\n");
 
 	return EXIT_SUCCESS;
 }

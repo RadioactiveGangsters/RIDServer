@@ -10,6 +10,6 @@
 
 int main(int,char**);
 
-void console(const int,char const*const,...);
+void console(const int,char const*const,va_list);
 
 #endif
