@@ -105,7 +105,7 @@ int LoadSensors(void)
 					snprintf(uboundq,sizeof(char)*boundlen,"%s%s",idstring,"ubound");
 
 					geniSensors(
-						iniparser_getstring(ini,name,"generic"),
+						iniparser_getstring(ini,name,"generici"),
 						iniparser_getint(ini,amount,0),
 						iniparser_getint(ini,lboundq,0),
 						iniparser_getint(ini,uboundq,100),

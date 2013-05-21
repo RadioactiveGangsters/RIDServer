@@ -23,16 +23,16 @@ The server currently looks for a `sensor.ini` on `.` to determine what to do wit
 ####binary
 Binary sensors can be on or off, on means it's giving off an alarm.
 
-* `typeXalarm`: The message to display when this alarm goes off.
+* `typeXalarm`: The message to display when this alarm goes off. (Default is `Alarm!`)
 
 ####integer
 Integer sensors give off an alarm when out of a certian range.
 
 
-* `typeXlbound`: The lowest value the sensor may register without giving off an alarm.
-* `typeXubound`: The highest value the sensor may register without giving off an alarm.
-* `typeXlalarm`: The message to display when the sensor crosses the lower bound.
-* `typeXualarm`: The message to display when the sensor crosses the upper bound.
+* `typeXlbound`: The lowest value the sensor may register without giving off an alarm. (Default is `0`)
+* `typeXubound`: The highest value the sensor may register without giving off an alarm. (Default is `100`)
+* `typeXlalarm`: The message to display when the sensor crosses the lower bound. (Default is `lower bound Alarm!`)
+* `typeXualarm`: The message to display when the sensor crosses the upper bound. (Default is `upper bound Alarm!`)
 
 Try the example [`sensor.ini`](https://github.com/RadioactiveGangsters/RIDServer/blob/master/sensor.ini).
 
