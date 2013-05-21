@@ -6,7 +6,9 @@
 
 #include "../Util/LinkedList.h"
 
-void Log(const int ll,char const*const, ...);
-void subscribe(void(*ls)(const int,char const*const,va_list));
+typedef enum{LOGL_UNDEFINED,LOGL_ERROR,LOGL_WARNING,LOGL_SERIOUSERROR,LOGL_DEBUG} LOGL;
+
+void Log(const LOGL ll,char const*const, ...);
+void subscribe(void(*ls)(const LOGL,char const*const,va_list));
 
 #endif
