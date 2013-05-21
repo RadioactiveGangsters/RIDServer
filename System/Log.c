@@ -5,11 +5,11 @@ LLNODE*subs;
 void subscribe(void(*ls)(const LOGL,char const*const,va_list))
 {
 	if(!ls)return;
-	if(!subs)subs=lle(ls);
-	else lladd(subs,ls);
+	if(!subs)subs=lle((void*)ls);
+	else lladd(subs,(void*)ls);
 }
 
-void Log(const LOGL,char const*const format, ...)
+void Log(const LOGL ll,char const*const format, ...)
 {
 	va_list ap;
 	LLNODE const*n = subs;
