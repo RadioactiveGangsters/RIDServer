@@ -13,11 +13,15 @@ int startDB()
 	return LoadSensors();
 }
 
-Sensor*registerSensor(Sensor const*const s)
+Sensor*registerSensor(Sensor*const s)
 {
 	if(!tbl)
 	{
-		return tbl=triee(s->name,s)->e;
+		tbl=triee(s->name,s);
+		return (tbl)?tbl->e:tbl;
 	}
-	else return trieadd(tbl,s->name,s)->e;
+	{
+		Trie*added=trieadd(tbl,s->name,s);
+		return (added)?added->e:added;
+	}
 }

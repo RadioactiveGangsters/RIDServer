@@ -14,5 +14,22 @@ void Sub(void(*cb)(Sensor*v));
 void UnSub(void(*cb)(Sensor*v));
 
 int LoadSensors(void);
-int generateSensors(char const*const,int const);
+
+
+void
+geniSensors(
+		char const*const type,
+		const int amount,
+		int const lbound,
+		int const ubound,
+		char const*const lalarm,
+		char const*const ualarm
+		);
+
+void
+genbSensors(
+		char const*const type,
+		const int amount,
+		char const*const alarm
+		);
 #endif
