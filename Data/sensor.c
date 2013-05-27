@@ -45,6 +45,7 @@ bSensor*const
 makebSensor(
 		char const*const name,
 		char const*const unit,
+		unsigned int const interval,
 		char const*const alarm
 		)
 {
@@ -52,6 +53,7 @@ makebSensor(
 	{
 		.base.type=binarysensor,
 		.base.stamp=time(0),
+		.base.interval=interval,
 		.value=0,
 	};
 
@@ -74,6 +76,7 @@ iSensor*const
 makeiSensor(
 		char const*const name,
 		char const*const unit,
+		unsigned int const interval,
 		int const lbound,
 		int const ubound,
 		char const*const lalarm,
@@ -84,6 +87,7 @@ makeiSensor(
 	{
 		.base.type=integersensor,
 		.base.stamp=time(0),
+		.base.interval=interval,
 		.lbound=lbound,
 		.ubound=ubound,
 		.value=(lbound+ubound)/2,

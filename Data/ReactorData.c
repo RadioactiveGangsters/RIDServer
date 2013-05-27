@@ -48,17 +48,20 @@ int LoadSensors(void)
 			const unsigned int namelen=idstringlen+4;
 			const unsigned int amountlen=idstringlen+5;
 			const unsigned int typelen=idstringlen+4;
+			const unsigned int intervallen=idstringlen+8;
 			char idstring[idstringlen];
 			char name[namelen];
 			char amount[amountlen];
 			char typeq[typelen];
+			char intervalq[intervallen];
 			sensortype stype=integersensor;
 
 			snprintf(idstring,sizeof(char)*idstringlen,"sensor:type%d",typecount);
 			snprintf(name,sizeof(char)*namelen,"%s%s",idstring,"name");
 			snprintf(amount,sizeof(char)*amountlen,"%s%s",idstring,"count");
+			snprintf(intervalq,sizeof(char)*intervallen,"%s%s",idstring,"interval");
 
-			if(!iniparser_find_entry(ini,name)||!iniparser_find_entry(ini,amount))
+			if(!iniparser_find_entry(ini,name)||!iniparser_find_entry(ini,amount)||!iniparser_find_entry(ini,intervalq))
 			{
 				Log(255,"skipping incomplete %s definition\n",idstring);
 				continue;
@@ -88,6 +91,7 @@ int LoadSensors(void)
 					genbSensors(
 						iniparser_getstring(ini,name,"genericb"),
 						iniparser_getint(ini,amount,0),
+						iniparser_getint(ini,intervalq,1000),
 						iniparser_getstring(ini,alarmq,"Alarm!"));
 				}
 				else if(stype==integersensor)
@@ -107,6 +111,7 @@ int LoadSensors(void)
 					geniSensors(
 						iniparser_getstring(ini,name,"generici"),
 						iniparser_getint(ini,amount,0),
+						iniparser_getint(ini,intervalq,1000),
 						iniparser_getint(ini,lboundq,0),
 						iniparser_getint(ini,uboundq,100),
 						iniparser_getstring(ini,lalarmq,"lower bound Alarm!"),
@@ -133,6 +138,7 @@ void
 genbSensors(
 		char const*const type,
 		const int amount,
+		unsigned int const interval,
 		char const*const alarm
 		)
 {
@@ -154,14 +160,14 @@ genbSensors(
 
 		// make one
 		{
-			Sensor*const s=(Sensor*)makebSensor(name,type,alarm);
+			Sensor*const s=(Sensor*)makebSensor(name,type,interval,alarm);
 			if(!s)
 			{
 				Log(1,"out of memory");
 				break;
 			}
 
-			Log(2,"generated %s{%d,%s,%d,%d,%s}\n",s->name,s->type,s->unit,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
+			Log(2,"generated %s %s{%s,%d,%d,%d,%s}\n",s->type==binarysensor?"binary":"integer",s->name,s->unit,s->interval,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
 			
 			// register them with the databases
 			if(registerSensor(s))
@@ -178,6 +184,7 @@ void
 geniSensors(
 		char const*const type,
 		const int amount,
+		unsigned int const interval,
 		int const lbound,
 		int const ubound,
 		char const*const lalarm,
@@ -202,14 +209,23 @@ geniSensors(
 
 		{
 			// make one
-			Sensor*const s=(Sensor*)makeiSensor(name,type,lbound,ubound,lalarm,ualarm);
+			Sensor*const s=(Sensor*)makeiSensor(name,type,interval,lbound,ubound,lalarm,ualarm);
 			if(!s)
 			{
 				Log(1,"out of memory");
 				break;
 			}
 
-			Log(2,"generated %s{%d,%s,%d,%d,%d,%s,%s}\n",s->name,s->type,s->unit,((iSensor*)s)->value,((iSensor*)s)->lbound,((iSensor*)s)->ubound,((iSensor*)s)->lalarm,((iSensor*)s)->ualarm);
+			Log(2,"generated %s %s{%s,%d, %d,%d,%d,%s,%s}\n",
+				s->type==binarysensor?"binary":"integer",
+				s->name,
+				s->unit,
+				s->interval,
+				((iSensor*)s)->value,
+				((iSensor*)s)->lbound,
+				((iSensor*)s)->ubound,
+				((iSensor*)s)->lalarm,
+				((iSensor*)s)->ualarm);
 			
 			// register them with the databases
 			if(registerSensor(s))

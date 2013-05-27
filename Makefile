@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -pipe -O3 -pedantic-errors -Wall -Wextra -Werror -std=c99 -x c
-CFLAGS = -pipe -Wall -std=c99 -pedantic
+CFLAGS = -pipe -Wall -std=c99 -pedantic -g
 LINKERFLAGS = -l iniparser -fwhole-program
 FRONTEND = CLI
 LINT = splint
@@ -31,7 +31,7 @@ $(TARGET) : $(OBJS)
 	$(CC) $(CFLAGS) $(LINKERFLAGS) -o $(TARGET) $(OBJS)
 
 %.o : %.c %.h.gch
-	#-$(LINT) $(LINTFLAGS) $<
+	-$(LINT) $(LINTFLAGS) $<
 	$(CC) $(CFLAGS) -o $@ -c $< 
 
 %.h.gch : %.h

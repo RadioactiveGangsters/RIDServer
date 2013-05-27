@@ -56,6 +56,7 @@ iSensor*const
 makeiSensor(
 		char const*const name,
 		char const*const unit,
+		unsigned int const interval,
 		int const lbound,
 		int const ubound,
 		char const*const lalarm,
@@ -66,6 +67,7 @@ bSensor*const
 makebSensor(
 		char const*const name,
 		char const*const unit,
+		unsigned int const interval,
 		char const*const alarm
 		);
 

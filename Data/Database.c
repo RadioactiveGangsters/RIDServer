@@ -24,7 +24,6 @@ int registerSensor(Sensor*const s)
 	// cannot register invalid sensor
 	if(!s||!s->unit||!s->name) return 0;
 	// do we have a db yet?
-	Log(4,"Registering %s on %s\n",s->name,s->unit);
 	if(!db)
 	{
 		Log(4,"DB uninitialised, making one.\n");

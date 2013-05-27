@@ -20,6 +20,7 @@ void
 geniSensors(
 		char const*const type,
 		const int amount,
+		unsigned int const interval,
 		int const lbound,
 		int const ubound,
 		char const*const lalarm,
@@ -30,6 +31,7 @@ void
 genbSensors(
 		char const*const type,
 		const int amount,
+		unsigned int const interval,
 		char const*const alarm
 		);
 #endif
