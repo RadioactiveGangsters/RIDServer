@@ -41,7 +41,7 @@ void SetupSensors(void)
 	_sensseed=(unsigned)rand();    
 }
 
-bSensor*const
+bSensor*
 makebSensor(
 		char const*const name,
 		char const*const unit,
@@ -49,12 +49,21 @@ makebSensor(
 		char const*const alarm
 		)
 {
+	Sensor base=
+	{
+		.name="genericb",
+		.unit="on/off",
+		.type=binarysensor,
+		.stamp=time(0),
+		.interval=interval,
+		.delta=NULL,
+	};
+
 	bSensor s=
 	{
-		.base.type=binarysensor,
-		.base.stamp=time(0),
-		.base.interval=interval,
+		.base=base,
 		.value=0,
+		.alarm="Alarm!",
 	};
 
 	strncpy(s.base.name,name,sizeof(char)*SENSOR_HNAMELEN);
@@ -72,7 +81,7 @@ makebSensor(
 	}
 }
 
-iSensor*const
+iSensor*
 makeiSensor(
 		char const*const name,
 		char const*const unit,
@@ -83,13 +92,23 @@ makeiSensor(
 		char const*const ualarm
 		)
 {
+	Sensor base=
+	{
+		.name="generici",
+		.unit="generici",
+		.type=integersensor,
+		.stamp=time(0),
+		.interval=interval,
+		.delta=NULL,
+	};
+
 	iSensor s=
 	{
-		.base.type=integersensor,
-		.base.stamp=time(0),
-		.base.interval=interval,
+		.base=base,
 		.lbound=lbound,
 		.ubound=ubound,
+		.lalarm="lower bound Alarm!",
+		.ualarm="upper bound Alarm!",
 		.value=(lbound+ubound)/2,
 	};
 

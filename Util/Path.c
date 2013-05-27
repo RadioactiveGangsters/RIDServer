@@ -1,6 +1,11 @@
 #include "Path.h"
 
-char*sensorinipath(void)
+inline char*sensorinipath(void)
 {
 	return "sensor.ini";
+}
+
+inline char*fileprinterpath(void)
+{
+	return "printher.txt";
 }

@@ -2,6 +2,7 @@
 #define REACTORDATA_H
 
 #include <iniparser.h>
+#include <pthread.h>
 
 #include "../Util/LinkedList.h"
 #include "../System/Log.h"
@@ -10,28 +11,8 @@
 #include "sensor.h"
 #include "Database.h"
 
-void Sub(void(*cb)(Sensor*v));
-void UnSub(void(*cb)(Sensor*v));
-
 int LoadSensors(void);
 
+int SensorSimulation(void);
 
-void
-geniSensors(
-		char const*const type,
-		const int amount,
-		unsigned int const interval,
-		int const lbound,
-		int const ubound,
-		char const*const lalarm,
-		char const*const ualarm
-		);
-
-void
-genbSensors(
-		char const*const type,
-		const int amount,
-		unsigned int const interval,
-		char const*const alarm
-		);
 #endif

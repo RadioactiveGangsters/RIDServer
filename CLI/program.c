@@ -9,7 +9,7 @@ void console(const int ll,char const*const le,va_list ap)
 int main(int argc,char**argv)
 {
 	subscribe(&console);
-	InitServer(argc,argv);
+	InitServer(argc,(char const*const*const)argv);
 	// TODO: check if successful.
 	(void)StartServer();
 	printf("Done.\n");

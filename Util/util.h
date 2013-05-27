@@ -12,7 +12,7 @@ typedef struct
 	void(*f)(void*);
 } delegate;
 
-unsigned int numlen(unsigned const int);
+unsigned int numlen(/*@+ignoresigns@*/unsigned const int);
 
 #endif	/* UTIL_H */
 

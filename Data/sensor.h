@@ -52,7 +52,7 @@ void SetupSensors(void);
 void initSensorValue(int*const, unsigned int const);
 void setNewSensorValue(int const, int*const, unsigned int const);
 
-iSensor*const
+iSensor*
 makeiSensor(
 		char const*const name,
 		char const*const unit,
@@ -63,7 +63,7 @@ makeiSensor(
 		char const*const ualarm
 		);
 
-bSensor*const
+bSensor*
 makebSensor(
 		char const*const name,
 		char const*const unit,

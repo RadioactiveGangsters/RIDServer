@@ -1,23 +1,160 @@
 #include "ReactorData.h"
 
-LLNODE*subs;
+static LLNODE*threads = NULL;
+static volatile bool stopsimulation=false;
 
-void Sub(void(*cb)(Sensor*v))
+static void SimulateSensor(Trie*const sensor)
 {
-	if(!subs)
+	if(!sensor)return;
+	Log(4,"Simulating %s\n",sensor->id);
+}
+
+static void*SimulateType(void*const rawtable)
+{
+	if(!rawtable)
+		pthread_exit(NULL);
 	{
-		subs=lle((void*)cb);
+		Trie*const table=rawtable;
+		Sensor const*const example=table->e;
+		if(example->interval)
+		{
+			while(!stopsimulation)
+			{
+				fortrie(table,&SimulateSensor);
+				sleep(example->interval);
+			}
+		}
 	}
-	else
+	pthread_exit(NULL);
+}
+
+static void registerthread(Trie*const table)
+{
+	if(!table)return;
+	if(!table->e)return;
 	{
-		lladd(subs,(void*)cb);	
+		pthread_t typethread;
+		pthread_create(&typethread,NULL,&SimulateType,table->e);
+		if(!threads)
+		{
+			threads=lle(&typethread);
+		}
+		else
+		{
+			lladd(threads,&typethread);
+		}
 	}
 }
 
-void UnSub(void(*cb)(Sensor*v))
+void StartSensorSimulation()
 {
-	LLNODE*h=llrm(subs,(void*)cb);
-	if(h)free(h);
+	Trie*const db=Tables();
+	fortrie(db,&registerthread);
+}
+
+static void
+genbSensors(
+		char const*const type,
+		const int amount,
+		unsigned int const interval,
+		char const*const alarm
+		)
+{
+	// generate the requested amount
+	int i;
+	for(i=0;i<amount;i++)
+	{
+		// generate a generic name
+		const unsigned int namelen=1+strlen(type)+numlen((unsigned)i);
+		char name[namelen];
+		snprintf(name,sizeof(char)*namelen,"%s%d",type,i);
+
+		// valid?
+		if(namelen>SENSOR_HNAMELEN)
+		{
+			Log(1,"Name %s too long! (skipping rest of this batch)\n", name);
+			break;
+		}
+
+		// make one
+		{
+			Sensor*const s=(Sensor*)makebSensor(name,type,interval,alarm);
+			if(!s)
+			{
+				Log(1,"out of memory");
+				break;
+			}
+
+			Log(2,"generated %s %s{%s,%d,%d,%d,%s}\n",s->type==binarysensor?"binary":"integer",s->name,s->unit,s->interval,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
+			
+			// register them with the databases
+			if(registerSensor(s))
+			{
+				Log(1,"cannot register %s\n",s->name);
+				free(s);
+				continue;
+			}
+		}
+	}
+}
+
+static void
+geniSensors(
+		char const*const type,
+		const int amount,
+		unsigned int const interval,
+		int const lbound,
+		int const ubound,
+		char const*const lalarm,
+		char const*const ualarm
+		)
+{
+	// generate the requested amount
+	int i;
+	for(i=0;i<amount;i++)
+	{
+		// generate a generic name
+		const unsigned int namelen=1+strlen(type)+numlen((unsigned)i);
+		char name[namelen];
+		snprintf(name,sizeof(char)*namelen,"%s%d",type,i);
+
+		// valid?
+		if(namelen>SENSOR_HNAMELEN)
+		{
+			Log(1,"Name %s too long! (skipping rest of this batch)\n", name);
+			break;
+		}
+
+		{
+			// make one
+			Sensor*const s=(Sensor*)makeiSensor(name,type,interval,lbound,ubound,lalarm,ualarm);
+			if(!s)
+			{
+				Log(1,"out of memory");
+				break;
+			}
+
+			Log(2,"generated %s %s{%s,%d, %d,%d,%d,%s,%s}\n",
+				s->type==binarysensor?"binary":"integer",
+				s->name,
+				s->unit,
+				s->interval,
+				((iSensor*)s)->value,
+				((iSensor*)s)->lbound,
+				((iSensor*)s)->ubound,
+				((iSensor*)s)->lalarm,
+				((iSensor*)s)->ualarm);
+			
+			// register them with the databases
+			if(registerSensor(s))
+			{
+				Log(1,"cannot register %s\n",s->name);
+				free(s);
+				continue;
+			}
+		}
+	}
+
 }
 
 int LoadSensors(void)
@@ -91,7 +228,7 @@ int LoadSensors(void)
 					genbSensors(
 						iniparser_getstring(ini,name,"genericb"),
 						iniparser_getint(ini,amount,0),
-						iniparser_getint(ini,intervalq,1000),
+						(unsigned)iniparser_getint(ini,intervalq,1000),
 						iniparser_getstring(ini,alarmq,"Alarm!"));
 				}
 				else if(stype==integersensor)
@@ -111,7 +248,7 @@ int LoadSensors(void)
 					geniSensors(
 						iniparser_getstring(ini,name,"generici"),
 						iniparser_getint(ini,amount,0),
-						iniparser_getint(ini,intervalq,1000),
+						(unsigned)iniparser_getint(ini,intervalq,1000),
 						iniparser_getint(ini,lboundq,0),
 						iniparser_getint(ini,uboundq,100),
 						iniparser_getstring(ini,lalarmq,"lower bound Alarm!"),
@@ -132,109 +269,4 @@ int LoadSensors(void)
 	exit_failure:
 		iniparser_freedict(ini);
 		return EXIT_FAILURE;
-}
-
-void
-genbSensors(
-		char const*const type,
-		const int amount,
-		unsigned int const interval,
-		char const*const alarm
-		)
-{
-	// generate the requested amount
-	int i;
-	for(i=0;i<amount;i++)
-	{
-		// generate a generic name
-		const unsigned int namelen=1+strlen(type)+numlen((unsigned)i);
-		char name[namelen];
-		snprintf(name,sizeof(char)*namelen,"%s%d",type,i);
-
-		// valid?
-		if(namelen>SENSOR_HNAMELEN)
-		{
-			Log(1,"Name %s too long! (skipping rest of this batch)\n", name);
-			break;
-		}
-
-		// make one
-		{
-			Sensor*const s=(Sensor*)makebSensor(name,type,interval,alarm);
-			if(!s)
-			{
-				Log(1,"out of memory");
-				break;
-			}
-
-			Log(2,"generated %s %s{%s,%d,%d,%d,%s}\n",s->type==binarysensor?"binary":"integer",s->name,s->unit,s->interval,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
-			
-			// register them with the databases
-			if(registerSensor(s))
-			{
-				Log(1,"cannot register %s\n",s->name);
-				free(s);
-				continue;
-			}
-		}
-	}
-}
-
-void
-geniSensors(
-		char const*const type,
-		const int amount,
-		unsigned int const interval,
-		int const lbound,
-		int const ubound,
-		char const*const lalarm,
-		char const*const ualarm
-		)
-{
-	// generate the requested amount
-	int i;
-	for(i=0;i<amount;i++)
-	{
-		// generate a generic name
-		const unsigned int namelen=1+strlen(type)+numlen((unsigned)i);
-		char name[namelen];
-		snprintf(name,sizeof(char)*namelen,"%s%d",type,i);
-
-		// valid?
-		if(namelen>SENSOR_HNAMELEN)
-		{
-			Log(1,"Name %s too long! (skipping rest of this batch)\n", name);
-			break;
-		}
-
-		{
-			// make one
-			Sensor*const s=(Sensor*)makeiSensor(name,type,interval,lbound,ubound,lalarm,ualarm);
-			if(!s)
-			{
-				Log(1,"out of memory");
-				break;
-			}
-
-			Log(2,"generated %s %s{%s,%d, %d,%d,%d,%s,%s}\n",
-				s->type==binarysensor?"binary":"integer",
-				s->name,
-				s->unit,
-				s->interval,
-				((iSensor*)s)->value,
-				((iSensor*)s)->lbound,
-				((iSensor*)s)->ubound,
-				((iSensor*)s)->lalarm,
-				((iSensor*)s)->ualarm);
-			
-			// register them with the databases
-			if(registerSensor(s))
-			{
-				Log(1,"cannot register %s\n",s->name);
-				free(s);
-				continue;
-			}
-		}
-	}
-
 }

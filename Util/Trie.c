@@ -15,7 +15,7 @@ Trie*triee(char*const id,void*const e)
 	}
 }
 
-Trie*const travp(Trie*const root,char const*const id)
+Trie*travp(Trie*const root,char const*const id)
 {
 	//can't traverse rootless trie or find no id
 	if(!root||!id)
@@ -47,7 +47,7 @@ Trie*const travp(Trie*const root,char const*const id)
 	}
 }
 
-Trie*const trav(Trie*const root,char const*const id)
+Trie*trav(Trie*const root,char const*const id)
 {
 	if(root==NULL)
 		return NULL;
@@ -145,4 +145,12 @@ Trie*trierm(Trie*const root,char const*const id)
 		// Remove the item from the trie
 		return *target=(*target)->g;
 	}
+}
+
+void fortrie(Trie*const trie,void(*cb)(Trie*const))
+{
+	if(!trie)return;
+	fortrie(trie->l,cb);
+	fortrie(trie->g,cb);
+	cb(trie);
 }

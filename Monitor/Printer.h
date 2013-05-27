@@ -14,5 +14,6 @@
 #include "../Data/sensor.h"
 #include "../System/Log.h"
 #include "../Util/util.h"
+#include "../Util/Path.h"
 
 #endif	/* PRINTER_H */

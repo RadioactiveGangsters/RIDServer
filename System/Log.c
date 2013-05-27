@@ -5,8 +5,8 @@ LLNODE*subs;
 void subscribe(void(*ls)(const int,char const*const,va_list))
 {
 	if(!ls)return;
-	if(!subs)subs=lle(ls);
-	else lladd(subs,ls);
+	if(!subs)subs=lle((void*)ls);
+	else lladd(subs,(void*)ls);
 }
 
 void Log(const int ll,char const*const format, ...)

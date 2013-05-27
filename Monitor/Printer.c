@@ -16,7 +16,7 @@ int storeToFile(char const*const path, char const*const data);
 void getSensorData(Sensor* sensor)
 {
     int Values[MAXVALUES];//TODO: Get Data from DB    
-    char const*const path; //TODO: Set Path of output file
+    char const*const path = fileprinterpath(); //TODO: Set Path of output file
     char *sensorName = sensor->name;
     
     int min = getMin(Values);
@@ -35,17 +35,17 @@ void getSensorData(Sensor* sensor)
 	
 	//Add Minimum value
     strcat(data," | Min: ");
-    sprintf(buffer, "%d", min);
+    snprintf(buffer, sizeof(char)*numlen(max), "%d", min);
     strcat(data, buffer);
 	
 	//Add Maximum value
     strcat(data," | Max: ");
-    sprintf(buffer, "%d", max);
+    snprintf(buffer, sizeof(char)*numlen(max), "%d", max);
     strcat(data, buffer);
 	
 	//Add Mean value
     strcat(data," | Mean: ");
-    sprintf(buffer, "%d", mean);
+    snprintf(buffer, sizeof(char)*numlen(max), "%d", mean);
     strcat(data, buffer);
     
 	//Write data to file and check if succesfull
@@ -57,8 +57,8 @@ void getSensorData(Sensor* sensor)
 
 int getMin(int Values[])
 {
-    int min = 0;
-    for (int i = 0; i < MAXVALUES; i++)
+    int min = 0,i;
+    for (i = 0; i < MAXVALUES; i++)
     {
         if (i == 0)
         {         
@@ -77,8 +77,8 @@ int getMin(int Values[])
 
 int getMax(int Values[])
 {
-    int max = 0;
-    for (int i = 0; i < MAXVALUES; i++)
+    int max = 0,i;
+    for (i = 0; i < MAXVALUES; i++)
     {
         if (i == 0)
         {         
@@ -97,12 +97,12 @@ int getMax(int Values[])
 
 int calcMean(int Values[])
 {
-    int total = 0;
-    for(int i = 0; i < MAXVALUES; i++)
+    int total = 0,i,mean;
+    for(i = 0; i < MAXVALUES; i++)
     {
         total += Values[i];
     }
-    int mean = 0;
+    mean = 0;
     if(!(total == 0)){ mean = (total/MAXVALUES); }
     return mean;
 }

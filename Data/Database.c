@@ -1,8 +1,28 @@
 #include "Database.h"
 
-Trie*db;
+static Trie*db;
 
-int startDB()
+static LLNODE*subs;
+
+void Sub(void(*cb)(Sensor*v))
+{
+	if(!subs)
+	{
+		subs=lle((void*)cb);
+	}
+	else
+	{
+		lladd(subs,(void*)cb);	
+	}
+}
+
+void UnSub(void(*cb)(Sensor*v))
+{
+	LLNODE*h=llrm(subs,(void*)cb);
+	if(h)free(h);
+}
+
+int OpenDatabase()
 {
 	if(db)
 	{
@@ -65,4 +85,20 @@ int registerSensor(Sensor*const s)
 		}
 		return EXIT_SUCCESS;
 	}
+}
+
+Trie const*Sensortable(char const*const type)
+{
+	if(!type)return NULL;
+	if(!db)return NULL;
+	{
+		Trie*found=trav(db,type);
+		if(!strcmp(found->id,type))return found;
+		return NULL;
+	}
+}
+
+Trie*Tables(void)
+{
+	return db;
 }

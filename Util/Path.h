@@ -7,5 +7,6 @@ typedef struct
 } _path;
 
 char*sensorinipath(void);
+char*fileprinterpath(void);
 
 #endif
