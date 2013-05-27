@@ -51,7 +51,7 @@ void getSensorData(Sensor* sensor)
 	//Write data to file and check if succesfull
     if(!storeToFile(path, data))
     {
-        Log(1, "Couldn't store data of %s to file\n", sensorName);
+        Log(LOGL_ERROR, "Couldn't store data of %s to file\n", sensorName);
     }
 }
 

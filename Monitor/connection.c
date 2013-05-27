@@ -28,23 +28,23 @@ int socklisten()
     while( 1 )
     {
         char ch;
-        Log(4,"server wait...\n" );
+        Log(LOGL_SYSTEM_ACTIVITY,"server wait...\n" );
 
         client_len = (socklen_t)sizeof( client_address );
         client_sockfd = accept( server_sockfd, ( struct sockaddr *)&client_address, &client_len );
 
-        Log(3, "Client connected \n" );
+        Log(LOGL_CLIENT_ACTIVITY, "Client connected \n" );
 
         if( fork() == 0 )
         {
             if( read( client_sockfd, &ch, 1 ) ) break; 
-            Log(2, "Client send = %c\n", ch );
+            Log(LOGL_DEBUG, "Client send = %c\n", ch );
 
             ch++;
 
             if( sleep( 5 ) ) break;
 
-            Log(2, "Server send = %c\n", ch );
+            Log(LOGL_DEBUG, "Server send = %c\n", ch );
             if( write( client_sockfd, &ch, 1 ) ) continue;
             (void)close( client_sockfd );
             return EXIT_SUCCESS;

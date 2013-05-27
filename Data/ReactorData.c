@@ -32,7 +32,7 @@ static void SimulateSensor(Trie*const sensor)
 				initSensorValue(&(((iSensor*)sensor)->value),((iSensor*)sensor)->ubound);
 			}
 		}
-		Log(4,"Simulated %d>>%s\n",((iSensor*)s)->value,s->name);
+		Log(LOGL_DEBUG,"Simulated %d>>%s\n",((iSensor*)s)->value,s->name);
 	}
 }
 
@@ -61,7 +61,7 @@ static void registerthread(Trie*const table)
 	if(!table->e)return;
 	{
 		pthread_t typethread;
-		Log(3,"creating simulation thread for %s\n",table->id);
+		Log(LOGL_SYSTEM_ACTIVITY,"creating simulation thread for %s\n",table->id);
 		pthread_create(&typethread,NULL,&SimulateType,table->e);
 		if(!threads)
 		{
@@ -100,7 +100,7 @@ genbSensors(
 		// valid?
 		if(namelen>SENSOR_HNAMELEN)
 		{
-			Log(1,"Name %s too long! (skipping rest of this batch)\n", name);
+			Log(LOGL_ERROR,"Name %s too long! (skipping rest of this batch)\n", name);
 			break;
 		}
 
@@ -109,16 +109,16 @@ genbSensors(
 			Sensor*const s=(Sensor*)makebSensor(name,type,interval,alarm);
 			if(!s)
 			{
-				Log(1,"out of memory");
+				Log(LOGL_ERROR,"out of memory");
 				break;
 			}
 
-			Log(2,"generated %s %s{%s,%d,%d,%d,%s}\n",s->type==binarysensor?"binary":"integer",s->name,s->unit,s->interval,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
+			Log(LOGL_DEBUG,"generated %s %s{%s,%d,%d,%d,%s}\n",s->type==binarysensor?"binary":"integer",s->name,s->unit,s->interval,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
 			
 			// register them with the databases
 			if(registerSensor(s))
 			{
-				Log(1,"cannot register %s\n",s->name);
+				Log(LOGL_ERROR,"cannot register %s\n",s->name);
 				free(s);
 				continue;
 			}
@@ -149,7 +149,7 @@ geniSensors(
 		// valid?
 		if(namelen>SENSOR_HNAMELEN)
 		{
-			Log(1,"Name %s too long! (skipping rest of this batch)\n", name);
+			Log(LOGL_ERROR,"Name %s too long! (skipping rest of this batch)\n", name);
 			break;
 		}
 
@@ -158,11 +158,11 @@ geniSensors(
 			Sensor*const s=(Sensor*)makeiSensor(name,type,interval,lbound,ubound,lalarm,ualarm);
 			if(!s)
 			{
-				Log(1,"out of memory");
+				Log(LOGL_ERROR,"out of memory");
 				break;
 			}
 
-			Log(2,"generated %s %s{%s,%d, %d,%d,%d,%s,%s}\n",
+			Log(LOGL_DEBUG,"generated %s %s{%s,%d, %d,%d,%d,%s,%s}\n",
 				s->type==binarysensor?"binary":"integer",
 				s->name,
 				s->unit,
@@ -176,7 +176,7 @@ geniSensors(
 			// register them with the databases
 			if(registerSensor(s))
 			{
-				Log(1,"cannot register %s\n",s->name);
+				Log(LOGL_ERROR,"cannot register %s\n",s->name);
 				free(s);
 				continue;
 			}
@@ -197,12 +197,12 @@ int LoadSensors(void)
 
 	if(!iniparser_find_entry(ini,"sensor"))
 	{
-		Log(1,"File %s does not contain sensor config section\n", sensorinipath());
+		Log(LOGL_ERROR,"File %s does not contain sensor config section\n", sensorinipath());
 		goto exit_failure;
 	}
 	if(!iniparser_find_entry(ini,"sensor:typecount"))
 	{
-		Log(1,"No sensor typecount present\n");
+		Log(LOGL_ERROR,"No sensor typecount present\n");
 		goto exit_failure;
 	}
 	{
@@ -231,7 +231,7 @@ int LoadSensors(void)
 
 			if(!iniparser_find_entry(ini,name)||!iniparser_find_entry(ini,amount)||!iniparser_find_entry(ini,intervalq))
 			{
-				Log(255,"skipping incomplete %s definition\n",idstring);
+				Log(LOGL_WARNING,"skipping incomplete %s definition\n",idstring);
 				continue;
 			}
 
@@ -246,7 +246,7 @@ int LoadSensors(void)
 				else if(!strcmp(typea,"integer")){;/*fallthrough*/;}
 				else
 				{
-					Log(2,"unrecognised type %s, falling back on integer");
+					Log(LOGL_WARNING,"unrecognised type %s, falling back on integer");
 				}
 	
 				if(stype==binarysensor)
@@ -288,7 +288,7 @@ int LoadSensors(void)
 				}
 				else
 				{
-					Log(1,"unknown sensor type %d from %s.\n",stype,typea);
+					Log(LOGL_ERROR,"unknown sensor type %d from %s.\n",stype,typea);
 				}
 			}		
 		}
