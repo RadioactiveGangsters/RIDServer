@@ -4,8 +4,10 @@
 #include <iniparser.h>
 #include <pthread.h>
 
-#include "../Util/LinkedList.h"
 #include "../System/Log.h"
+#include "../Util/LinkedList.h"
+#include "../Util/DeathRow.h"
+#include "../Util/Trie.h"
 #include "../Util/Path.h"
 #include "../Util/util.h"
 #include "sensor.h"

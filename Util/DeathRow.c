@@ -16,8 +16,7 @@ AutoQ*AutoQe(void*const e,unsigned int const space)
 	return _AutoQe(e,NULL,space);
 }
 
-AutoQ*ale(AutoQ*const r);
-inline AutoQ*ale(AutoQ*const r)
+static AutoQ*ale(AutoQ*const r)
 {
 	// return the next-to-last element or r itself.
 	return (!r||!r->n||!r->n->n)?r:ale(r->n);

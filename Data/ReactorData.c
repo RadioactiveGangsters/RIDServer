@@ -6,7 +6,34 @@ static volatile bool stopsimulation=false;
 static void SimulateSensor(Trie*const sensor)
 {
 	if(!sensor)return;
-	Log(4,"Simulating %s\n",sensor->id);
+	if(!sensor->e)return;
+	{
+		Sensor*const s=sensor->e;
+		// is initialised?
+		if(!s->delta) 
+		{
+			if(s->type==binarysensor)
+			{
+			}
+			else if(s->type==integersensor)
+			{
+				initSensorValue(&(((iSensor*)sensor)->value),((iSensor*)sensor)->ubound);
+				s->delta=AutoQe(&(((iSensor*)s)->value),s->interval);
+			}
+		}
+		else
+		{
+			if(s->type==binarysensor)
+			{
+			}
+			else if(s->type==integersensor)
+			{
+				s->delta=AutoQadd(s->delta,&(((iSensor*)s)->value));
+				initSensorValue(&(((iSensor*)sensor)->value),((iSensor*)sensor)->ubound);
+			}
+		}
+		Log(4,"Simulated %d>>%s\n",((iSensor*)s)->value,s->name);
+	}
 }
 
 static void*SimulateType(void*const rawtable)
@@ -164,6 +191,9 @@ int LoadSensors(void)
 	dictionary*ini=iniparser_load(sensorinipath());
 	if(!ini)
 		return EXIT_FAILURE;
+
+	// just to be sure
+	SetupSensors();
 
 	if(!iniparser_find_entry(ini,"sensor"))
 	{

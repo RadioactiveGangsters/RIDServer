@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -O3
 CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic -g
-LINKERFLAGS = -l iniparser -lpthread -fwhole-program
+LINKERFLAGS = -liniparser -lpthread -fwhole-program
 FRONTEND = CLI
 LINT = splint
 LINTFLAGS = +quiet -warnposix +weak -castfcnptr
@@ -13,7 +13,7 @@ OBJS = $(FRONTEND)/program.o \
 		System/Server.o System/Log.o\
 		Monitor/connection.o Monitor/Printer.o \
 		Data/Database.o Data/ReactorData.o Data/sensor.o \
-		Util/LinkedList.o Util/Trie.o Util/Path.o Util/util.o Util/DeathRow.o
+		Util/LinkedList.o Util/Trie.o Util/Path.o Util/DeathRow.o Util/util.o \
 		
 
 .PHONY : all
@@ -28,7 +28,7 @@ clean :
 	-rm $(OBJS)
 
 $(TARGET) : $(OBJS)
-	$(CC) $(CFLAGS) $(LINKERFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LINKERFLAGS) -o $(TARGET)
 
 %.o : %.c %.h.gch
 	-$(LINT) $(LINTFLAGS) $<
