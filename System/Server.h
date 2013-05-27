@@ -6,6 +6,7 @@
 #include "../Monitor/connection.h"
 #include "Log.h"
 #include "../Data/Database.h"
+#include "../Data/ReactorData.h"
 
 int InitServer(const int, char const*const*const);
 int StartServer(void);

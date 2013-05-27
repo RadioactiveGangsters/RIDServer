@@ -13,6 +13,6 @@
 
 int LoadSensors(void);
 
-int SensorSimulation(void);
+void StartSensorSimulation(void);
 
 #endif

@@ -72,12 +72,25 @@ int registerSensor(Sensor*const s)
 			// found something like it, but not exact, add it.
 			// linking like this saves a traversal.
 			// FIXME: memory leak
-			tbl=trieadd(tbl,s->unit,triee(s->unit,s));
+			tbl=trieadd(tbl,s->unit,triee(s->name,s));
 		}
 		else
 		{
-			return trieadd(tbl,s->name,s)?EXIT_SUCCESS:EXIT_FAILURE;
+			if(!trieadd(tbl->e,s->name,s))
+			{
+				if(!tbl->e)
+				{
+					Log(1,"Database structure corrupt, this is a bug.");
+				}
+				else
+				{
+					tbl=tbl->e;
+					Log(1,"Cannot add to table %s\n",tbl->id);
+				}
+				return EXIT_FAILURE;
+			}
 		}
+
 		if(!tbl)
 		{
 			Log(1,"cannot link new %s table\n",s->unit);

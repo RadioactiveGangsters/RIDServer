@@ -34,6 +34,7 @@ static void registerthread(Trie*const table)
 	if(!table->e)return;
 	{
 		pthread_t typethread;
+		Log(3,"creating simulation thread for %s\n",table->id);
 		pthread_create(&typethread,NULL,&SimulateType,table->e);
 		if(!threads)
 		{
@@ -46,7 +47,7 @@ static void registerthread(Trie*const table)
 	}
 }
 
-void StartSensorSimulation()
+void StartSensorSimulation(void)
 {
 	Trie*const db=Tables();
 	fortrie(db,&registerthread);
