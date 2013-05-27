@@ -4,9 +4,11 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define RTRIE_HNAMELEN 128
+
 typedef struct _Trie
 {
-	char id[128];
+	char id[RTRIE_HNAMELEN];
 	void*e;
 	struct _Trie*l;
 	struct _Trie*g;

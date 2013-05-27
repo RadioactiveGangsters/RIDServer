@@ -55,9 +55,9 @@ makebSensor(
 		.value=0,
 	};
 
-	strncpy(&(s.base.name),name,sizeof(char)*SENSOR_HNAMELEN);
-	strncpy(&(s.base.unit),unit,sizeof(char)*SENSOR_HUNITLEN);
-	strncpy(&(s.alarm),alarm,sizeof(char)*SENSOR_HALARMLEN);
+	strncpy(s.base.name,name,sizeof(char)*SENSOR_HNAMELEN);
+	strncpy(s.base.unit,unit,sizeof(char)*SENSOR_HUNITLEN);
+	strncpy(s.alarm,alarm,sizeof(char)*SENSOR_HALARMLEN);
 
 	{
 		bSensor*const p=malloc(sizeof*p);
@@ -89,10 +89,10 @@ makeiSensor(
 		.value=(lbound+ubound)/2,
 	};
 
-	strncpy(&(s.base.name),name,sizeof(char)*SENSOR_HNAMELEN);
-	strncpy(&(s.base.unit),unit,sizeof(char)*SENSOR_HUNITLEN);
-	strncpy(&(s.lalarm),lalarm,sizeof(char)*SENSOR_HALARMLEN);
-	strncpy(&(s.ualarm),ualarm,sizeof(char)*SENSOR_HALARMLEN);
+	strncpy(s.base.name,name,sizeof(char)*SENSOR_HNAMELEN);
+	strncpy(s.base.unit,unit,sizeof(char)*SENSOR_HUNITLEN);
+	strncpy(s.lalarm,lalarm,sizeof(char)*SENSOR_HALARMLEN);
+	strncpy(s.ualarm,ualarm,sizeof(char)*SENSOR_HALARMLEN);
 
 	{
 		iSensor*const p=malloc(sizeof*p);

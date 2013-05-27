@@ -2,19 +2,23 @@
 
 Trie*triee(char*const id,void*const e)
 {
-	Trie*x = (Trie*)malloc(sizeof(Trie));
-	strcpy(x->id,id);
-	x->e=e;
-	// has no braches yet
-	x->l=NULL;
-	x->g=NULL;
-	return x;
+	if(!id||!e)return NULL;
+	{
+		Trie*x=malloc(sizeof(Trie));
+		if(!x)return x;
+		strncpy(x->id,id,sizeof(char)*RTRIE_HNAMELEN);
+		x->e=e;
+		// has no braches yet
+		x->l=NULL;
+		x->g=NULL;
+		return x;
+	}
 }
 
 Trie*const travp(Trie*const root,char const*const id)
 {
-	//can't traverse rootless trie
-	if(root==NULL)
+	//can't traverse rootless trie or find no id
+	if(!root||!id)
 		return NULL;
 	{
 		Trie*const*hook;

@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "../Util/DeathRow.h"
+
 #define SENSOR_HNAMELEN 41
 #define SENSOR_HUNITLEN 15
 #define SENSOR_HALARMLEN 127
@@ -25,6 +27,8 @@ typedef struct
 	char name[SENSOR_HNAMELEN];
 	char unit[SENSOR_HUNITLEN];
 	time_t stamp;
+	unsigned int interval;
+	AutoQ*delta;
 } Sensor;
 
 typedef struct

@@ -4,16 +4,16 @@ CFLAGS = -pipe -Wall -std=c99 -pedantic
 LINKERFLAGS = -l iniparser -fwhole-program
 FRONTEND = CLI
 LINT = splint
-LINTFLAGS = +quiet +posix-strict-lib +weak
+LINTFLAGS = +quiet +posix-strict-lib +weak -castfcnptr
 TARGET = ReaktorServer$(FRONTEND)
 INSTALLATIONDIR = /usr/local/bin
 .SUFFIXES:
 
 OBJS = $(FRONTEND)/program.o \
 		System/Server.o System/Log.o\
-		Monitor/Client.o Monitor/Network.o Monitor/connection.o Monitor/toFile.o \
+		Monitor/Client.o Monitor/Network.o Monitor/connection.o Monitor/Printer.o \
 		Data/Database.o Data/ReactorData.o Data/sensor.o \
-		Util/LinkedList.o Util/Trie.o Util/Path.o Util/util.o
+		Util/LinkedList.o Util/Trie.o Util/Path.o Util/util.o Util/DeathRow.o
 		
 
 .PHONY : all
@@ -31,7 +31,7 @@ $(TARGET) : $(OBJS)
 	$(CC) $(CFLAGS) $(LINKERFLAGS) -o $(TARGET) $(OBJS)
 
 %.o : %.c %.h.gch
-	-$(LINT) $(LINTFLAGS) $<
+	#-$(LINT) $(LINTFLAGS) $<
 	$(CC) $(CFLAGS) -o $@ -c $< 
 
 %.h.gch : %.h

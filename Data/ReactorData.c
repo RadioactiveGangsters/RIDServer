@@ -6,17 +6,17 @@ void Sub(void(*cb)(Sensor*v))
 {
 	if(!subs)
 	{
-		subs=lle(cb);
+		subs=lle((void*)cb);
 	}
 	else
 	{
-		lladd(subs,cb);	
+		lladd(subs,(void*)cb);	
 	}
 }
 
 void UnSub(void(*cb)(Sensor*v))
 {
-	LLNODE*h=llrm(subs,cb);
+	LLNODE*h=llrm(subs,(void*)cb);
 	if(h)free(h);
 }
 

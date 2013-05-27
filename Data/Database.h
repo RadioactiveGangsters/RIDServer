@@ -7,6 +7,6 @@
 
 int OpenDatabase(void);
 
-Sensor*registerSensor(Sensor*const);
+int registerSensor(Sensor*const);
 
 #endif
