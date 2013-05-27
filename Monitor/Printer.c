@@ -15,24 +15,40 @@ int storeToFile(char const*const path, char const*const data);
 
 void getSensorData(Sensor* sensor)
 {
-    int Values[4320000];//TODO Get Data from DB    
-    char const*const path; //Has to be somewhere else
+    int Values[MAXVALUES];//TODO: Get Data from DB    
+    char const*const path; //TODO: Set Path of output file
     char *sensorName = sensor->name;
     
     int min = getMin(Values);
     int max = getMax(Values);
     int mean = calcMean(Values);
     
-    char data[(28 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
+    char data[(34 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
+    char buffer[numlen(max)];
+    
+	//Set array as empty
+    data[0] = '\0';
+	
+    //Add Sensor name
     strcat(data, "Sensor: ");
     strcat(data, sensorName);
-    strcat(data," Min: ");
-    sprintf(data, "%d", min);
-    strcat(data," Max: ");
-    sprintf(data, "%d", max);
-    strcat(data," Mean: ");
-    sprintf(data, "%d", mean);
+	
+	//Add Minimum value
+    strcat(data," | Min: ");
+    sprintf(buffer, "%d", min);
+    strcat(data, buffer);
+	
+	//Add Maximum value
+    strcat(data," | Max: ");
+    sprintf(buffer, "%d", max);
+    strcat(data, buffer);
+	
+	//Add Mean value
+    strcat(data," | Mean: ");
+    sprintf(buffer, "%d", mean);
+    strcat(data, buffer);
     
+	//Write data to file and check if succesfull
     if(!storeToFile(path, data))
     {
         Log(1, "Couldn't store data of %s to file\n", sensorName);
@@ -42,7 +58,7 @@ void getSensorData(Sensor* sensor)
 int getMin(int Values[])
 {
     int min = 0;
-    for (int i = 0; i < 4320000; i++)
+    for (int i = 0; i < MAXVALUES; i++)
     {
         if (i == 0)
         {         
@@ -62,7 +78,7 @@ int getMin(int Values[])
 int getMax(int Values[])
 {
     int max = 0;
-    for (int i = 0; i < 4320000; i++)
+    for (int i = 0; i < MAXVALUES; i++)
     {
         if (i == 0)
         {         
@@ -82,12 +98,12 @@ int getMax(int Values[])
 int calcMean(int Values[])
 {
     int total = 0;
-    for(int i = 0; i < 4320000; i++)
+    for(int i = 0; i < MAXVALUES; i++)
     {
         total += Values[i];
     }
     int mean = 0;
-    if(!(total == 0)){ mean = (total/4320000); }
+    if(!(total == 0)){ mean = (total/MAXVALUES); }
     return mean;
 }
 

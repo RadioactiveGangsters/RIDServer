@@ -6,6 +6,7 @@
 
 #ifndef PRINTER_H
 #define	PRINTER_H
+#define MAXVALUES 43200
 
 #include<stdlib.h>
 #include<stdio.h>
