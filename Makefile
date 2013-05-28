@@ -6,7 +6,7 @@ CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -g
 
 INIPARSER = -liniparser
 #bundled iniparser
-INIPARSER = -Iiniparser/ -liniparser
+INIPARSER = -Liniparser/ -liniparser
 
 LINKERFLAGS = $(INIPARSER) -lpthread -fwhole-program
 
