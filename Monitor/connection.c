@@ -2,6 +2,9 @@
 
 int socklisten()
 {
+    #ifdef _WIN32
+    Sleep(100000000);
+    #else
     int server_sockfd, client_sockfd;
     socklen_t server_len, client_len;
     struct sockaddr_in server_address;
@@ -53,5 +56,6 @@ int socklisten()
             (void)close( client_sockfd );
 
     }
+    #endif
     return EXIT_FAILURE;
 }
