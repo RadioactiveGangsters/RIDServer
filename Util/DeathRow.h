@@ -12,7 +12,11 @@ typedef struct _AutoQ
 	
 } AutoQ;
 
+void DestroyAutoQ(AutoQ*const);
+
 AutoQ*AutoQe(void*const,unsigned int const);
-AutoQ*AutoQadd(AutoQ*const,void*const);
+/*@null@*/AutoQ*AutoQadd(AutoQ*const,void*const);
+
+void forautoq(AutoQ*const q,void(*cb)(AutoQ*const));
 
 #endif

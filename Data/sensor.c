@@ -41,6 +41,13 @@ void SetupSensors(void)
 	_sensseed=(unsigned)rand();    
 }
 
+void DestroySensor(Sensor*const s)
+{
+	if(!s)return;
+	DestroyAutoQ(s->delta);
+	free(s);
+}
+
 bSensor*
 makebSensor(
 		char const*const name,

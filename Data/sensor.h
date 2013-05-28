@@ -52,6 +52,8 @@ void SetupSensors(void);
 void initSensorValue(int*const, unsigned int const);
 void setNewSensorValue(int const, int*const, unsigned int const);
 
+void DestroySensor(Sensor*const);
+
 iSensor*
 makeiSensor(
 		char const*const name,
