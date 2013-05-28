@@ -2,13 +2,17 @@
 
 LLNODE*lle(void*const e)
 {
-	LLNODE*x = (LLNODE*)malloc(sizeof(LLNODE));
-	x->e=e;
-	x->n=NULL;
-	return x;
+	LLNODE x=
+	{
+		.e=e,
+		.n=NULL,
+	},*p=malloc(sizeof*p);
+	if(!p)return NULL;
+	memcpy(p,&x,sizeof*p);
+	return p;
 }
 
-void lladd(LLNODE*list, void*const e)
+void lladd(LLNODE*list,void*const e)
 {
 	if(list==NULL)return;
 	{

@@ -2,6 +2,7 @@
 #define RLINKEDLIST_H
 
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct _LLNODE 
 {
@@ -9,10 +10,10 @@ typedef struct _LLNODE
 	struct _LLNODE*n;
 } LLNODE;
 
-LLNODE*lle(void*const);
+/*@null@*/LLNODE*lle(void*const);
 
 void lladd(LLNODE*const, void*const);
 
-LLNODE*llrm(LLNODE*const, void const*const);
+/*@null@*/LLNODE*llrm(LLNODE*const, void const*const);
 
 #endif

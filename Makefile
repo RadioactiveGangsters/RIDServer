@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -O3
-CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic -g
+CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -g
 LINKERFLAGS = -liniparser -lpthread -fwhole-program
 FRONTEND = CLI
 LINT = splint
-LINTFLAGS = +quiet -warnposix +weak -castfcnptr
+LINTFLAGS = +quiet +weak -warnposix -castfcnptr
 TARGET = ReaktorServer$(FRONTEND)
 INSTALLATIONDIR = /usr/local/bin
 .SUFFIXES:

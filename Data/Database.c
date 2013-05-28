@@ -11,44 +11,66 @@ void PushS(Sensor*const s)
 		LLNODE*x=subs;
 		while(x->n!=NULL)
 		{
-			((SensorCB*)x->e)(s);
+			((SensorCB*)x->e)->cb(s);
 			x=x->n;
 		}
 	}
 }
 
-void Sub(void(*cb)(Sensor*v))
+void const*
+Sub(void(*cb)(Sensor*))
 {
-	if(!subs)
+	if(!cb)return NULL;
 	{
-		subs=lle((void*)cb);
-	}
-	else
-	{
-		lladd(subs,(void*)cb);	
+		SensorCB c=
+		{
+			.cb=cb,
+		},*p=malloc(sizeof*p);
+
+		if(!p)return NULL;
+		memcpy(p,&c,sizeof*p);
+
+		if(!subs)
+		{
+			subs=lle(p);
+		}
+		else
+		{
+			lladd(subs,p);
+		}
+		return p;
 	}
 }
 
-void UnSub(void(*cb)(Sensor*v))
+void UnSub(void const*const ticket)
 {
-	LLNODE*h=llrm(subs,(void*)cb);
-	if(h)free(h);
+	LLNODE*h=llrm(subs,ticket);
+	if(h)
+	{
+		free(h->e);
+		free(h);
+	}
+}
+
+static void DestroyTable(Trie*const e)
+{
+	if(!e)return;
+	DestroySensor(e->e);
+	free(e);
+}
+
+static void DestroyDB(Trie*const e)
+{
+	if(!e)return;
+	// for each leaf in the table
+	fortrie(e->e,&DestroyTable);
+	free(e);
 }
 
 int OpenDatabase()
 {
-	if(db)
-	{
-		while(db->l)
-		{
-			free(trierm(db,db->l->id));
-		}
-		while(db->g)
-		{
-			free(trierm(db,db->g->id));
-		}
-		free(db);
-	}
+	// for each table in the db
+	fortrie(db,&DestroyDB);
 	return LoadSensors();
 }
 

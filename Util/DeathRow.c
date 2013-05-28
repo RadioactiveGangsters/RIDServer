@@ -1,6 +1,23 @@
 #include "DeathRow.h"
 
-static AutoQ*_AutoQe(void*const e,AutoQ*const n,unsigned int const space)
+static void DestroyAutoQe(AutoQ*const e)
+{
+	free(e->e);
+	free(e);
+}
+
+void forautoq(AutoQ*const q,void(*cb)(AutoQ*const))
+{
+	forautoq(q->n,cb);
+	cb(q->e);
+}
+
+void DestroyAutoQ(AutoQ*const q)
+{
+	forautoq(q,&DestroyAutoQe);
+}
+
+static AutoQ*_AutoQe(void*const e,/*@null@*/AutoQ*const n,unsigned int const space)
 {
 	AutoQ a={
 		.e=e,
@@ -28,9 +45,9 @@ AutoQ*AutoQadd(AutoQ*q,void*const e)
 	if(!q||!e) return NULL;
 
 	// no space left?
-	if(!q->space)
+	if(q->space==0)
 	{
-		AutoQ*le=ale(q);
+		/*@-mustfreefresh@*/AutoQ*le=ale(q);
 
 		/*
 
@@ -47,7 +64,7 @@ AutoQ*AutoQadd(AutoQ*q,void*const e)
 		if(!le->n)
 		{
 			// remove the last element
-			free(le);
+			DestroyAutoQe(le);
 			// has no reference other than q;
 			q=NULL;
 
@@ -56,11 +73,12 @@ AutoQ*AutoQadd(AutoQ*q,void*const e)
 		else
 		{
 			// remove the last element
-			free(le->n);
+			DestroyAutoQe(le->n);
 			// remove its reference
 			le->n=NULL;
 		}
+		le=NULL;
 	}
 
-	return q=AutoQe(e,(q->space)?q->space--:0);
+	return q=AutoQe(e,(!!q&&(q->space>0))?q->space--:0);
 }

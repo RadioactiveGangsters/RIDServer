@@ -3,6 +3,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "../Util/LinkedList.h"
 
@@ -17,7 +18,14 @@ typedef enum
 	LOGL_CLIENT_ACTIVITY,
 } LOGL;
 
-void Log(const LOGL ll,char const*const, ...);
-void subscribe(void(*ls)(const LOGL,char const*const,va_list));
+struct LOGCB
+{
+	void(*log)(const LOGL,char const*const,va_list);
+};
+
+void Log(const LOGL,char const*const, ...);
+
+/*@null@*/void const*
+subscribe(void(*)(const LOGL,char const*const,va_list));
 
 #endif
