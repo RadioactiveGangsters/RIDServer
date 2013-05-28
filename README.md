@@ -5,7 +5,7 @@ industrial automation
 ##Installation
 If you have windows, get MinGW before continuing.
 
-The software requires [`iniparser`](http://ndevilla.free.fr/iniparser/) to be installed on your system, unless for popular demand, there are no plans for bundeling it. You can install it (for free)[http://ndevilla.free.fr/iniparser/].
+The software no longer requires [`iniparser`](http://ndevilla.free.fr/iniparser/) to be installed on your system, but rather bundles it to automatically create the needed resources.
 
 To build the server, run `make` or `make all`. This will build the `ReaktorServerCLI` program which can be run normally. (See [Usage](#usage))
 
