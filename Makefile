@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -O3
-CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -g
+CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic -g
 LINKERFLAGS = -liniparser -lpthread -fwhole-program
 FRONTEND = CLI
 LINT = splint

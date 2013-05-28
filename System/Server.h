@@ -3,10 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../Monitor/connection.h"
 #include "Log.h"
 #include "../Data/Database.h"
 #include "../Data/ReactorData.h"
+#include "../Monitor/Printer.h"
+#include "../Monitor/connection.h"
 
 int InitServer(const int, char const*const*const);
 int StartServer(void);

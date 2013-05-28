@@ -6,17 +6,10 @@
 
 #include "Printer.h"
 
-void getSensorData(Sensor* sensor);
-int getMin(int Values[]);
-int getMax(int Values[]);
-int calcMean(int Values[]);
-int storeToFile(char const*const path, char const*const data);
-void StartPrinter();
-
 void getSensorData(Sensor* sensor)
 {
     int Values[4320000];//TODO Get Data from DB    
-    char const*const path; //Has to be somewhere else
+    char const*const path = fileprinterpath(); //Has to be somewhere else
     char *sensorName = sensor->name;
     
     int min = getMin(Values);
