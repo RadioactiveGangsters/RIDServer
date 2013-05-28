@@ -8,6 +8,7 @@
 int OpenDatabase(void);
 
 int registerSensor(Sensor*const);
+void PushS(Sensor*const);
 
 void Sub(void(*)(Sensor*const));
 void UnSub(void(*)(Sensor*const));

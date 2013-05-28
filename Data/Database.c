@@ -4,6 +4,19 @@ static Trie*db;
 
 static LLNODE*subs;
 
+void PushS(Sensor*const s)
+{
+	if(!subs)return;
+	{
+		LLNODE*x=subs;
+		while(x->n!=NULL)
+		{
+			((SensorCB*)x->e)(s);
+			x=x->n;
+		}
+	}
+}
+
 void Sub(void(*cb)(Sensor*v))
 {
 	if(!subs)

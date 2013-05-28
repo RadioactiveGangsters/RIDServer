@@ -17,7 +17,7 @@ static void SimulateSensor(Trie*const sensor)
 			}
 			else if(s->type==integersensor)
 			{
-				initSensorValue(&(((iSensor*)sensor)->value),((iSensor*)sensor)->ubound);
+				initSensorValue(&(((iSensor*)s)->value),((iSensor*)s)->ubound);
 				s->delta=AutoQe(&(((iSensor*)s)->value),s->interval);
 			}
 		}
@@ -33,6 +33,7 @@ static void SimulateSensor(Trie*const sensor)
 			}
 		}
 		Log(LOGL_DEBUG,"Simulated %d>>%s\n",((iSensor*)s)->value,s->name);
+		PushS(s);
 	}
 }
 
