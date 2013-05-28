@@ -11,54 +11,38 @@ int getMin(int Values[]);
 int getMax(int Values[]);
 int calcMean(int Values[]);
 int storeToFile(char const*const path, char const*const data);
-
+void StartPrinter();
 
 void getSensorData(Sensor* sensor)
 {
-    int Values[MAXVALUES];//TODO: Get Data from DB    
-    char const*const path = fileprinterpath(); //TODO: Set Path of output file
+    int Values[4320000];//TODO Get Data from DB    
+    char const*const path; //Has to be somewhere else
     char *sensorName = sensor->name;
     
     int min = getMin(Values);
     int max = getMax(Values);
     int mean = calcMean(Values);
     
-    char data[(34 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
-    char buffer[numlen(max)];
-    
-	//Set array as empty
-    data[0] = '\0';
-	
-    //Add Sensor name
+    char data[(28 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
     strcat(data, "Sensor: ");
     strcat(data, sensorName);
-	
-	//Add Minimum value
-    strcat(data," | Min: ");
-    snprintf(buffer, sizeof(char)*numlen(max), "%d", min);
-    strcat(data, buffer);
-	
-	//Add Maximum value
-    strcat(data," | Max: ");
-    snprintf(buffer, sizeof(char)*numlen(max), "%d", max);
-    strcat(data, buffer);
-	
-	//Add Mean value
-    strcat(data," | Mean: ");
-    snprintf(buffer, sizeof(char)*numlen(max), "%d", mean);
-    strcat(data, buffer);
+    strcat(data," Min: ");
+    sprintf(data, "%d", min);
+    strcat(data," Max: ");
+    sprintf(data, "%d", max);
+    strcat(data," Mean: ");
+    sprintf(data, "%d", mean);
     
-	//Write data to file and check if succesfull
     if(!storeToFile(path, data))
     {
-        Log(LOGL_ERROR, "Couldn't store data of %s to file\n", sensorName);
+        Log(1, "Couldn't store data of %s to file\n", sensorName);
     }
 }
 
 int getMin(int Values[])
 {
-    int min = 0,i;
-    for (i = 0; i < MAXVALUES; i++)
+    int min = 0;
+    for (int i = 0; i < 4320000; i++)
     {
         if (i == 0)
         {         
@@ -77,8 +61,8 @@ int getMin(int Values[])
 
 int getMax(int Values[])
 {
-    int max = 0,i;
-    for (i = 0; i < MAXVALUES; i++)
+    int max = 0;
+    for (int i = 0; i < 4320000; i++)
     {
         if (i == 0)
         {         
@@ -97,13 +81,13 @@ int getMax(int Values[])
 
 int calcMean(int Values[])
 {
-    int total = 0,i,mean;
-    for(i = 0; i < MAXVALUES; i++)
+    int total = 0;
+    for(int i = 0; i < 4320000; i++)
     {
         total += Values[i];
     }
-    mean = 0;
-    if(!(total == 0)){ mean = (total/MAXVALUES); }
+    int mean = 0;
+    if(!(total == 0)){ mean = (total/4320000); }
     return mean;
 }
 
@@ -127,4 +111,28 @@ int storeToFile(char const*const path, char const*const data)
         return 1;
     }
 }
+
+void *printSensors(void *param)
+{
+    printf("%s \n", param);
+}
+
+void StartPrinter()
+{
+    pthread_t printThread;
+    char *param = "Thread started";
+    
+    if(pthread_create(&printThread, NULL, printSensors, (void*) param)) 
+    {
+        printf("Error creating thread for printer.\n"); 
+    }
+    else
+    {
+        printf("Printer Thread started.\n"); 
+    }
+    
+}
+
+
+
 
