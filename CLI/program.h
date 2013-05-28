@@ -9,7 +9,13 @@
 #include "../System/Log.h"
 #include "../System/Server.h"
 
-static bool useColours=true;
+#ifdef _WIN32
+#define COLOURSUPPORT false
+#else
+#define COLOURSUPPORT true
+#endif
+
+static bool useColours=COLOURSUPPORT;
 
 int main(int,char**);
 
