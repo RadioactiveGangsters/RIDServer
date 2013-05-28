@@ -1,8 +1,9 @@
 #ifndef REACTORDATA_H
 #define REACTORDATA_H
 
-#include <iniparser.h>
 #include <pthread.h>
+
+#include "../iniparser/src/iniparser.h"
 
 #include "../System/Log.h"
 #include "../Util/LinkedList.h"
