@@ -10,9 +10,14 @@
 #include "../System/Server.h"
 
 #ifdef _WIN32
-#define COLOURSUPPORT false
+
+	#include <windows.h>
+	#define COLOURSUPPORT false
+
 #else
-#define COLOURSUPPORT true
+
+	#define COLOURSUPPORT true
+
 #endif
 
 static bool useColours=COLOURSUPPORT;
