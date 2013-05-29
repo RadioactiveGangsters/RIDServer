@@ -35,6 +35,12 @@ void initSensorValue(int*const value, unsigned int const maxval)
 	*value = (rand()%maxval + 1); 
 }
 
+bool binaryflux()
+{
+	srand(_sensseed=(unsigned)rand());
+	return !(rand()%1000);
+}
+
 void SetupSensors(void)
 {
 	srand((unsigned int)time(NULL));

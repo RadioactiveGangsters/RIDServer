@@ -14,25 +14,32 @@ static void SimulateSensor(Trie*const sensor)
 		{
 			if(s->type==binarysensor)
 			{
+				bSensor*const b=(bSensor*)b;
+				s->delta=AutoQe(&b->value,10);
 			}
 			else if(s->type==integersensor)
 			{
-				initSensorValue(&(((iSensor*)s)->value),((iSensor*)s)->ubound);
-				s->delta=AutoQe(&(((iSensor*)s)->value),s->interval);
+				iSensor*const i=(iSensor*)s;
+				initSensorValue(&(i->value),i->ubound);
+				s->delta=AutoQe(&(i->value),s->interval);
 			}
 		}
 		else
 		{
 			if(s->type==binarysensor)
 			{
+				bSensor*const b=(bSensor*)b;
+				printf("%p!=%p\n", b,s);
+				s->delta=AutoQadd(s->delta,&(b->value));
+				b->value=binaryflux();
 			}
 			else if(s->type==integersensor)
 			{
-				s->delta=AutoQadd(s->delta,&(((iSensor*)s)->value));
-				initSensorValue(&(((iSensor*)sensor)->value),((iSensor*)sensor)->ubound);
+				iSensor*const i=(iSensor*)s;
+				s->delta=AutoQadd(s->delta,&(i->value));
+				initSensorValue(&(i->value),i->ubound);
 			}
 		}
-		Log(LOGL_DEBUG,"Simulated %d>>%s\n",((iSensor*)s)->value,s->name);
 		PushS(s);
 	}
 }

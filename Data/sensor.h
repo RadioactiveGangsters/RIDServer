@@ -51,7 +51,7 @@ typedef struct
 void SetupSensors(void);
 void initSensorValue(int*const, unsigned int const);
 void setNewSensorValue(int const, int*const, unsigned int const);
-
+bool binaryflux();
 void DestroySensor(Sensor*const);
 
 iSensor*
