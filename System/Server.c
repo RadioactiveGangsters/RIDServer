@@ -13,6 +13,7 @@ int StartServer(void)
 {
 	Log(LOGL_DEBUG,"Starting\n");
 	StartSensorSimulation();
+	StartPrinter();
 	socklisten();
 	return EXIT_SUCCESS;
 }
