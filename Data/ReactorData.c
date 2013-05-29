@@ -50,7 +50,7 @@ static void*SimulateType(void*const rawtable)
 			{
 				fortrie(table,&SimulateSensor);
 				#ifdef _WIN32
-				Sleep(example->interval*1000)
+				Sleep(example->interval*1000);
 				#else
 				sleep(example->interval);
 				#endif

@@ -12,7 +12,7 @@
 #ifdef _WIN32
 
 	#include <windows.h>
-	#define COLOURSUPPORT false
+	#define COLOURSUPPORT true
 
 #else
 

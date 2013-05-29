@@ -20,7 +20,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 	{
 		case LOGL_SERIOUS_ERROR:
 			#ifdef _WIN32
-				colour=FOREGROUND_RED;
+				colour=FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_INTENSITY;
 			#else
 				strncpy(colour,"\x1B[41;37m",sizeof(char)*8);
 			#endif
@@ -28,7 +28,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			break;
 		case LOGL_ERROR:
 			#ifdef _WIN32
-				colour=FOREGROUND_RED;
+				colour=FOREGROUND_RED | FOREGROUND_INTENSITY;
 			#else
 				strncpy(colour,"\x1B[31m",sizeof(char)*8);
 			#endif
@@ -36,7 +36,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			break;
 		case LOGL_WARNING:
 			#ifdef _WIN32
-				colour=FOREGROUND_YELLOW;
+				colour=FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
 			#else
 				strncpy(colour,"\x1B[33m",sizeof(char)*8);
 			#endif
@@ -44,7 +44,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			break;
 		case LOGL_DEBUG:
 			#ifdef _WIN32
-				colour=FOREGROUND_RED;
+				colour=FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 			#else
 				strncpy(colour,"\x1B[30;1m",sizeof(char)*8);
 			#endif
