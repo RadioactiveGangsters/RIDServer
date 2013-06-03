@@ -15,6 +15,7 @@ static void SimulateSensor(Trie*const sensor)
 			if(s->type==binarysensor)
 			{
 				bSensor*const b=(bSensor*)s;
+				// reserve memory for delta value
 				bool*p=malloc(sizeof*p);
 				if(!p)
 				{
@@ -22,7 +23,14 @@ static void SimulateSensor(Trie*const sensor)
 					return;
 				}
 				*p=b->value;
+				// store current value in a new history
 				s->delta=AutoQe(p,10);
+				if(!s->delta)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					free(p);
+					return;
+				}
 			}
 			else if(s->type==integersensor)
 			{
@@ -33,9 +41,15 @@ static void SimulateSensor(Trie*const sensor)
 					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
 					return;
 				}
-				initSensorValue(&(i->value),i->ubound);
+				i->value=randSensorValue(i->lbound,i->ubound);
 				*p=i->value;
 				s->delta=AutoQe(p,s->interval);
+				if(!s->delta)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					free(p);
+					return;
+				}
 			}
 		}
 		else
@@ -64,7 +78,7 @@ static void SimulateSensor(Trie*const sensor)
 				}
 				*p=i->value;
 				s->delta=AutoQadd(s->delta,p);
-				initSensorValue(&(i->value),i->ubound);
+				i->value=integerflux(i->value);
 			}
 		}
 		PushS(s);
@@ -84,9 +98,9 @@ static void*SimulateType(void*const rawtable)
 			{
 				fortrie(table,&SimulateSensor);
 				#ifdef _WIN32
-				Sleep(example->interval*1000);
+				Sleep(example->interval);
 				#else
-				sleep(example->interval);
+				usleep(example->interval*1000);
 				#endif
 			}
 		}

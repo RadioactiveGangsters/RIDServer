@@ -6,6 +6,19 @@ static LLNODE*subs;
 
 void PushS(Sensor*const s)
 {
+	if(s->type==binarysensor)
+	{
+	if(((bSensor*)s)->value)
+			Log(LOGL_WARNING,((bSensor*)s)->alarm);
+	}
+	else if(s->type==integersensor)
+	{
+		if(((iSensor*)s)->value>((iSensor*)s)->ubound)
+			Log(LOGL_WARNING,((iSensor*)s)->ualarm);
+		if(((iSensor*)s)->value<((iSensor*)s)->lbound)
+			Log(LOGL_WARNING,((iSensor*)s)->lalarm);
+	}
+
 	if(!subs)return;
 	{
 		LLNODE*x=subs;
@@ -122,7 +135,7 @@ int registerSensor(Sensor*const s)
 				}
 				else
 				{
-					Log(LOGL_ERROR,"Cannot add to table %s\n",tbl->e->id);
+					Log(LOGL_ERROR,"Cannot add to table %s\n",((Trie*)tbl->e)->id);
 				}
 				return EXIT_FAILURE;
 			}
