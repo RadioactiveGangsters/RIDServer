@@ -83,7 +83,11 @@ static void*SimulateType(void*const rawtable)
 			while(!stopsimulation)
 			{
 				fortrie(table,&SimulateSensor);
+				#ifdef _WIN32
+				Sleep(example->interval*1000);
+				#else
 				sleep(example->interval);
+				#endif
 			}
 		}
 	}

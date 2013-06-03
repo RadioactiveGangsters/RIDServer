@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Printer.c
  * Author: Bas
  *
