@@ -14,29 +14,56 @@ static void SimulateSensor(Trie*const sensor)
 		{
 			if(s->type==binarysensor)
 			{
-				bSensor*const b=(bSensor*)b;
-				s->delta=AutoQe(&b->value,10);
+				bSensor*const b=(bSensor*)s;
+				bool*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				*p=b->value;
+				s->delta=AutoQe(p,10);
 			}
 			else if(s->type==integersensor)
 			{
 				iSensor*const i=(iSensor*)s;
+				int*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
 				initSensorValue(&(i->value),i->ubound);
-				s->delta=AutoQe(&(i->value),s->interval);
+				*p=i->value;
+				s->delta=AutoQe(p,s->interval);
 			}
 		}
 		else
 		{
 			if(s->type==binarysensor)
 			{
-				bSensor*const b=(bSensor*)b;
-				printf("%p!=%p\n", b,s);
-				s->delta=AutoQadd(s->delta,&(b->value));
+				bSensor*const b=(bSensor*)s;
+				bool*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				*p=b->value;
+				s->delta=AutoQadd(s->delta,p);
 				b->value=binaryflux();
 			}
 			else if(s->type==integersensor)
 			{
 				iSensor*const i=(iSensor*)s;
-				s->delta=AutoQadd(s->delta,&(i->value));
+				int*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				*p=i->value;
+				s->delta=AutoQadd(s->delta,p);
 				initSensorValue(&(i->value),i->ubound);
 			}
 		}

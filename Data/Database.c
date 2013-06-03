@@ -81,13 +81,13 @@ int registerSensor(Sensor*const s)
 	// do we have a db yet?
 	if(!db)
 	{
-		Log(4,"DB uninitialised, making one.\n");
+		Log(LOGL_DEBUG,"DB uninitialised, making one.\n");
 		// make a new db with a table with the sensor
+		// FIXME: memory leak
 		db=triee(s->unit,triee(s->name,s));
 		if(!db)
 		{
-			
-			Log(1,"Cannot register unit type %s\n",s->unit);
+			Log(LOGL_ERROR,"Cannot register unit type %s\n",s->unit);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;
@@ -111,16 +111,18 @@ int registerSensor(Sensor*const s)
 		}
 		else
 		{
+			// found the table
+			// can it be added?
 			if(!trieadd(tbl->e,s->name,s))
 			{
+				// the table has no... table?
 				if(!tbl->e)
 				{
-					Log(1,"Database structure corrupt, this is a bug.");
+					Log(LOGL_SERIOUS_ERROR,"Database structure corrupt, this is a bug.");
 				}
 				else
 				{
-					tbl=tbl->e;
-					Log(1,"Cannot add to table %s\n",tbl->id);
+					Log(LOGL_ERROR,"Cannot add to table %s\n",tbl->e->id);
 				}
 				return EXIT_FAILURE;
 			}
@@ -128,7 +130,7 @@ int registerSensor(Sensor*const s)
 
 		if(!tbl)
 		{
-			Log(1,"cannot link new %s table\n",s->unit);
+			Log(LOGL_ERROR,"cannot link new %s table\n",s->unit);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;
