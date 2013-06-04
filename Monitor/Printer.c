@@ -27,17 +27,17 @@ void getSensorData(Trie* s)
 	
     //Add Minimum value
     strcat(data," | Min: ");
-    snprintf(buffer, sizeof(char)*numlen(min), "%d", min);
+    snprintf(buffer, sizeof(char)*numlen(min)+1, "%1d", min);
     strcat(data, buffer);
 	
     //Add Maximum value
     strcat(data," | Max: ");
-    snprintf(buffer, sizeof(char)*numlen(max), "%d", max);
+    snprintf(buffer, sizeof(char)*numlen(max)+1, "%1d", max);
     strcat(data, buffer);
 	
     //Add Mean value
     strcat(data," | Mean: ");
-    snprintf(buffer, sizeof(char)*numlen(mean), "%d", mean);
+    snprintf(buffer, sizeof(char)*numlen(mean)+1, "%1d", mean);
     strcat(data, buffer);
     
     if(!storeToFile(path, data))
@@ -54,36 +54,38 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
+    usleep(60000000); // 10 sec sleep to wait for some data to be generated
+
     while(1)
     {
         // Get all sensors types from table and for each type do printTable()
         fortrie(Tables(), &getSensors);
-        usleep(600000); // 10 min sleep
+        usleep(600000000); // 10 min sleep
     }
 }
 
 int getMin(AutoQ* list)
-{
+{ 
     int min = INT_MAX;
-    while(list && list->n != NULL)
+    while(list)
     {
-        if(list->e < min)
+        if(*((int*)list->e) < min)
         {
-            min = list->e;
+            min = *((int*)list->e);
         }
         list = list->n;
-    } 
+    }
     return min;
 }
 
 int getMax(AutoQ* list)
 {
     int max = INT_MIN;
-    while(list && list->n != NULL)
+    while(list)
     {
-        if(list->e > max)
+        if(*((int*)list->e) > max)
         {
-            max = list->e;
+            max = *((int*)list->e);
         }
         list = list->n;
     }
@@ -93,9 +95,9 @@ int getMax(AutoQ* list)
 int calcMean(AutoQ* list)
 {
     int total = 0, mean = 0, amount = 0;
-    while(list && list->n != NULL)
+    while(list)
     {
-        total += list->e;
+        total += *((int*)list->e);
         amount++;
         list = list->n;
     }
