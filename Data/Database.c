@@ -94,13 +94,21 @@ int registerSensor(Sensor*const s)
 	// do we have a db yet?
 	if(!db)
 	{
+		Trie*const tbl=triee(s->name,s);
 		Log(LOGL_DEBUG,"DB uninitialised, making one.\n");
-		// make a new db with a table with the sensor
-		// FIXME: memory leak
-		db=triee(s->unit,triee(s->name,s));
-		if(!db)
+		// Make a new Trie with the sensor
+		if(!tbl)
 		{
 			Log(LOGL_ERROR,"Cannot register unit type %s\n",s->unit);
+			return EXIT_SUCCESS;
+		}
+
+		// Link the new Table to the empty database, creating one.
+		db=triee(s->unit,tbl);
+		if(!db)
+		{
+			Log(LOGL_ERROR,"Cannot create database\n",s->unit);
+			DestroyTable(tbl);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;
@@ -111,16 +119,42 @@ int registerSensor(Sensor*const s)
 		Trie*tbl=trav(db,s->unit);
 		if(!tbl)
 		{
-			// not found or something, add it.
-			// FIXME: memory leak
-			tbl=trieadd(db,s->unit,triee(s->name,s));
+			// not found or something, make a new table.
+			Trie*const newtable=triee(s->name,s);
+			if(!newtable)
+			{
+				Log(LOGL_ERROR,"Cannot create new table for %s\n",s->unit);
+			}
+			else
+			{
+				// link the table to the database.
+				tbl=trieadd(db,s->unit,newtable);
+				if(!tbl)
+				{
+					Log(LOGL_ERROR,"Cannot expand database with table for %s\n",s->unit);
+					DestroyTable(newtable);
+					// FIXME: double deallocation of s by caller?
+					return EXIT_FAILURE;
+				}
+			}
 		}
 		else if(strcmp(tbl->id,s->unit))
 		{
 			// found something like it, but not exact, add it.
+			Trie*const newtable=triee(s->name,s);
+			if(!newtable)
+			{
+				Log(LOGL_ERROR,"Cannot create new table for %s\n",s->unit);
+				return EXIT_FAILURE;
+			}
 			// linking like this saves a traversal.
-			// FIXME: memory leak
 			tbl=trieadd(tbl,s->unit,triee(s->name,s));
+			if(!tbl)
+			{
+				Log(LOGL_ERROR,"Cannot expand database with table for %s\n",s->unit);
+				DestroyTable(newtable);
+				return EXIT_FAILURE;
+			}
 		}
 		else
 		{
@@ -139,12 +173,6 @@ int registerSensor(Sensor*const s)
 				}
 				return EXIT_FAILURE;
 			}
-		}
-
-		if(!tbl)
-		{
-			Log(LOGL_ERROR,"cannot link new %s table\n",s->unit);
-			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;
 	}
