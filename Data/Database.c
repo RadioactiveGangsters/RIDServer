@@ -6,6 +6,19 @@ static LLNODE*subs;
 
 void PushS(Sensor*const s)
 {
+	if(s->type==binarysensor)
+	{
+	if(((bSensor*)s)->value)
+			Log(LOGL_WARNING,((bSensor*)s)->alarm);
+	}
+	else if(s->type==integersensor)
+	{
+		if(((iSensor*)s)->value>((iSensor*)s)->ubound)
+			Log(LOGL_WARNING,((iSensor*)s)->ualarm);
+		if(((iSensor*)s)->value<((iSensor*)s)->lbound)
+			Log(LOGL_WARNING,((iSensor*)s)->lalarm);
+	}
+
 	if(!subs)return;
 	{
 		LLNODE*x=subs;
@@ -81,13 +94,21 @@ int registerSensor(Sensor*const s)
 	// do we have a db yet?
 	if(!db)
 	{
-		Log(4,"DB uninitialised, making one.\n");
-		// make a new db with a table with the sensor
-		db=triee(s->unit,triee(s->name,s));
+		Trie*const tbl=triee(s->name,s);
+		Log(LOGL_DEBUG,"DB uninitialised, making one.\n");
+		// Make a new Trie with the sensor
+		if(!tbl)
+		{
+			Log(LOGL_ERROR,"Cannot register unit type %s\n",s->unit);
+			return EXIT_SUCCESS;
+		}
+
+		// Link the new Table to the empty database, creating one.
+		db=triee(s->unit,tbl);
 		if(!db)
 		{
-			
-			Log(1,"Cannot register unit type %s\n",s->unit);
+			Log(LOGL_ERROR,"Cannot create database\n",s->unit);
+			DestroyTable(tbl);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;
@@ -98,38 +119,60 @@ int registerSensor(Sensor*const s)
 		Trie*tbl=trav(db,s->unit);
 		if(!tbl)
 		{
-			// not found or something, add it.
-			// FIXME: memory leak
-			tbl=trieadd(db,s->unit,triee(s->name,s));
+			// not found or something, make a new table.
+			Trie*const newtable=triee(s->name,s);
+			if(!newtable)
+			{
+				Log(LOGL_ERROR,"Cannot create new table for %s\n",s->unit);
+			}
+			else
+			{
+				// link the table to the database.
+				tbl=trieadd(db,s->unit,newtable);
+				if(!tbl)
+				{
+					Log(LOGL_ERROR,"Cannot expand database with table for %s\n",s->unit);
+					DestroyTable(newtable);
+					// FIXME: double deallocation of s by caller?
+					return EXIT_FAILURE;
+				}
+			}
 		}
 		else if(strcmp(tbl->id,s->unit))
 		{
 			// found something like it, but not exact, add it.
-			// linking like this saves a traversal.
-			// FIXME: memory leak
-			tbl=trieadd(tbl,s->unit,triee(s->name,s));
-		}
-		else
-		{
-			if(!trieadd(tbl->e,s->name,s))
+			Trie*const newtable=triee(s->name,s);
+			if(!newtable)
 			{
-				if(!tbl->e)
-				{
-					Log(1,"Database structure corrupt, this is a bug.");
-				}
-				else
-				{
-					tbl=tbl->e;
-					Log(1,"Cannot add to table %s\n",tbl->id);
-				}
+				Log(LOGL_ERROR,"Cannot create new table for %s\n",s->unit);
+				return EXIT_FAILURE;
+			}
+			// linking like this saves a traversal.
+			tbl=trieadd(tbl,s->unit,triee(s->name,s));
+			if(!tbl)
+			{
+				Log(LOGL_ERROR,"Cannot expand database with table for %s\n",s->unit);
+				DestroyTable(newtable);
 				return EXIT_FAILURE;
 			}
 		}
-
-		if(!tbl)
+		else
 		{
-			Log(1,"cannot link new %s table\n",s->unit);
-			return EXIT_FAILURE;
+			// found the table
+			// can it be added?
+			if(!trieadd(tbl->e,s->name,s))
+			{
+				// the table has no... table?
+				if(!tbl->e)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Database structure corrupt, this is a bug.");
+				}
+				else
+				{
+					Log(LOGL_ERROR,"Cannot add to table %s\n",((Trie*)tbl->e)->id);
+				}
+				return EXIT_FAILURE;
+			}
 		}
 		return EXIT_SUCCESS;
 	}

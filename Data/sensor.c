@@ -25,14 +25,27 @@ void setNewSensorValue(int const amount, int*const values, unsigned int const ma
 	}
 }
 
-void initSensorValue(int*const value, unsigned int const maxval)
+int randSensorValue(int const minval, int const maxval)
 {
+	if(maxval-minval<1)return minval;
 	//Create and set seed for random generator
 	_sensseed = (unsigned)rand();
 	srand(_sensseed );
 
 	//Set random number in value
-	*value = (rand()%maxval + 1); 
+	return (rand()%maxval-minval) + minval; 
+}
+
+bool binaryflux()
+{
+	srand(_sensseed=(unsigned)rand());
+	return !(rand()%1000);
+}
+
+int integerflux(int const pvalue)
+{
+	srand(_sensseed=(unsigned)rand());
+	return pvalue+((rand()%100)-50);
 }
 
 void SetupSensors(void)

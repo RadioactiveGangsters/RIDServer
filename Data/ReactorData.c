@@ -14,25 +14,73 @@ static void SimulateSensor(Trie*const sensor)
 		{
 			if(s->type==binarysensor)
 			{
+				bSensor*const b=(bSensor*)s;
+				// reserve memory for delta value
+				bool*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				*p=b->value;
+				// store current value in a new history
+				s->delta=AutoQe(p,10);
+				if(!s->delta)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					free(p);
+					return;
+				}
 			}
 			else if(s->type==integersensor)
 			{
-				initSensorValue(&(((iSensor*)s)->value),((iSensor*)s)->ubound);
-				s->delta=AutoQe(&(((iSensor*)s)->value),s->interval);
+				iSensor*const i=(iSensor*)s;
+				int*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				i->value=randSensorValue(i->lbound,i->ubound);
+				*p=i->value;
+				s->delta=AutoQe(p,s->interval);
+				if(!s->delta)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					free(p);
+					return;
+				}
 			}
 		}
 		else
 		{
 			if(s->type==binarysensor)
 			{
+				bSensor*const b=(bSensor*)s;
+				bool*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				*p=b->value;
+				s->delta=AutoQadd(s->delta,p);
+				b->value=binaryflux();
 			}
 			else if(s->type==integersensor)
 			{
-				s->delta=AutoQadd(s->delta,&(((iSensor*)s)->value));
-				initSensorValue(&(((iSensor*)sensor)->value),((iSensor*)sensor)->ubound);
+				iSensor*const i=(iSensor*)s;
+				int*p=malloc(sizeof*p);
+				if(!p)
+				{
+					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					return;
+				}
+				*p=i->value;
+				s->delta=AutoQadd(s->delta,p);
+				i->value=integerflux(i->value);
 			}
 		}
-		Log(LOGL_DEBUG,"Simulated %d>>%s\n",((iSensor*)s)->value,s->name);
 		PushS(s);
 	}
 }
@@ -50,9 +98,9 @@ static void*SimulateType(void*const rawtable)
 			{
 				fortrie(table,&SimulateSensor);
 				#ifdef _WIN32
-				Sleep(example->interval*1000);
+				Sleep(example->interval);
 				#else
-				sleep(example->interval);
+				usleep(example->interval*1000);
 				#endif
 			}
 		}
