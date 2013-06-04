@@ -7,5 +7,5 @@ inline char*sensorinipath(void)
 
 inline char*fileprinterpath(void)
 {
-	return "printher.txt";
+	return "printer.txt";
 }
