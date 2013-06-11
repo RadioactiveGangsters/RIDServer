@@ -38,24 +38,35 @@ int randSensorValue(int const minval, int const maxval)
 
 /* Generates a flux value for binary sensors. 
  * This value is randomly generated between the 
- * reed 1 and the -500. The opportunity for 
- * '1' is 1 to 500.
+ * reed 1 and the -1000. The opportunity for 
+ * '1' is 1 to 1000.
  */
 bool binaryflux()
 {
 	srand(_sensseed=(unsigned)rand());
-	return !(rand()%500);
+	return !(rand()%1000);
 }
 
 /* Generates a flux value for integer sensors.
  * This value will be used to increase or decrease
  * the original value. The random generated value
- * will be between -12 and 12.
+ * will be between -5 and 6.
  */
-int integerflux(int const pvalue)
+int integerflux(int pvalue)
 {
 	srand(_sensseed=(unsigned)rand());
-	return pvalue+((rand()%24)-12);
+	int flux = (rand()%11)-5;
+
+	if(pvalue == 0)
+	{
+		if(flux < 0) flux = abs(flux);
+		pvalue += flux;
+	}
+	else if((pvalue+flux)<0) pvalue = 0;
+	else pvalue += flux;
+
+	return pvalue;
+	// return pvalue + ((pvalue+flux<0)?-1*flux:flux);
 }
 
 void SetupSensors(void)
