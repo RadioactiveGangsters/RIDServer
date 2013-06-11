@@ -15,7 +15,7 @@ void getSensorData(Trie* s)
     int max = getMax(((Sensor*)s->e)->delta);
     int mean = calcMean(((Sensor*)s->e)->delta);
     
-    char data[(34 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
+    char data[(35 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
     char buffer[numlen(max)];
     
     //Set array as empty
@@ -26,17 +26,17 @@ void getSensorData(Trie* s)
     strcat(data, sensorName);
 	
     //Add Minimum value
-    strcat(data," | Min: ");
+    strcat(data,"  \t Min: "); 
     snprintf(buffer, sizeof(char)*numlen(min)+1, "%1d", min);
     strcat(data, buffer);
 	
     //Add Maximum value
-    strcat(data," | Max: ");
+    strcat(data," \t Max: ");
     snprintf(buffer, sizeof(char)*numlen(max)+1, "%1d", max);
     strcat(data, buffer);
 	
     //Add Mean value
-    strcat(data," | Mean: ");
+    strcat(data," \t Mean: ");
     snprintf(buffer, sizeof(char)*numlen(mean)+1, "%1d", mean);
     strcat(data, buffer);
     
@@ -54,11 +54,21 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-    usleep(60000000); // 10 sec sleep to wait for some data to be generated
+    usleep(5000000); // 5 sec sleep to wait for some data to be generated
+    time_t t;
 
     while(1)
     {
         // Get all sensors types from table and for each type do printTable()
+	char data[32];
+	data[0] = '\0';
+	strcat(data, " --- ");
+	time(&t);
+	strcat(data, ctime(&t));
+	data[24+3+2]='\0';
+	strcat(data, " --- ");
+	storeToFile(fileprinterpath(), data);
+
         fortrie(Tables(), &getSensors);
         usleep(600000000); // 10 min sleep
     }

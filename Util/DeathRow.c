@@ -80,5 +80,5 @@ AutoQ*AutoQadd(AutoQ*q,void*const e)
 		le=NULL;
 	}
 
-	return q=AutoQe(e,(!!q&&(q->space>0))?q->space--:0);
+	return q=_AutoQe(e,q,(!!q&&(q->space>0))?q->space--:0);
 }

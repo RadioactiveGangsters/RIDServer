@@ -133,13 +133,8 @@ void StartSensorSimulation(void)
 	fortrie(db,&registerthread);
 }
 
-static void
-genbSensors(
-		char const*const type,
-		const int amount,
-		unsigned int const interval,
-		char const*const alarm
-		)
+static void genbSensors(char const*const type, const int amount,
+			unsigned int const interval, char const*const alarm)
 {
 	// generate the requested amount
 	int i;
@@ -165,8 +160,6 @@ genbSensors(
 				Log(LOGL_ERROR,"out of memory");
 				break;
 			}
-
-			Log(LOGL_DEBUG,"generated %s %s{%s,%d,%d,%d,%s}\n",s->type==binarysensor?"binary":"integer",s->name,s->unit,s->interval,s->stamp,((bSensor*)s)->value,((bSensor*)s)->alarm);
 			
 			// register them with the databases
 			if(registerSensor(s))
@@ -175,20 +168,28 @@ genbSensors(
 				free(s);
 				continue;
 			}
+
+			// set in log that all sensors of the group are generated
+			if(i==(amount-1))
+			{
+				Log(LOGL_DEBUG,"Generated %d %s %s %s\n{%s,%d,%d,%d,%s}\n\n",
+				(i+1),
+				s->type==binarysensor?"binary":"integer",
+				s->unit,
+				"Sensors",
+				s->unit,
+				s->interval,
+				s->stamp,
+				((bSensor*)s)->value,
+				((bSensor*)s)->alarm);
+			}
 		}
 	}
 }
 
-static void
-geniSensors(
-		char const*const type,
-		const int amount,
-		unsigned int const interval,
-		int const lbound,
-		int const ubound,
-		char const*const lalarm,
-		char const*const ualarm
-		)
+static void geniSensors(char const*const type, const int amount, 
+			unsigned int const interval, int const lbound, 
+			int const ubound, char const*const lalarm, char const*const ualarm)
 {
 	// generate the requested amount
 	int i;
@@ -206,25 +207,14 @@ geniSensors(
 			break;
 		}
 
+		// make one
 		{
-			// make one
 			Sensor*const s=(Sensor*)makeiSensor(name,type,interval,lbound,ubound,lalarm,ualarm);
 			if(!s)
 			{
 				Log(LOGL_ERROR,"out of memory");
 				break;
 			}
-
-			Log(LOGL_DEBUG,"generated %s %s{%s,%d, %d,%d,%d,%s,%s}\n",
-				s->type==binarysensor?"binary":"integer",
-				s->name,
-				s->unit,
-				s->interval,
-				((iSensor*)s)->value,
-				((iSensor*)s)->lbound,
-				((iSensor*)s)->ubound,
-				((iSensor*)s)->lalarm,
-				((iSensor*)s)->ualarm);
 			
 			// register them with the databases
 			if(registerSensor(s))
@@ -233,9 +223,25 @@ geniSensors(
 				free(s);
 				continue;
 			}
+
+			// set in log that all sensors of the group are generated
+			if(i==(amount-1))
+			{
+				Log(LOGL_DEBUG,"Generated %d %s %s %s\n{%s,%d,%d,%d,%d,%s,%s}\n\n",
+				(i+1),
+				s->type==binarysensor?"binary":"integer",
+				s->unit,
+				"Sensors",
+				s->unit,
+				s->interval,
+				((iSensor*)s)->value,
+				((iSensor*)s)->lbound,
+				((iSensor*)s)->ubound,
+				((iSensor*)s)->lalarm,
+				((iSensor*)s)->ualarm);
+			}
 		}
 	}
-
 }
 
 int LoadSensors(void)

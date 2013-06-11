@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <time.h>
 #include "../Data/sensor.h"
 #include "../System/Log.h"
 #include "../Util/util.h"

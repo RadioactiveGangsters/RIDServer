@@ -6,7 +6,7 @@ static LLNODE*subs;
 
 void PushS(Sensor*const s)
 {
-	if(s->type==binarysensor)
+/*	if(s->type==binarysensor)
 	{
 	if(((bSensor*)s)->value)
 			Log(LOGL_WARNING,((bSensor*)s)->alarm);
@@ -18,7 +18,7 @@ void PushS(Sensor*const s)
 		if(((iSensor*)s)->value<((iSensor*)s)->lbound)
 			Log(LOGL_WARNING,((iSensor*)s)->lalarm);
 	}
-
+*/
 	if(!subs)return;
 	{
 		LLNODE*x=subs;
@@ -95,7 +95,7 @@ int registerSensor(Sensor*const s)
 	if(!db)
 	{
 		Trie*const tbl=triee(s->name,s);
-		Log(LOGL_DEBUG,"DB uninitialised, making one.\n");
+		Log(LOGL_DEBUG,"DB uninitialised, making one.\n\n");
 		// Make a new Trie with the sensor
 		if(!tbl)
 		{
