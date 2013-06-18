@@ -35,7 +35,7 @@ int socklisten()
     while( 1 )
     {
         char ch;
-        Log(LOGL_SYSTEM_ACTIVITY,"server wait...\n" );
+        Log(LOGL_SYSTEM_ACTIVITY,"Configuring Server complete, Ready for Client connections..\n" );
 
         client_len = (socklen_t)sizeof( client_address );
         if((client_sockfd = accept( server_sockfd, ( struct sockaddr *)&client_address, &client_len ))<1)

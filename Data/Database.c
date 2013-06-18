@@ -95,7 +95,7 @@ int registerSensor(Sensor*const s)
 	if(!db)
 	{
 		Trie*const tbl=triee(s->name,s);
-		Log(LOGL_DEBUG,"DB uninitialised, making one.\n\n");
+		Log(LOGL_DEBUG,"\nDB uninitialised, making one..\n\n");
 		// Make a new Trie with the sensor
 		if(!tbl)
 		{

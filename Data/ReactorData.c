@@ -114,7 +114,7 @@ static void registerthread(Trie*const table)
 	if(!table->e)return;
 	{
 		pthread_t typethread;
-		Log(LOGL_SYSTEM_ACTIVITY,"creating simulation thread for %s\n",table->id);
+		Log(LOGL_SYSTEM_ACTIVITY,"Creating simulation thread for %s..\n",table->id);
 		pthread_create(&typethread,NULL,&SimulateType,table->e);
 		if(!threads)
 		{
