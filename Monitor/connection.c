@@ -14,7 +14,7 @@ int socklisten()
 
     server_sockfd = socket( AF_INET, SOCK_STREAM, 0 );
     if (! server_sockfd){
-        Log(LOGL_ERROR,LOGT_NETWORK,"Error sockfd" );
+        Log(LOGL_ERROR,LOGT_NETWORK,"Error sockfd\n");
     }
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = inet_addr( "127.0.0.1" );
@@ -31,11 +31,28 @@ int socklisten()
     if( listen( server_sockfd, 5 ) ) return EXIT_FAILURE;
 
     if( signal( SIGCHLD, SIG_IGN ) == SIG_ERR ) return EXIT_FAILURE;
+    
+    
+    typedef  struct{
+        char opcode;
+        char sensortype;
+        int maxsensorcount;
+        int *sensorwaardes;
+        
+    }pack;
+    int h,g;
+     g= (int) 49;
+    h= (int) 52;
+    
+     pack p = {0x03,'b',2,2};
 
+     pack*pp=malloc(sizeof*pp);
+     memcpy(pp,&p,sizeof*pp);
+     
     while( 1 )
     {
         char ch;
-        Log(LOGL_SYSTEM_ACTIVITY,LOGT_NETWORK,"Configuring complete, ready for Client connections..\n" );
+        Log(LOGL_SYSTEM_ACTIVITY,LOGT_NETWORK,"Configuring complete, ready for Client connections..\n");
 
         client_len = (socklen_t)sizeof( client_address );
         if((client_sockfd = accept( server_sockfd, ( struct sockaddr *)&client_address, &client_len ))<1)
@@ -43,21 +60,34 @@ int socklisten()
             int x = errno;
              Log(LOGL_ERROR,LOGT_NETWORK,"Client sockfd error : %d \n", x);
         }
-        Log(LOGL_CLIENT_ACTIVITY,LOGT_NETWORK,"Client connected \n" );
+        Log(LOGL_CLIENT_ACTIVITY,LOGT_NETWORK,"Client connected\n");
         
+       
+        
+/*
         char*p=malloc(sizeof*p);
         *p='5';
+        
+        char*t=malloc(sizeof*t);
+        *t='t';
+*/
+        
         for (int i=0; i< 20; i++){
             ssize_t x;
-        if((x=write(client_sockfd, p, sizeof(char)))!=sizeof(char))
-            Log(LOGL_ERROR,LOGT_NETWORK,"String cannot send %d: %d",x, errno);
+        if((x=write(client_sockfd, pp, sizeof(pp)))!=sizeof(pp))
+            Log(LOGL_ERROR,LOGT_NETWORK,"Cannot send %d: %d\n",x, errno);
         
-         Log(LOGL_DEBUG,LOGT_NETWORK,"Send char: %c \n", *p );
+            Log(LOGL_DEBUG,LOGT_NETWORK,"Send char %c \n", pp);
+            
+      //      if((x=write(client_sockfd, t, sizeof(char)))!=sizeof(char))
+        //    Log(LOGL_ERROR, "string cannot send %d: %d",x, errno);
+        
+        //Log(LOGL_CLIENT_ACTIVITY, "send char %c \n", t );
         }
     //     
         if( fork() == 0 )
         {
-            Log(LOGL_DEBUG,LOGT_NETWORK,"In fork loop" );
+            Log(LOGL_DEBUG,LOGT_NETWORK,"In fork loop\n");
             if( read( client_sockfd, &ch, 1 ) ) break; 
             Log(LOGL_DEBUG,LOGT_NETWORK,"Client send = %c\n", ch );
             //
@@ -76,7 +106,7 @@ int socklisten()
             return EXIT_SUCCESS;
         }
         else
-            Log(LOGL_DEBUG,LOGT_NETWORK,"Socket closed" );
+            Log(LOGL_DEBUG,LOGT_NETWORK,"Socket closed\n");
       //  printf("socket closed");
             (void)close( client_sockfd );
 
