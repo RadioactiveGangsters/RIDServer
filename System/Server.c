@@ -11,9 +11,10 @@ int InitServer(const int argc,char const*const*const argv)
 
 int StartServer(void)
 {
-	Log(LOGL_DEBUG,"Starting\n");
+	Log(LOGL_SYSTEM_ACTIVITY,"Starting Server\n");
 	StartSensorSimulation();
 	StartPrinter();
+	Log(LOGL_SYSTEM_ACTIVITY,"Server Started\n");
 	socklisten();
 	return EXIT_SUCCESS;
 }

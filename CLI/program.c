@@ -42,6 +42,14 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			#endif
 			strncpy(head,"Warning: ",sizeof(char)*9);
 			break;
+		case LOGL_ALARM:
+			#ifdef _WIN32
+				colour=FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_INTENSITY;
+			#else
+				strncpy(colour,"\x1B[41;37m",sizeof(char)*8);
+			#endif
+			strncpy(head,"Alarm: ",sizeof(char)*9);
+			break;
 		case LOGL_DEBUG:
 			#ifdef _WIN32
 				colour=FOREGROUND_BLUE | FOREGROUND_INTENSITY;

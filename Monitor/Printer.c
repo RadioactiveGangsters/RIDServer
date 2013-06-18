@@ -59,7 +59,8 @@ void *getSensorTable(void *param)
 
     while(1)
     {
-        // Get all sensors types from table and for each type do printTable()
+	Log(LOGL_SYSTEM_ACTIVITY, "Printing new data\n");
+        // Print current time and date
 	char data[32];
 	data[0] = '\0';
 	strcat(data, " --- ");
@@ -69,6 +70,7 @@ void *getSensorTable(void *param)
 	strcat(data, " --- ");
 	storeToFile(fileprinterpath(), data);
 
+	// Get all sensors types from table and for each type do printTable()
         fortrie(Tables(), &getSensors);
         usleep(600000000); // 10 min sleep
     }
@@ -148,7 +150,7 @@ void StartPrinter()
     }
     else
     {
-        Log(LOGL_DEBUG, "Printer Started\n"); 
+        Log(LOGL_SYSTEM_ACTIVITY, "Printer Started\n"); 
     }
     
 }
