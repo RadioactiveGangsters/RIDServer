@@ -2,7 +2,7 @@
 
 static LLNODE*subs;
 
-void const*subscribe(void(*ls)(const LOGL,const LOGT,char const*const,va_list))
+void const*subscribe(void(*ls)(const LOGL, const LOGT, char const*const, va_list))
 {
 	if(!ls)return NULL;
 	{
@@ -26,7 +26,7 @@ void const*subscribe(void(*ls)(const LOGL,const LOGT,char const*const,va_list))
 	}
 }
 
-void Log(const LOGL ll,const LOGT lt,char const*const format, ...)
+void Log(const LOGL ll, const LOGT lt, char const*const format, ...)
 {
 	va_list ap;
 	LLNODE const*n = subs;
