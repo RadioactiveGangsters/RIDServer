@@ -42,7 +42,7 @@ void getSensorData(Trie* s)
     
     if(!storeToFile(path, data))
     {
-        Log(LOGL_ERROR, "Couldn't store data of %s to file\n", sensorName);
+        Log(LOGL_ERROR,LOGT_PRINTER,"Cannot store data of %s to file\n", sensorName);
     }
 }
 
@@ -59,7 +59,7 @@ void *getSensorTable(void *param)
 
     while(1)
     {
-	Log(LOGL_SYSTEM_ACTIVITY, "Printing new data\n");
+	Log(LOGL_SYSTEM_ACTIVITY,LOGT_PRINTER,"Printing new data\n");
         // Print current time and date
 	char data[32];
 	data[0] = '\0';
@@ -146,11 +146,11 @@ void StartPrinter()
     // Create new thread for printer, if failed print error to log
     if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) 
     {
-        Log(LOGL_ERROR, "Error creating thread for printer\n");
+        Log(LOGL_ERROR,LOGT_SERVER,"Error creating thread for printer\n");
     }
     else
     {
-        Log(LOGL_SYSTEM_ACTIVITY, "Printer Started\n"); 
+        Log(LOGL_SYSTEM_ACTIVITY,LOGT_SERVER,"Printer Started\n"); 
     }
     
 }

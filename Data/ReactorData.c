@@ -19,7 +19,7 @@ static void SimulateSensor(Trie*const sensor)
 				bool*p=malloc(sizeof*p);
 				if(!p)
 				{
-					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					Log(LOGL_SERIOUS_ERROR,LOGT_SERVER,"Out of memory!\n");
 					return;
 				}
 				*p=b->value;
@@ -27,7 +27,7 @@ static void SimulateSensor(Trie*const sensor)
 				s->delta=AutoQe(p,10);
 				if(!s->delta)
 				{
-					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					Log(LOGL_SERIOUS_ERROR,LOGT_SERVER,"Out of memory!\n");
 					free(p);
 					return;
 				}
@@ -38,7 +38,7 @@ static void SimulateSensor(Trie*const sensor)
 				int*p=malloc(sizeof*p);
 				if(!p)
 				{
-					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					Log(LOGL_SERIOUS_ERROR,LOGT_SERVER,"Out of memory!\n");
 					return;
 				}
 				i->value=randSensorValue(i->lbound,i->ubound);
@@ -46,7 +46,7 @@ static void SimulateSensor(Trie*const sensor)
 				s->delta=AutoQe(p,s->interval);
 				if(!s->delta)
 				{
-					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					Log(LOGL_SERIOUS_ERROR,LOGT_SERVER,"Out of memory!\n");
 					free(p);
 					return;
 				}
@@ -60,7 +60,7 @@ static void SimulateSensor(Trie*const sensor)
 				bool*p=malloc(sizeof*p);
 				if(!p)
 				{
-					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					Log(LOGL_SERIOUS_ERROR,LOGT_SERVER,"Out of memory!\n");
 					return;
 				}
 				*p=b->value;
@@ -73,7 +73,7 @@ static void SimulateSensor(Trie*const sensor)
 				int*p=malloc(sizeof*p);
 				if(!p)
 				{
-					Log(LOGL_SERIOUS_ERROR,"Out of memory!\n");
+					Log(LOGL_SERIOUS_ERROR,LOGT_SERVER,"Out of memory!\n");
 					return;
 				}
 				*p=i->value;
@@ -114,7 +114,7 @@ static void registerthread(Trie*const table)
 	if(!table->e)return;
 	{
 		pthread_t typethread;
-		Log(LOGL_SYSTEM_ACTIVITY,"Creating simulation thread for %s..\n",table->id);
+		Log(LOGL_SYSTEM_ACTIVITY,LOGT_SERVER,"Creating simulation thread for %s..\n",table->id);
 		pthread_create(&typethread,NULL,&SimulateType,table->e);
 		if(!threads)
 		{
@@ -148,7 +148,7 @@ static void genbSensors(char const*const type, const int amount,
 		// valid?
 		if(namelen>SENSOR_HNAMELEN)
 		{
-			Log(LOGL_ERROR,"Name %s too long! (skipping rest of this batch)\n", name);
+			Log(LOGL_ERROR,LOGT_SERVER,"Name %s too long! (skipping rest of this batch)\n", name);
 			break;
 		}
 
@@ -157,14 +157,14 @@ static void genbSensors(char const*const type, const int amount,
 			Sensor*const s=(Sensor*)makebSensor(name,type,interval,alarm);
 			if(!s)
 			{
-				Log(LOGL_ERROR,"out of memory");
+				Log(LOGL_ERROR,LOGT_SERVER,"Out of memory!\n");
 				break;
 			}
 			
 			// register them with the databases
 			if(registerSensor(s))
 			{
-				Log(LOGL_ERROR,"cannot register %s\n",s->name);
+				Log(LOGL_ERROR,LOGT_SERVER,"Cannot register %s\n",s->name);
 				free(s);
 				continue;
 			}
@@ -172,7 +172,7 @@ static void genbSensors(char const*const type, const int amount,
 			// set in log that all sensors of the group are generated
 			if(i==(amount-1))
 			{
-				Log(LOGL_DEBUG,"Generated %d %s %s %s\n{%s,%d,%d,%d,%s}\n\n",
+				Log(LOGL_DEBUG,LOGT_SERVER,"Generated %d %s %s %s\n{%s,%d,%d,%d,%s}\n\n",
 				(i+1),
 				s->type==binarysensor?"binary":"integer",
 				s->unit,
@@ -203,7 +203,7 @@ static void geniSensors(char const*const type, const int amount,
 		// valid?
 		if(namelen>SENSOR_HNAMELEN)
 		{
-			Log(LOGL_ERROR,"Name %s too long! (skipping rest of this batch)\n", name);
+			Log(LOGL_ERROR,LOGT_SERVER,"Name %s too long! (skipping rest of this batch)\n", name);
 			break;
 		}
 
@@ -212,14 +212,14 @@ static void geniSensors(char const*const type, const int amount,
 			Sensor*const s=(Sensor*)makeiSensor(name,type,interval,lbound,ubound,lalarm,ualarm);
 			if(!s)
 			{
-				Log(LOGL_ERROR,"out of memory");
+				Log(LOGL_ERROR,LOGT_SERVER,"Out of memory!\n");
 				break;
 			}
 			
 			// register them with the databases
 			if(registerSensor(s))
 			{
-				Log(LOGL_ERROR,"cannot register %s\n",s->name);
+				Log(LOGL_ERROR,LOGT_SERVER,"Cannot register %s\n",s->name);
 				free(s);
 				continue;
 			}
@@ -227,7 +227,7 @@ static void geniSensors(char const*const type, const int amount,
 			// set in log that all sensors of the group are generated
 			if(i==(amount-1))
 			{
-				Log(LOGL_DEBUG,"Generated %d %s %s %s\n{%s,%d,%d,%d,%d,%s,%s}\n\n",
+				Log(LOGL_DEBUG,LOGT_SERVER,"Generated %d %s %s %s\n{%s,%d,%d,%d,%d,%s,%s}\n\n",
 				(i+1),
 				s->type==binarysensor?"binary":"integer",
 				s->unit,
@@ -256,12 +256,12 @@ int LoadSensors(void)
 
 	if(!iniparser_find_entry(ini,"sensor"))
 	{
-		Log(LOGL_ERROR,"File %s does not contain sensor config section\n", sensorinipath());
+		Log(LOGL_ERROR,LOGT_SERVER,"File %s does not contain sensor config section\n", sensorinipath());
 		goto exit_failure;
 	}
 	if(!iniparser_find_entry(ini,"sensor:typecount"))
 	{
-		Log(LOGL_ERROR,"No sensor typecount present\n");
+		Log(LOGL_ERROR,LOGT_SERVER,"No sensor typecount present\n");
 		goto exit_failure;
 	}
 	{
@@ -290,7 +290,7 @@ int LoadSensors(void)
 
 			if(!iniparser_find_entry(ini,name)||!iniparser_find_entry(ini,amount)||!iniparser_find_entry(ini,intervalq))
 			{
-				Log(LOGL_WARNING,"skipping incomplete %s definition\n",idstring);
+				Log(LOGL_WARNING,LOGT_SERVER,"Skipping incomplete %s definition\n",idstring);
 				continue;
 			}
 
@@ -305,7 +305,7 @@ int LoadSensors(void)
 				else if(!strcmp(typea,"integer")){;/*fallthrough*/;}
 				else
 				{
-					Log(LOGL_WARNING,"unrecognised type %s, falling back on integer");
+					Log(LOGL_WARNING,LOGT_SERVER,"Unrecognised type %s, falling back on integer\n");
 				}
 	
 				if(stype==binarysensor)
@@ -347,7 +347,7 @@ int LoadSensors(void)
 				}
 				else
 				{
-					Log(LOGL_ERROR,"unknown sensor type %d from %s.\n",stype,typea);
+					Log(LOGL_ERROR,LOGT_SERVER,"Unknown sensor type %d from %s\n",stype,typea);
 				}
 			}		
 		}

@@ -38,6 +38,7 @@ install : $(TARGET)
 clean :
 	-rm $(OBJS)
 	-cd iniparser && make clean
+	.rm printer.txt
 
 $(TARGET) : $(OBJS)
 	cd iniparser && make

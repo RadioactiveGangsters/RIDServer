@@ -1,6 +1,6 @@
 #include "program.h"
 
-void console(const LOGL ll,char const*const le,va_list ap)
+void console(const LOGL ll,const LOGT lt,char const*const le,va_list ap)
 {
 	#ifdef _WIN32
 	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -24,7 +24,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			#else
 				strncpy(colour,"\x1B[41;37m",sizeof(char)*8);
 			#endif
-			strncpy(head,"ERROR: ",sizeof(char)*9);
+			strncpy(head,"ERROR -> ",sizeof(char)*10);
 			break;
 		case LOGL_ERROR:
 			#ifdef _WIN32
@@ -32,7 +32,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			#else
 				strncpy(colour,"\x1B[31m",sizeof(char)*8);
 			#endif
-			strncpy(head,"ERROR: ",sizeof(char)*9);
+			strncpy(head,"ERROR -> ",sizeof(char)*10);
 			break;
 		case LOGL_WARNING:
 			#ifdef _WIN32
@@ -40,7 +40,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			#else
 				strncpy(colour,"\x1B[33m",sizeof(char)*8);
 			#endif
-			strncpy(head,"Warning: ",sizeof(char)*9);
+			strncpy(head,"WARNING -> ",sizeof(char)*12);
 			break;
 		case LOGL_ALARM:
 			#ifdef _WIN32
@@ -48,7 +48,7 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			#else
 				strncpy(colour,"\x1B[41;37m",sizeof(char)*8);
 			#endif
-			strncpy(head,"Alarm: ",sizeof(char)*9);
+			strncpy(head,"ALARM -> ",sizeof(char)*10);
 			break;
 		case LOGL_DEBUG:
 			#ifdef _WIN32
@@ -64,6 +64,28 @@ void console(const LOGL ll,char const*const le,va_list ap)
 			#else
 				colour[0]='\0';
 			#endif
+			head[0]='\0';
+			break;
+	}
+
+	switch(lt)
+	{
+		case LOGT_SERVER:
+			strncpy(head,"Server:   ",sizeof(char)*11);
+			break;
+		case LOGT_DB:
+			strncpy(head,"Database: ",sizeof(char)*11);
+			break;
+		case LOGT_PRINTER:
+			strncpy(head,"Printer:  ",sizeof(char)*11);
+			break;
+		case LOGT_NETWORK:
+			strncpy(head,"Network:  ",sizeof(char)*11);
+			break;
+		case LOGT_CLIENT:
+			strncpy(head,"Client:   ",sizeof(char)*11);
+			break;
+		default:
 			head[0]='\0';
 			break;
 	}

@@ -19,14 +19,25 @@ typedef enum
 	LOGL_CLIENT_ACTIVITY,
 } LOGL;
 
+typedef enum
+{
+	LOGT_UNDEFINED,
+	LOGT_PROGRAM,
+	LOGT_SERVER,
+	LOGT_DB,
+	LOGT_PRINTER,
+	LOGT_NETWORK,
+	LOGT_CLIENT,
+} LOGT;
+
 struct LOGCB
 {
-	void(*log)(const LOGL,char const*const,va_list);
+	void(*log)(const LOGL,const LOGT,char const*const,va_list);
 };
 
-void Log(const LOGL,char const*const, ...);
+void Log(const LOGL,const LOGT,char const*const, ...);
 
 /*@null@*/void const*
-subscribe(void(*)(const LOGL,char const*const,va_list));
+subscribe(void(*)(const LOGL,const LOGT,char const*const,va_list));
 
 #endif
