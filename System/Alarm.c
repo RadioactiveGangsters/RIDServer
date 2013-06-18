@@ -10,10 +10,10 @@ void AlarmDetection(Sensor* sn){
 		iSensor* isn = (iSensor*) sn;
 		
 		if(isn->value > isn->ubound){
-			sendAlarm(sn);
+			sendAlarm(isn->ualarm);
 				
 		} else if (isn->value < isn->lbound){
-			sendAlarm(sn);
+			sendAlarm(isn->lalarm);
 		}
 		
 		
@@ -25,22 +25,12 @@ void AlarmDetection(Sensor* sn){
 		 bSensor* bsn = (bSensor*) sn;
 		 
 		if(bsn->value){		
-			sendAlarm(sn);	
+			sendAlarm(bsn->alarm);	
 		}
 	}
 
 }
 
-void sendAlarm(Sensor* sn){
-	
-	if(sn->type == integersensor){
-		iSensor* isn = (iSensor*) sn;
-		send(isn->
-		
-	}
-		
-	
-}	
 
 #ifndef FRONTEND_H
 
