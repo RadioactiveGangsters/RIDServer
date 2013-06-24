@@ -2,54 +2,27 @@
 
 unsigned int _sensseed;
 
-void setNewSensorValue(int const amount, int*const values, unsigned int const maxval)
-{
-	int i;
-	int count = 0;
-
-	//Create and set seed for random generator
-	_sensseed=(unsigned)rand();
-	srand(_sensseed);
-
-	for (i = 0; i < amount; i++) 
-	{
-		//Add new random value to old value
-		values[count] += (rand()%maxval + 1);
-		count++;
-	}
-}
-
-int randSensorValue(int const minval, int const maxval)
-{
-	if(maxval-minval<1)return minval;
-	//Create and set seed for random generator
-	_sensseed = (unsigned)rand();
-	srand(_sensseed );
-
-	//Set random number in value
-	return (rand()%maxval-minval) + minval; 
-}
-
 /* Generates a flux value for binary sensors. 
  * This value is randomly generated between the 
- * reed 1 and the -1000. The opportunity for 
- * '1' is 1 to 1000.
+ * reed 1 and the -10000. The opportunity for 
+ * '1' is 1 to 10000.
  */
 bool binaryflux()
 {
 	srand(_sensseed=(unsigned)rand());
-	return !(rand()%1600);
+	return !(rand()%10000);
 }
 
 /* Generates a flux value for integer sensors.
  * This value will be used to increase or decrease
  * the original value. The random generated value
- * will be between -5 and 6.
+ * will be between -2 and 3.
  */
 int integerflux(int pvalue)
 {
+	int flux;
 	srand(_sensseed=(unsigned)rand());
-	int flux = (rand()%3)-1;
+	flux = (rand()%5)-2;
 
 	if(pvalue == 0)
 	{
@@ -67,6 +40,12 @@ void SetupSensors(void)
 {
 	srand((unsigned int)time(NULL));
 	_sensseed=(unsigned)rand();    
+}
+
+void ResetSensor(Sensor*const s)
+{
+	if(s->type == binarysensor) ((bSensor*)s)->value = 0;
+	else ((iSensor*)s)->value = ((((iSensor*)s)->lbound)+(((iSensor*)s)->ubound))/2;
 }
 
 void DestroySensor(Sensor*const s)
