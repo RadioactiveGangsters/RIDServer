@@ -49,7 +49,7 @@ bool binaryflux()
 int integerflux(int pvalue)
 {
 	srand(_sensseed=(unsigned)rand());
-	int flux = (rand()%11)-5;
+	int flux = (rand()%3)-1;
 
 	if(pvalue == 0)
 	{

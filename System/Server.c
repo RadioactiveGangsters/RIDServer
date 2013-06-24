@@ -11,7 +11,11 @@ int InitServer(const int argc, char const*const*const argv)
 		Log(LOGL_DEBUG,"%s\n",argv[i]);
 	}
 */
-	return OpenDatabase();
+	
+	// need not unsubscribe
+	if(!Sub(&AlarmDetection))return false;;
+	if(!OpenDatabase())return false;
+	return true;
 }
 
 int StartServer(void)

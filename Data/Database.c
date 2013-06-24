@@ -23,11 +23,12 @@ void PushS(Sensor*const s)
 	if(!subs)return;
 	{
 		LLNODE*x=subs;
-		while(x->n!=NULL)
+do
 		{
 			((SensorCB*)x->e)->cb(s);
 			x=x->n;
 		}
+		while(x!=NULL);
 	}
 }
 
