@@ -41,7 +41,7 @@ static void SimulateSensor(Trie*const sensor)
 					Log(LOGL_SERIOUS_ERROR, LOGT_SERVER, "Out of memory!\n");
 					return;
 				}
-				i->value=randSensorValue(i->lbound, i->ubound);
+				//i->value=randSensorValue(i->lbound, i->ubound);
 				*p=i->value;
 				s->delta=AutoQe(p, s->interval);
 				if(!s->delta)

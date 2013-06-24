@@ -38,7 +38,7 @@ int randSensorValue(int const minval, int const maxval)
 bool binaryflux()
 {
 	srand(_sensseed=(unsigned)rand());
-	return !(rand()%1000);
+	return !(rand()%1600);
 }
 
 /* Generates a flux value for integer sensors.
