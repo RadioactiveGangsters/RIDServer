@@ -1,8 +1,10 @@
 
 init_queue(queue *q)
 {
+	q->size=INIT_SIZE_QUEUE;
+	q->array=malloc(sizeof(void*)*q->size));
         q->first = 0;
-        q->last = QUEUESIZE-1;
+        q->last = q->size-1;
         q->count = 0;
 }
 
@@ -16,23 +18,25 @@ enqueue(queue *q, void*x)
 	}
         else 
 	{
-                q->last = (q->last+1) % QUEUESIZE;
-                q->q[ q->last ] = x;    
+                q->last = (q->last+1) % q->size;
+                q->array[ q->last ] = x;    
                 q->count = q->count + 1;
         }
 }
 
-int dequeue(queue *q)
+void* dequeue(queue *q)
 {
         void*x;
 
         if (q->count <= 0) printf("Warning: empty queue dequeue.\n");
         else 
 	{
-                x = q->q[ q->first ];
-                q->first = (q->first+1) % QUEUESIZE;
+                x = q->array[ q->first ];
+                q->first = (q->first+1) % q->size;
                 q->count = q->count - 1;
         }
 
         return(x);
 }
+
+

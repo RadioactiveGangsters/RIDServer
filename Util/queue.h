@@ -4,11 +4,13 @@
 #include "bool.h"
 
 
-#define QUEUESIZE       1000
+
+#define	INIT_SIZE_QUEUE 8
 
 typedef struct {
-        void*q[QUEUESIZE+1];		/* body of queue */
+        void**array;				/* body of queue */
         int first;                      /* position of first element */
         int last;                       /* position of last element */
         int count;                      /* number of queue elements */
+	int size;
 } queue;
