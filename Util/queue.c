@@ -39,13 +39,25 @@ void* dequeue(queue *q)
         return(x);
 }
 
-void resize()
+void resize(queue *q)
 {
+	int seccount = 0;
 	q->size = q->size*2;
 	q->array=malloc(sizeof(void*)*q-size));
-	while(q->count != 0)
-		enqueue(*q, dequeue(*q));
+	// !=0 kan eigenlijk weg toch?
+	while(q->count != 0) 
+	{		
+	enqueue(q->temparray, dequeue(q-array));
+	seccount++;
+	}
 
+	free(q->array);
+
+	while(seccount != 0)
+	{	
+		enqueue(q->array, dequeue(q->temparray));
+		seccount--;
+	}
 }
 
 
