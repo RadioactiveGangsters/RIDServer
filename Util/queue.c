@@ -10,7 +10,7 @@ init_queue(queue *q)
 
 enqueue(queue *q, void*x)
 {
-        if (q->count >= QUEUESIZE)
+        if (q->count >= q->size)
 	{
 		printf("Warning: queue overflow enqueue x=%d\n",x);
 		//TODO: Make it Dynamic!!
@@ -31,12 +31,21 @@ void* dequeue(queue *q)
         if (q->count <= 0) printf("Warning: empty queue dequeue.\n");
         else 
 	{
-                x = q->array[ q->first ];
+                x = q->array[ q->first];
                 q->first = (q->first+1) % q->size;
                 q->count = q->count - 1;
         }
 
         return(x);
+}
+
+void resize()
+{
+	q->size = q->size*2;
+	q->array=malloc(sizeof(void*)*q-size));
+	while(q->count != 0)
+		enqueue(*q, dequeue(*q));
+
 }
 
 
