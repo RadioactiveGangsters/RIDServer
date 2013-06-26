@@ -100,7 +100,7 @@ static void*SimulateType(void*const rawtable)
 				#ifdef _WIN32
 				Sleep(example->interval);
 				#else
-				usleep(example->interval*1000);
+				nanosleep((struct timespec[]){{example->interval/1000,example->interval%1000}},NULL);
 				#endif
 			}
 		}

@@ -2,6 +2,7 @@
 #define REACTORDATA_H
 
 #include <pthread.h>
+#include <time.h>
 
 #ifdef _WIN32
 	#include <windows.h>
