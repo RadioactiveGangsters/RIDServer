@@ -21,7 +21,7 @@ void writePacket(const int fd,Packet*const p)
 					break;
 			}
 	
-		if(write(fd,p,packsize)!=packsize)
+		if(write(fd,p,packsize)<(ssize_t)packsize)
 		{
 			Log(LOGL_WARNING, LOGT_NETWORK, "Could not send complete packet %d\n",p->op);
 			return;
@@ -153,6 +153,7 @@ void test(void)
 
 void sendPacket(Client*const c,Packet*const p)
 {
+	if(!c)return;
 	if(!p)return;
 	else
 	{

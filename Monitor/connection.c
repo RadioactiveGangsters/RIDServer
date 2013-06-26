@@ -20,15 +20,8 @@ void*socklisten(void*connection)
 
 			if((client_sockfd = accept(server_sockfd, &client_address, &clien_len)) < 1 )
 			{
-				int x = errno;
-				switch(x)
-				{
-					case EBADF:
-						Log(LOGL_BUG,LOGT_NETWORK,"Invalid socket alloccated.");
-						break;
-				}
-				Log(LOGL_BUG, LOGT_NETWORK, "Connection error: %s\n", strerror(x));
-				continue;
+				Log(LOGL_BUG,LOGT_NETWORK,"Unable to accept connection, dying.");
+				break;
 			}
 			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected\n");       
 
@@ -40,6 +33,7 @@ void*socklisten(void*connection)
 			}
 		}
 	}
+	free(connection);
 	pthread_exit(NULL);
 }
 
@@ -84,12 +78,12 @@ int AcceptClients(void)
 	}
 
 	/* why are we telling, and who are we telling, their child changed state? 
-	*/if(signal(SIGCHLD, SIG_IGN) == SIG_ERR)
+	if(signal(SIGCHLD, SIG_IGN) == SIG_ERR)
 	{
 		Log(LOGL_BUG,LOGT_NETWORK,"sigchld wat\n");
 		return EXIT_FAILURE;
 	}
-	/*do we need this?
+	do we need this?
 	*/
 
 	{
