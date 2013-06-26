@@ -48,8 +48,14 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-    usleep(5000000); // 5 second; to wait for some data to be generated
-    time_t t;
+    	time_t t;
+    // 5 second; to wait for some data to be generated
+	#ifdef _WIN32
+	Sleep(5000
+	#else
+	sleep(5
+	#endif
+	);
 
     while(1)
     {
@@ -67,7 +73,14 @@ void *getSensorTable(void *param)
 
 		// Get all sensors types from table and for each type do printTable()
         fortrie(Tables(), &getSensors);
-        usleep(600000000); // 10 minutes
+	   // Wait 10 minutes for the next printout
+	   // TODO: configurable
+		#ifdef _WIN32
+		Sleep(600000
+		#else
+		sleep(600
+		#endif
+		);
     }
 }
 

@@ -47,6 +47,7 @@ void AlarmDetection(Sensor* sn)
 
 void SendAlarm(Sensor*fb)
 {
+	if(!fb)return;
 //	forClient(&warn);
 }
 

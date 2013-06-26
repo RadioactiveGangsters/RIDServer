@@ -5,12 +5,10 @@ int InitServer(const int argc, char const*const*const argv)
 	int i;
 	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Initializing..\n");
 
-/*  TODO: Change this below
-	for(i=0;i<argc;i++)
+	for(i=1;i<argc;i++)
 	{
-		Log(LOGL_DEBUG,"%s\n",argv[i]);
+		Log(LOGL_DEBUG,LOGT_PROGRAM,"has: %s\n",argv[i]);
 	}
-*/
 	
 	// need not unsubscribe
 	if(!Sub(&AlarmDetection))return false;;
