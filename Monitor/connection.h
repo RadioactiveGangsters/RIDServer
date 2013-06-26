@@ -20,8 +20,11 @@
 
 #endif
 
+#include <errno.h>
+
+#include "Client.h"
 #include "../System/Log.h"
 
-int socklisten(void);
+int AcceptClients(void);
 
 #endif

@@ -1,14 +1,15 @@
 #ifndef RPACKET_H
 #define RPACKET_H
 
-typedef enum
+typedef enum opcode
 {
-
+	OPC_UNDEFINED=0x00,
+	OPC_PING=0x02,
 } opcode;
 
 typedef struct
 {
-	opcode opcode,
-} packet;
+	opcode op;
+} Packet;
 
 #endif

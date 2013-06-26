@@ -50,10 +50,9 @@ typedef struct
 } iSensor;
 
 void SetupSensors(void);
-int randSensorValue(int const,int const);
-void setNewSensorValue(int const, int*const, unsigned int const);
 bool binaryflux();
 int integerflux(int const);
+void ResetSensor(Sensor*const);
 void DestroySensor(Sensor*const);
 
 iSensor*

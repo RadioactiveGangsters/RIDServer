@@ -1,29 +1,64 @@
 #include "Client.h"
 
+void*_iLoop(void*const c)
+{
+	if(!c)
+	{
+		pthread_exit(NULL);
+	}
+	else
+	{
+//		Client*client=c;
+	}
+	pthread_exit(NULL);
+}
 
-Client* MakeClient(int fd)
+void*_oLoop(void*const c)
+{
+	if(!c)
+	{
+		pthread_exit(NULL);
+	}
+	else
+	{
+		Client*client=c;
+		while(true)
+		{
+			if(client->_queue)
+			{
+//				ssize_t x;
+//				if((x=write(client->fd, dequeue(client->_queue), sizeof(char)))!=sizeof(char))
+				{
+					// TODO: assume client is dead; cleanup
+					break;
+				}
+			}
+		}
+	}
+	pthread_exit(NULL);
+}
+
+Client*SpawnClient(int fd)
 {
 	pthread_t iloop,oloop;
-	Client c =
+	Client c=
 	{
 		.fd=fd,
-		.send=&sendpacket,
 		.iloop=iloop,
 		.oloop=oloop,
+		._queue=NULL,
+		.send=&sendPacket,
 	},*p=malloc(sizeof*p);
-	if(!p)
-	{
-		Log(LOGL_SERIOUS_ERROR,LOGT_NETWORK,"Out of memory!");
-		return NULL;
-	}
+	if(!p)return NULL;
+
 	memcpy(p,&c,sizeof*p);
-	pthread_create(&p->iloop,NULL,&iLoop,p);
-	pthread_create(&p->oloop,NULL,$oLoop,p);
+	pthread_create(&p->iloop,NULL,&_iLoop,p);
+	pthread_create(&p->oloop,NULL,&_oLoop,p);
 	return p;
 }
 
-void test(void);
-}
+void test(void)
+{
 	int i = 0;
 	//if(read(address, &ch, 1)) break; 
 	//Log(LOGL_DEBUG, LOGT_NETWORK, "Client send: %c\n", ch);
@@ -41,8 +76,6 @@ void test(void);
 
 //		Log(LOGL_DEBUG, LOGT_NETWORK, "Send char %d \n", *pp);
 
-		//if((x=write(client_sockfd, t, sizeof(char)))!=sizeof(char))
-		//Log(LOGL_ERROR, "string cannot send %d: %d",x, errno);
 
 		//Log(LOGL_CLIENT_ACTIVITY, "send char %c \n", t );
 	}
@@ -51,27 +84,11 @@ void test(void);
 //	if(write(address, &ch, 1)) continue;
 //	printf("Send: %c", ch);
 
-	(void)close(address);
+//	(void)close(address);
 }
 
 
-static void iLoop(Client*c)
+void sendPacket(Packet*p)
 {
-
-}
-
-static void oLoop(Client*c)
-{
-	while(true)
-	{
-		if(Client->queue)
-		{
-			
-		}
-	}
-}
-
-void sendPacket(Packet*)
-{
-
+	if(!p)return;
 }

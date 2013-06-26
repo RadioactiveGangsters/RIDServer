@@ -24,6 +24,6 @@ static bool useColours=COLOURSUPPORT;
 
 int main(int,char**);
 
-static void console(const LOGL,char const*const,va_list);
+static void console(const LOGL,const LOGT,char const*const,va_list);
 
 #endif

@@ -1,9 +1,3 @@
-/*
- * File:   Printer.c
- * Author: Bas
- *
- */
-
 #include "Printer.h"
 
 void getSensorData(Trie* s)
@@ -42,7 +36,7 @@ void getSensorData(Trie* s)
     
     if(!storeToFile(path, data))
     {
-        Log(LOGL_ERROR, "Couldn't store data of %s to file\n", sensorName);
+        Log(LOGL_ERROR, LOGT_PRINTER, "Cannot store data of %s to file\n", sensorName);
     }
 }
 
@@ -54,25 +48,26 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-    usleep(5000000); // 5 sec sleep to wait for some data to be generated
     time_t t;
+    usleep(5000000); // 5 second; to wait for some data to be generated
 
     while(1)
     {
-	Log(LOGL_SYSTEM_ACTIVITY, "Printing new data\n");
-        // Print current time and date
-	char data[32];
-	data[0] = '\0';
-	strcat(data, " --- ");
-	time(&t);
-	strcat(data, ctime(&t));
-	data[24+3+2]='\0';
-	strcat(data, " --- ");
-	storeToFile(fileprinterpath(), data);
+		char data[32];
+		Log(LOGL_SYSTEM_ACTIVITY, LOGT_PRINTER, "Printing new data\n");
+		
+		// Print current time and date
+		data[0] = '\0';
+		strcat(data, " --- ");
+		time(&t);
+		strcat(data, ctime(&t));
+		data[24+3+2]='\0';
+		strcat(data, " --- ");
+		storeToFile(fileprinterpath(), data);
 
-	// Get all sensors types from table and for each type do printTable()
+		// Get all sensors types from table and for each type do printTable()
         fortrie(Tables(), &getSensors);
-        usleep(600000000); // 10 min sleep
+        usleep(600000000); // 10 minutes
     }
 }
 
@@ -128,7 +123,7 @@ int storeToFile(char const*const path, char const*const data)
         FILE *printFile;
     
         // Append data to the file
-        if((printFile = fopen(path,"a")) == NULL )
+        if((printFile = fopen(path, "a")) == NULL )
         {
             return 0;
         }
@@ -146,11 +141,10 @@ void StartPrinter()
     // Create new thread for printer, if failed print error to log
     if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) 
     {
-        Log(LOGL_ERROR, "Error creating thread for printer\n");
+        Log(LOGL_ERROR, LOGT_SERVER, "Error creating thread for printer\n");
     }
     else
     {
-        Log(LOGL_SYSTEM_ACTIVITY, "Printer Started\n"); 
+        Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Printer Started\n"); 
     }
-    
 }

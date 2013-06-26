@@ -1,5 +1,5 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef RCLIENT_H
+#define RCLIENT_H
 
 #ifdef _WIN32
 
@@ -18,19 +18,21 @@
 #endif
 
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "Packet.h"
 #include "../System/Log.h"
 
 typedef struct
 {
-	const int fd,
-	const pthread_t iloop, oloop;
-	const void *send(Packet*),
+	const int fd;
+	pthread_t iloop, oloop;
+	void*_queue;
+	void (*const send)(Packet*const);
 } Client;
 
-Client* MakeClient(int);
+Client*SpawnClient(const int);
 
-void sendPacket(Packet*);
+void sendPacket(Packet*const);
 
 #endif
