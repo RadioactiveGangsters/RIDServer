@@ -28,11 +28,10 @@ typedef struct
 	const int fd;
 	pthread_t iloop, oloop;
 	void*_queue;
-	void (*const send)(Packet*const);
 } Client;
 
 Client*SpawnClient(const int);
 
-void sendPacket(Packet*const);
+void sendPacket(Client*const,Packet*const);
 
 #endif

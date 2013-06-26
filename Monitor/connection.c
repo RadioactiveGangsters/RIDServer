@@ -21,7 +21,13 @@ void*socklisten(void*connection)
 			if((client_sockfd = accept(server_sockfd, &client_address, &clien_len)) < 1 )
 			{
 				int x = errno;
-				Log(LOGL_ERROR, LOGT_NETWORK, "Connection error: %s\n", strerror(x));
+				switch(x)
+				{
+					case EBADF:
+						Log(LOGL_BUG,LOGT_NETWORK,"Invalid socket alloccated.");
+						break;
+				}
+				Log(LOGL_BUG, LOGT_NETWORK, "Connection error: %s\n", strerror(x));
 				continue;
 			}
 			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected\n");       
