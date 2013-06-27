@@ -44,12 +44,17 @@ int AcceptClients(void)
 	#else
 	pthread_t netthread;
 	int server_sockfd;
+	dictionary*config=iniparser_load(networkinipath());
+	if(!config||!iniparser_find_entry(config,"network"))
+	{
+		Log(LOGL_WARNING,LOGT_NETWORK, "Network configuration missing from %s, using defaults.\n",networkinipath());
+	}
 	// TODO: address config
 	const struct sockaddr_in server_address=
 	{
 		.sin_family=AF_INET,
-		.sin_port = htons(4444),
-		.sin_addr.s_addr = inet_addr("127.0.0.1"),
+		.sin_port = htons(iniparser_getint(config,"network:port",4444)),
+		.sin_addr.s_addr = inet_addr(iniparser_getstring(config,"network:address","127.0.0.1")),
 		// padding
 		.sin_zero = {0},
 	};
