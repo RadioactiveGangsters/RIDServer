@@ -10,7 +10,7 @@
 	#include <unistd.h>
 #endif
 
-#include "../iniparser/src/iniparser.h"
+#include "../deps/iniparser/src/iniparser.h"
 
 #include "../System/Log.h"
 #include "../Util/LinkedList.h"
