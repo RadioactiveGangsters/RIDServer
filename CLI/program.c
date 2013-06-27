@@ -11,10 +11,50 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 	    GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
 	    saved_attributes = consoleInfo.wAttributes;
     #else
-		char colour[] ="\x1B[41;37";
+		char colour[] ="\x1B[41;37;1m";
 	#endif
+	size_t lcolour=sizeof(char)*10;
+	
+	char const*const origin[]=
+	{
+		//UNDEFINED
+		"",
+		// PROGRAM
+		"",
+		//SERVER
+		"Server",
+		//DB
+		"Database",
+		//PRINTER
+		"Printer",
+		//NETWORK
+		"Network",
+		//CLIENT
+		"Client",
+	},
 
-	char head[] ="Warning: ";
+	*const head[]=
+	{
+		//UNDEFINED
+		": ",
+		//ERROR
+		" error: ",
+		//WARNING
+		" warning: ",
+		//SERIOUS_ERROR
+		" ERROR: ",
+		//ALARM
+		" alarm: ",
+		// DEBUG
+		": ",
+		// SYSTEM_ACTIVITY
+		": ",
+		// CLIENT_ACTIVITY
+		": ",
+	};
+
+
+	const char*const porigin=origin[lt],*const phead=head[ll];
 
 	switch(ll)
 	{
@@ -22,45 +62,40 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			#ifdef _WIN32
 				colour = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_INTENSITY;
 			#else
-				strncpy(colour, "\x1B[41;37m", sizeof(char)*8);
+				strncpy(colour, "\x1B[41;37m", lcolour);
 			#endif
-			strncpy(head, "ERROR -> ", sizeof(char)*10);
 			break;
 
 		case LOGL_ERROR:
 			#ifdef _WIN32
 				colour = FOREGROUND_RED | FOREGROUND_INTENSITY;
 			#else
-				strncpy(colour, "\x1B[31m", sizeof(char)*8);
+				strncpy(colour, "\x1B[31m", lcolour);
 			#endif
-			strncpy(head, "ERROR -> ", sizeof(char)*10);
 			break;
 
 		case LOGL_WARNING:
 			#ifdef _WIN32
 				colour = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
 			#else
-				strncpy(colour, "\x1B[33m", sizeof(char)*8);
+				strncpy(colour, "\x1B[33m", lcolour);
 			#endif
-			strncpy(head, "WARNING -> ", sizeof(char)*12);
 			break;
 
 		case LOGL_ALARM:
 			#ifdef _WIN32
-				colour = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_INTENSITY;
+				colour = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_RED ;
 			#else
-				strncpy(colour, "\x1B[41;37m", sizeof(char)*8);
+				strncpy(colour, "\x1B[41;37m", lcolour);
 			#endif
-			strncpy(head, "ALARM -> ", sizeof(char)*10);
 			break;
 
 		case LOGL_DEBUG:
 			#ifdef _WIN32
 				colour = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 			#else
-				strncpy(colour, "\x1B[30;1m", sizeof(char)*8);
+				strncpy(colour, "\x1B[30;1m", lcolour);
 			#endif
-			head[0] ='\0';
 			break;
 
 		default:
@@ -69,34 +104,6 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			#else
 				colour[0] ='\0';
 			#endif
-			head[0] ='\0';
-			break;
-	}
-
-	switch(lt)
-	{
-		case LOGT_SERVER:
-			strncpy(head, "Server:   ", sizeof(char)*11);
-			break;
-
-		case LOGT_DB:
-			strncpy(head, "Database: ", sizeof(char)*11);
-			break;
-
-		case LOGT_PRINTER:
-			strncpy(head, "Printer:  ", sizeof(char)*11);
-			break;
-
-		case LOGT_NETWORK:
-			strncpy(head, "Network:  ", sizeof(char)*11);
-			break;
-
-		case LOGT_CLIENT:
-			strncpy(head, "Client:   ", sizeof(char)*11);
-			break;
-
-		default:
-			head[0]='\0';
 			break;
 	}
 
@@ -104,12 +111,11 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 	{
 		#ifdef _WIN32
 			SetConsoleTextAttribute(hConsole, colour);
-			printf("%s", head);
 		#else
-
-			printf("%s%s", colour, head);
+			printf("%s", colour);
 		#endif
 	}
+	printf("%s%s",porigin, phead);
 
 	(void)vprintf(le, ap);
 
