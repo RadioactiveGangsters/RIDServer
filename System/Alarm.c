@@ -12,13 +12,13 @@ void AlarmDetection(Sensor* sn)
 		
 		if(isn->value > isn->ubound)
 		{
-			Log(LOGL_ALARM, LOGT_SERVER, "%s to HIGH\n", (sn->name));
+			Log(LOGL_ALARM, LOGT_SERVER, "%s to HIGH", (sn->name));
 			//sendAlarm(isn->ualarm);		
 		} 
 		else if (isn->value < isn->lbound)
 		{
 			//sendAlarm(isn->lalarm);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s to LOW\n", (sn->name));
+			Log(LOGL_ALARM, LOGT_SERVER, "%s to LOW", (sn->name));
 		}
 	} 
 	
@@ -30,7 +30,7 @@ void AlarmDetection(Sensor* sn)
 		if(bsn->value)
 		{		
 			//sendAlarm(bsn->alarm);	
-			Log(LOGL_ALARM, LOGT_SERVER, "%s is TRUE\n", (sn->name));
+			Log(LOGL_ALARM, LOGT_SERVER, "%s is TRUE", (sn->name));
 		}
 	}
 }

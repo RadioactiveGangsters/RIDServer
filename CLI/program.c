@@ -122,6 +122,7 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			printf("\x1B[0m");
 		#endif
 	}
+	printf("\n");
 }
 
 int main(int argc, char**argv)
