@@ -1,11 +1,19 @@
-
 init_queue(queue *q)
 {
 	q->size=INIT_SIZE_QUEUE;
 	q->array=malloc(sizeof(void*)*q->size));
-        q->first = 0;
-        q->last = q->size-1;
-        q->count = 0;
+	q->first = 0;
+	q->last = q->size-1;
+	q->count = 0;
+}
+
+init_bigqueue(queue *b, int s)
+{
+	b->size=s;
+	b->array=malloc(sizeof(void*)*b->size));
+	b->first=0;
+	b->last=b->size-1;
+	b->count = 0;
 }
 
 enqueue(queue *q, void*x)
@@ -41,23 +49,46 @@ void* dequeue(queue *q)
 
 void resize(queue *q)
 {
-	int seccount = 0;
-	q->size = q->size*2;
-	q->array=malloc(sizeof(void*)*q-size));
-	// !=0 kan eigenlijk weg toch?
-	while(q->count != 0) 
-	{		
-	enqueue(q->temparray, dequeue(q-array));
-	seccount++;
+	// HOWTO: FIXME:
+	// TODO:
+	// init a twice-as-big queue
+	// while q has elements
+	// 	enqueue into twice-as-big queue the dequeued element of q
+	// free q->array (it is empty now)
+	// memcpy into q twice-as-big-queue
+	
+	// the problem was that we did not need a temparray, but a tempqueue
+	// it can be done with temparray, but to do that beautifully you need Level 2 Pointermagic (try it sometime!)
+	
+	//Making that delicious double sauced queue
+	init_bigqueue(temp, q->size*2);
+	
+	
+	//While those ingredients are hopping on ya whopper
+	while(q->count)
+	{
+		enqueue(temp, dequeue(q));
 	}
-
-	free(q->array);
-
-	while(seccount != 0)
+	
+	//Cleaning that shit 
+	free(q->array):
+	//DONE, get the f*ck out of here
+	memcpy(q, temp, sizeof(temp));
+	
+	
+/*	prev solution:
+   	q->size = q->size*2;
+	void**temparray=malloc(sizeof(void*)*q-size));
+	
+	void**p=temparray+q->first;
+	while(q->count) 
 	{	
-		enqueue(q->array, dequeue(q->temparray));
-		seccount--;
+		enqueue(q->temparray, dequeue(q->array));
 	}
+	free(q->array);
+	q->array = temparray
+*/
 }
 
 
+-
