@@ -6,7 +6,7 @@ CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic -g
 
 INIPARSER = -liniparser
 #bundled iniparser
-INIPARSER = -Liniparser/ -liniparser
+INIPARSER = -Ldeps/iniparser/ -liniparser
 
 LINKERFLAGS = $(INIPARSER) -lpthread -fwhole-program
 
@@ -26,7 +26,7 @@ OBJS = $(FRONTEND)/program.o \
 		Data/Database.o Data/ReactorData.o Data/sensor.o \
 		Util/LinkedList.o Util/Trie.o Util/Path.o Util/DeathRow.o Util/util.o \
 		
-LIBS = iniparser/libiniparser.a \
+LIBS = deps/iniparser/libiniparser.a \
 
 
 .PHONY : all
@@ -45,7 +45,7 @@ clean :
 $(TARGET) : $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) $(OBJS) $(LINKERFLAGS) -o $(TARGET)
 
-iniparser/libiniparser.a : iniparser/Makefile
+deps/iniparser/libiniparser.a : iniparser/Makefile
 		cd iniparser && make default
 
 %.o : %.c %.h.gch
