@@ -63,10 +63,23 @@ void*_iLoop(void*const c)
 						// Do not cause pingstorm
 						break;
 
-					case OPC_UPDATE:
 					case OPC_GRAPH:
+						Log(LOGL_DEBUG,LOGT_CLIENT,"reading graph packet\n");
+						p=readGraph(client->fd);
+						if(!p)
+						{
+							Log(LOGL_SERIOUS_ERROR,LOGT_CLIENT,"Out of memory!\n");
+							break;
+						}
+						if(p->op==OPC_UNDEFINED)
+						{
+							Log(LOGL_BUG,LOGT_CLIENT,"Cannot read packet\n");
+							continue;
+						}
+						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet.\n");
+						break;
+					case OPC_UPDATE:
 						Log(LOGL_BUG,LOGT_NETWORK,"packet %d not supported yet\n",ch);
-						continue;
 					case OPC_ALARM:
 					case OPC_UNDEFINED:
 						Log(LOGL_ERROR,LOGT_NETWORK,"Client violates protocol\n");
@@ -89,6 +102,7 @@ void*_oLoop(void*const c)
 	else
 	{
 		Client*client=c;
+		write(client->fd,makePing(),sizeof(Packet));
 		while(true)
 		{
 			if(client->_queue)
