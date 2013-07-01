@@ -41,6 +41,8 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 		" error: ",
 		//WARNING
 		" warning: ",
+		//BUG
+		" BUG: ",
 		//SERIOUS_ERROR
 		" ERROR: ",
 		//ALARM
@@ -80,7 +82,6 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			#else
 				strncpy(colour, "\x1B[43;30m",sizeof(char)*8);
 			#endif
-			strncpy(head, "BUG -> ", sizeof(char)*12);
 			break;
 
 		case LOGL_WARNING:

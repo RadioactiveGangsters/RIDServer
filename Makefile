@@ -11,7 +11,7 @@ LINKERFLAGS = $(INIPARSER) -lpthread -fwhole-program
 
 
 LINT = splint
-LINTFLAGS = +quiet +weak -warnposix -castfcnptr
+LINTFLAGS = +quiet +weak -warnposix
 
 
 FRONTEND = CLI
@@ -38,20 +38,14 @@ install : $(TARGET)
 .PHONY : clean
 clean :
 	-rm $(OBJS)
-
-
-$(TARGET) : $(OBJS) $(LIBS)
-
 	-cd deps/iniparser && make veryclean
 	-rm printer.txt
 
-
-	cd deps/iniparser && make
-
+$(TARGET) : $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) $(OBJS) $(LINKERFLAGS) -o $(TARGET)
 
-deps/iniparser/libiniparser.a : iniparser/Makefile
-		cd iniparser && make default
+deps/iniparser/libiniparser.a : deps/iniparser/Makefile
+	cd deps/iniparser && make default
 
 %.o : %.c %.h.gch
 	-$(LINT) $(LINTFLAGS) $<

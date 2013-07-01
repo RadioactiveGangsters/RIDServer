@@ -25,7 +25,7 @@
 #include "Client.h"
 #include "../System/Log.h"
 #include "../Util/Path.h"
-#include "../iniparser/src/iniparser.h"
+#include "../deps/iniparser/src/iniparser.h"
 
 int AcceptClients(void);
 

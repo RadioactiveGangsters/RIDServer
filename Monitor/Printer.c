@@ -57,12 +57,12 @@ void *getSensorTable(void *param)
 	#endif
 	);
 
-    while(1)
+    while(true)
     {
+		char data[32];
 		Log(LOGL_SYSTEM_ACTIVITY, LOGT_PRINTER, "Printing new data");
 		
 		// Print current time and date
-		char data[32];
 		data[0] = '\0';
 		strcat(data, " --- ");
 		time(&t);

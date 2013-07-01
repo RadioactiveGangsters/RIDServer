@@ -2,7 +2,7 @@
 
 int InitServer(const int argc, char const*const*const argv)
 {
-	
+	int i;
 	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Initializing..");
 
 	for(i=1;i<argc;i++)
