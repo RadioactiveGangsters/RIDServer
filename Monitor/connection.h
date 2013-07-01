@@ -20,8 +20,13 @@
 
 #endif
 
-#include "../System/Log.h"
+#include <errno.h>
 
-int socklisten(void);
+#include "Client.h"
+#include "../System/Log.h"
+#include "../Util/Path.h"
+#include "../iniparser/src/iniparser.h"
+
+int AcceptClients(void);
 
 #endif

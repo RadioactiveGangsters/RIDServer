@@ -18,4 +18,6 @@
 *.app
 
 ReaktorServerCLI
-IRI.sublime-workspace
+*.sublime-workspace
+printer.txt
+

@@ -48,15 +48,15 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-    usleep(5000000); // 5 second; to wait for some data to be generated
     time_t t;
+    usleep(5000000); // 5 second; to wait for some data to be generated
 
     while(1)
     {
+		char data[32];
 		Log(LOGL_SYSTEM_ACTIVITY, LOGT_PRINTER, "Printing new data\n");
 		
 		// Print current time and date
-		char data[32];
 		data[0] = '\0';
 		strcat(data, " --- ");
 		time(&t);

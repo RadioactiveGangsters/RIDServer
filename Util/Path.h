@@ -8,5 +8,6 @@ typedef struct
 
 char*sensorinipath(void);
 char*fileprinterpath(void);
+char*networkinipath(void);
 
 #endif

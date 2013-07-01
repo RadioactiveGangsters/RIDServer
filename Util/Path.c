@@ -1,8 +1,13 @@
 #include "Path.h"
 
+inline char*networkinipath(void)
+{
+	return "reactor.ini";
+}
+
 inline char*sensorinipath(void)
 {
-	return "sensor.ini";
+	return "reactor.ini";
 }
 
 inline char*fileprinterpath(void)

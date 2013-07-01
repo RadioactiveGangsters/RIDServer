@@ -22,10 +22,12 @@ INSTALLATIONDIR = /usr/local/bin
 
 OBJS = $(FRONTEND)/program.o \
 		System/Server.o System/Log.o System/Alarm.o\
-		Monitor/connection.o Monitor/Printer.o \
+		Monitor/Packet.o Monitor/connection.o Monitor/Client.o Monitor/Printer.o \
 		Data/Database.o Data/ReactorData.o Data/sensor.o \
 		Util/LinkedList.o Util/Trie.o Util/Path.o Util/DeathRow.o Util/util.o \
 		
+LIBS = iniparser/libiniparser.a \
+
 
 .PHONY : all
 all : $(TARGET)
@@ -37,12 +39,14 @@ install : $(TARGET)
 .PHONY : clean
 clean :
 	-rm $(OBJS)
-	-cd iniparser && make clean
-	.rm printer.txt
+	-cd iniparser && make veryclean
+	-rm printer.txt
 
-$(TARGET) : $(OBJS)
-	cd iniparser && make
+$(TARGET) : $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) $(OBJS) $(LINKERFLAGS) -o $(TARGET)
+
+iniparser/libiniparser.a : iniparser/Makefile
+		cd iniparser && make default
 
 %.o : %.c %.h.gch
 	-$(LINT) $(LINTFLAGS) $<

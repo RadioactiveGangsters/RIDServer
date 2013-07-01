@@ -1,108 +1,94 @@
 #include "connection.h"
-#include <errno.h>
 
-int socklisten()
+void*socklisten(void*connection)
 {
-    #ifdef _WIN32
-    Sleep(100000000); // 1 second
-    #else
-    int server_sockfd, client_sockfd;
-    socklen_t server_len, client_len;
-    struct sockaddr_in server_address;
-    struct sockaddr_in client_address;
-
-    server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (!server_sockfd)
+	if(!connection)
 	{
-        Log(LOGL_ERROR, LOGT_NETWORK, "Error sockfd\n");
-    }
-
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
-    server_address.sin_port = htons(4444);
-
-    server_len = (socklen_t)sizeof(server_address);
-
-	if(bind(server_sockfd, (struct sockaddr *)&server_address, server_len) != 0)
-    {
-    	perror("oops: server-tcp-single");
-        return EXIT_FAILURE;
-    }
-
-    if(listen(server_sockfd, 5)) return EXIT_FAILURE;
-    if(signal(SIGCHLD, SIG_IGN) == SIG_ERR) return EXIT_FAILURE;
-       
-    typedef  struct
+		Log(LOGL_BUG,LOGT_NETWORK,"Cannot listen without connection");
+		pthread_exit(NULL);
+	}
+	else
 	{
-        char opcode;
-        char sensortype;
-        int maxsensorcount;
-        int *sensorwaardes;
-    } pack;
-
-    int h,g;
-    g = (int) 49;
-    h = (int) 52;
-    
-    pack p = {0x03,'b',2,2};
-
-    pack*pp = malloc(sizeof*pp);
-    memcpy(pp, &p, sizeof*pp);
-     
-    while(1)
-    {
-        char ch;
-        Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, ready for Client connections..\n");
-
-        client_len = (socklen_t)sizeof(client_address);
-        if((client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, &client_len)) < 1)
-        {
-        	int x = errno;
-            Log(LOGL_ERROR, LOGT_NETWORK, "Client sockfd error: %d\n", x);
-        }
-        Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected\n");       
-        
-/*		char*p = malloc(sizeof*p);
-        *p ='5'; 
-        char*t = malloc(sizeof*t);
-        *t ='t';
-*/        
-        for (int i = 0; i < 20; i++)
+		int server_sockfd = *(int*)connection;
+	    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, ready for Client connections.\n");
+		while(1)
 		{
-            ssize_t x;
-        	if((x = write(client_sockfd, pp, sizeof(pp))) != sizeof(pp))
-            Log(LOGL_ERROR, LOGT_NETWORK, "Cannot send %d: %d\n",x, errno);
-        
-            Log(LOGL_DEBUG, LOGT_NETWORK, "Send char %c \n", pp);
-            
-        	//if((x=write(client_sockfd, t, sizeof(char)))!=sizeof(char))
-        	//Log(LOGL_ERROR, "string cannot send %d: %d",x, errno);
-        
-        	//Log(LOGL_CLIENT_ACTIVITY, "send char %c \n", t );
-        }
+			struct sockaddr client_address;
+			socklen_t clien_len = (socklen_t)sizeof(client_address);
+			int client_sockfd;
+			Client*c;
+
+			if((client_sockfd = accept(server_sockfd, &client_address, &clien_len)) < 1 )
+			{
+				Log(LOGL_BUG,LOGT_NETWORK,"Unable to accept connection, dying.");
+				break;
+			}
+			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected\n");       
+
+			c=SpawnClient(client_sockfd);
+			if(!c)
+			{
+				Log(LOGL_SERIOUS_ERROR,LOGT_NETWORK,"Out of memory!");
+				pthread_exit(NULL);
+			}
+		}
+	}
+	free(connection);
+	pthread_exit(NULL);
+}
+
+int AcceptClients(void)
+{
+	#ifdef _WIN32
+	Sleep(100000000);
+	#else
+	pthread_t netthread;
+	int server_sockfd;
+	dictionary*config=iniparser_load(networkinipath());
+	if(!config||!iniparser_find_entry(config,"network"))
+	{
+		Log(LOGL_WARNING,LOGT_NETWORK, "Network configuration missing from %s, using defaults.\n",networkinipath());
+	}
+	// continue using defaults
+	{
+		// TODO: address config
+		const struct sockaddr_in server_address=
+		{
+			.sin_family=AF_INET,
+			.sin_port = htons((uint16_t)iniparser_getint(config,"network:port",61014)),
+			.sin_addr.s_addr = inet_addr(iniparser_getstring(config,"network:address","127.0.0.1")),
+			// padding
+			.sin_zero = {0},
+		};
 		
-        if(fork() == 0)
-        {
-            Log(LOGL_DEBUG, LOGT_NETWORK, "In fork loop\n");
-            if(read(client_sockfd, &ch, 1)) break; 
-            Log(LOGL_DEBUG, LOGT_NETWORK, "Client send: %c\n", ch);
-            printf("Received: %c\n", ch);
-           
-            ch++;
+		//specify kind of socket required.
+		server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+		// did not get file descriptor?
+		if (!server_sockfd)
+		{
+		    Log(LOGL_ERROR, LOGT_NETWORK, "Network unavailable.\n");
+		    return EXIT_FAILURE;
+		}
 
-            if(sleep(5)) break;
+		if(bind(server_sockfd, (struct sockaddr*)&server_address, (socklen_t)sizeof(server_address)))
+		{
+			Log(LOGL_ERROR,LOGT_NETWORK,"Network Address in use.\n");
+			return EXIT_FAILURE;
+		}
 
-            Log(LOGL_DEBUG, LOGT_NETWORK, "Server send: %c\n", ch);
-			if(write(client_sockfd, &ch, 1)) continue;
-            printf("Send: %c", ch);
+		// we now accept connections
+		if(listen(server_sockfd, iniparser_getint(config,"network:clients",10)))
+		{
+			Log(LOGL_ERROR,LOGT_NETWORK,"Cannot accept any incoming connections.\n");
+			return EXIT_FAILURE;
+		}
 
-            (void)close(client_sockfd);
-            return EXIT_SUCCESS;
-        }
-        else
-            Log(LOGL_DEBUG, LOGT_NETWORK, "Socket closed\n");
-            (void)close(client_sockfd);
-    }
-    #endif
-    return EXIT_FAILURE;
+		{
+			int*server_ret = malloc(sizeof*server_ret);
+			*server_ret = server_sockfd;
+			pthread_create(&netthread,NULL,&socklisten,server_ret);
+		}
+	}
+	#endif
+	return EXIT_SUCCESS;
 }

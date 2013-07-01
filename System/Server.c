@@ -2,7 +2,6 @@
 
 int InitServer(const int argc, char const*const*const argv)
 {
-	int i;
 	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Initializing..\n");
 
 /*  TODO: Change this below
@@ -13,20 +12,20 @@ int InitServer(const int argc, char const*const*const argv)
 */
 	
 	// need not unsubscribe
-	if(!Sub(&AlarmDetection))return false;;
-	if(!OpenDatabase())return false;
-	return true;
+	if(!Sub(&AlarmDetection))return EXIT_FAILURE;
+	if(OpenDatabase()!=EXIT_SUCCESS)return EXIT_FAILURE;
+	if(AcceptClients()!=EXIT_SUCCESS)return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
 
 int StartServer(void)
 {
 	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Starting system..\n");
 
-	StartSensorSimulation();
 	StartPrinter();
+	StartSensorSimulation();
 
 	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "System started\n");
 
-	socklisten();
 	return EXIT_SUCCESS;
 }

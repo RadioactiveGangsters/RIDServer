@@ -36,6 +36,15 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			strncpy(head, "ERROR -> ", sizeof(char)*10);
 			break;
 
+		case LOGL_BUG:
+			#ifdef _WIN32
+				colour = BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | FOREGROUND_BLUE;
+			#else
+				strncpy(colour, "\x1B[43;30m",sizeof(char)*8);
+			#endif
+			strncpy(head, "BUG -> ", sizeof(char)*12);
+			break;
+
 		case LOGL_WARNING:
 			#ifdef _WIN32
 				colour = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
@@ -136,9 +145,20 @@ int main(int argc, char**argv)
 		return EXIT_FAILURE;
 	}
 
+	#ifdef _WIN32
+	Sleep(10000);
+	#else
+	sleep(10);
+	#endif
+
 	// TODO: check if successful.
 	(void)StartServer();
 	printf("Done.\n");
+
+	// TODO: I don't know.
+	// join some other thread, maybe?
+	Log(LOGL_BUG,LOGT_PROGRAM,"server will exit on keypress.\n");
+	getchar();
 
 	return EXIT_SUCCESS;
 }
