@@ -36,7 +36,7 @@ void getSensorData(Trie* s)
     
     if(!storeToFile(path, data))
     {
-        Log(LOGL_ERROR, LOGT_PRINTER, "Cannot store data of %s to file\n", sensorName);
+        Log(LOGL_ERROR, LOGT_PRINTER, "Cannot store data of %s to file", sensorName);
     }
 }
 
@@ -48,15 +48,21 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-    time_t t;
-    usleep(5000000); // 5 second; to wait for some data to be generated
+    	time_t t;
+    // 5 second; to wait for some data to be generated
+	#ifdef _WIN32
+	Sleep(5000
+	#else
+	sleep(5
+	#endif
+	);
 
     while(1)
     {
-		char data[32];
-		Log(LOGL_SYSTEM_ACTIVITY, LOGT_PRINTER, "Printing new data\n");
+		Log(LOGL_SYSTEM_ACTIVITY, LOGT_PRINTER, "Printing new data");
 		
 		// Print current time and date
+		char data[32];
 		data[0] = '\0';
 		strcat(data, " --- ");
 		time(&t);
@@ -67,7 +73,14 @@ void *getSensorTable(void *param)
 
 		// Get all sensors types from table and for each type do printTable()
         fortrie(Tables(), &getSensors);
-        usleep(600000000); // 10 minutes
+	   // Wait 10 minutes for the next printout
+	   // TODO: configurable
+		#ifdef _WIN32
+		Sleep(600000
+		#else
+		sleep(600
+		#endif
+		);
     }
 }
 
@@ -127,7 +140,7 @@ int storeToFile(char const*const path, char const*const data)
         {
             return 0;
         }
-        fprintf(printFile, "%s\n", data);
+        fprintf(printFile, "%s", data);
 
         fclose(printFile);
         return 1;
@@ -141,10 +154,10 @@ void StartPrinter()
     // Create new thread for printer, if failed print error to log
     if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) 
     {
-        Log(LOGL_ERROR, LOGT_SERVER, "Error creating thread for printer\n");
+        Log(LOGL_ERROR, LOGT_SERVER, "Error creating thread for printer");
     }
     else
     {
-        Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Printer Started\n"); 
+        Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Printer Started"); 
     }
 }

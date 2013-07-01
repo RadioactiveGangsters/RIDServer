@@ -4,9 +4,8 @@ CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic-errors -Werror -O3
 CFLAGS = -pipe -Wall -Wextra -std=c99 -pedantic -g
 
 
-INIPARSER = -liniparser
 #bundled iniparser
-INIPARSER = -Liniparser/ -liniparser
+INIPARSER = -Ldeps/iniparser/ -liniparser
 
 LINKERFLAGS = $(INIPARSER) -lpthread -fwhole-program
 
@@ -39,10 +38,16 @@ install : $(TARGET)
 .PHONY : clean
 clean :
 	-rm $(OBJS)
-	-cd iniparser && make veryclean
-	-rm printer.txt
+
 
 $(TARGET) : $(OBJS) $(LIBS)
+
+	-cd deps/iniparser && make veryclean
+	-rm printer.txt
+
+
+	cd deps/iniparser && make
+
 	$(CC) $(CFLAGS) $(OBJS) $(LINKERFLAGS) -o $(TARGET)
 
 iniparser/libiniparser.a : iniparser/Makefile

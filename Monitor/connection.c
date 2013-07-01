@@ -1,3 +1,4 @@
+
 #include "connection.h"
 
 void*socklisten(void*connection)
@@ -10,7 +11,7 @@ void*socklisten(void*connection)
 	else
 	{
 		int server_sockfd = *(int*)connection;
-	    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, ready for Client connections.\n");
+	    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, ready for Client connections.");
 		while(1)
 		{
 			struct sockaddr client_address;
@@ -23,7 +24,7 @@ void*socklisten(void*connection)
 				Log(LOGL_BUG,LOGT_NETWORK,"Unable to accept connection, dying.");
 				break;
 			}
-			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected\n");       
+			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected");       
 
 			c=SpawnClient(client_sockfd);
 			if(!c)
@@ -47,7 +48,7 @@ int AcceptClients(void)
 	dictionary*config=iniparser_load(networkinipath());
 	if(!config||!iniparser_find_entry(config,"network"))
 	{
-		Log(LOGL_WARNING,LOGT_NETWORK, "Network configuration missing from %s, using defaults.\n",networkinipath());
+		Log(LOGL_WARNING,LOGT_NETWORK, "Network configuration missing from %s, using defaults.",networkinipath());
 	}
 	// continue using defaults
 	{
@@ -66,20 +67,20 @@ int AcceptClients(void)
 		// did not get file descriptor?
 		if (!server_sockfd)
 		{
-		    Log(LOGL_ERROR, LOGT_NETWORK, "Network unavailable.\n");
+		    Log(LOGL_ERROR, LOGT_NETWORK, "Network unavailable.");
 		    return EXIT_FAILURE;
 		}
 
 		if(bind(server_sockfd, (struct sockaddr*)&server_address, (socklen_t)sizeof(server_address)))
 		{
-			Log(LOGL_ERROR,LOGT_NETWORK,"Network Address in use.\n");
+			Log(LOGL_ERROR,LOGT_NETWORK,"Network Address in use.");
 			return EXIT_FAILURE;
 		}
 
 		// we now accept connections
 		if(listen(server_sockfd, iniparser_getint(config,"network:clients",10)))
 		{
-			Log(LOGL_ERROR,LOGT_NETWORK,"Cannot accept any incoming connections.\n");
+			Log(LOGL_ERROR,LOGT_NETWORK,"Cannot accept any incoming connections.");
 			return EXIT_FAILURE;
 		}
 
