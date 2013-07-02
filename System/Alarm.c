@@ -1,6 +1,6 @@
 #include "Alarm.h"
 
-
+static queue q={.size=0}; 
 void AlarmDetection(Sensor* sn)
 {
 			
@@ -13,12 +13,14 @@ void AlarmDetection(Sensor* sn)
 		if(isn->value > isn->ubound)
 		{
 			Log(LOGL_ALARM, LOGT_SERVER, "%s to HIGH", (sn->name));
+			SensorQueue(sn);
 			//sendAlarm(isn->ualarm);		
 		} 
 		else if (isn->value < isn->lbound)
 		{
 			//sendAlarm(isn->lalarm);
 			Log(LOGL_ALARM, LOGT_SERVER, "%s to LOW", (sn->name));
+			SensorQueue(sn);
 		}
 	} 
 	
@@ -31,8 +33,28 @@ void AlarmDetection(Sensor* sn)
 		{		
 			//sendAlarm(bsn->alarm);	
 			Log(LOGL_ALARM, LOGT_SERVER, "%s is TRUE", (sn->name));
+			SensorQueue(sn);
 		}
 	}
+}
+
+void SensorQueue(Sensor* sn)
+{	
+	if(!q.size)
+	{
+		enqueue(&q, sn);
+	}
+	else
+	{
+		init_queue(&q);
+		enqueue(&q, sn);
+	}	
+}
+
+Sensor* Sensor_dequeue(queue *q)
+{
+	if(q.size) return *dequeue(&q);
+	else return NULL;
 }
 
 //void warn(Client*c)

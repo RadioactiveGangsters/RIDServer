@@ -24,11 +24,13 @@ enqueue(queue *q, void*x)
 	{
 		resize(q);
 	}
-  
+		if(!Queue_has(q, x))
+		{
 		//printf("Push: %d\n", *(int*)x);
         q->last = (q->last+1) % q->size;
         q->array[ q->last ] = x;    
         q->count = q->count + 1;
+		}
 }
 
 void* dequeue(queue *q)
@@ -56,18 +58,26 @@ void print(queue *q)
 	printf("]\n");
 }
 
+bool Queue_has(queue *q, void*x){
+	
+	int first = q->first;
+	
+	do
+	{
+	
+		if(q->array[first] == x)
+		{
+			return TRUE;
+		}
+		first=(first+1);
+	
+	}while(first < q->last);
+	
+	return FALSE;
+}
+
 void resize(queue *q)
 {
-	// HOWTO: FIXME:
-	// TODO:
-	// init a twice-as-big queue
-	// while q has elements
-	// 	enqueue into twice-as-big queue the dequeued element of q
-	// free q->array (it is empty now)
-	// memcpy into q twice-as-big-queue
-	
-	// the problem was that we did not need a temparray, but a tempqueue
-	// it can be done with temparray, but to do that beautifully you need Level 2 Pointermagic (try it sometime!)
 	
 	//Making that delicious double sauced queue
 	queue i, *temp=&i;
@@ -86,18 +96,6 @@ void resize(queue *q)
 	memcpy(q, temp, sizeof(*temp));
 	
 	
-/*	prev solution:
-   	q->size = q->size*2;
-	void**temparray=malloc(sizeof(void*)*q-size));
-	
-	void**p=temparray+q->first;
-	while(q->count) 
-	{	
-		enqueue(q->temparray, dequeue(q->array));
-	}
-	free(q->array);
-	q->array = temparray
-*/
 }
 #ifndef FRONTEND_H
 
@@ -109,33 +107,8 @@ int main(void){
 	
 	enqueue(q, &bliep);	print(q);
 	enqueue(q, &blap);	print(q);
-	enqueue(q, &blop);	print(q);
-	enqueue(q, &blup);	print(q);
-	enqueue(q, &blip);	print(q);
-	enqueue(q, &bloep);	print(q);
-	enqueue(q, &blaup);	print(q);
-	enqueue(q, &bluup);	print(q);
-	enqueue(q, &blep);	print(q);
-	
-	enqueue(q, &xiep);	print(q);
-	enqueue(q, &xap);	print(q);
-	enqueue(q, &xop);	print(q);
-	enqueue(q, &xup);	print(q);
-	enqueue(q, &xip);	print(q);
-	enqueue(q, &xoep);	print(q);
-	enqueue(q, &xaup);	print(q);
-	enqueue(q, &xuup);	print(q);
-	enqueue(q, &xep);	print(q);
-	
-	
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
-	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	enqueue(q, &blop); print(q);
+	enqueue(q, &bliep);	print(q);
 	
 	
 	return 0;

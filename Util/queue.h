@@ -14,3 +14,9 @@ typedef struct {
         int count;                      /* number of queue elements */
 	int size;
 } queue;
+
+void init_queue(queue *q);
+void enqueue(queue *q, void*x);
+void* dequeue(queue *q);
+void resize(queue *q);
+bool Queue_has(queue *q, void*x);
