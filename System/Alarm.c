@@ -15,13 +15,13 @@ void AlarmDetection(Sensor* sn)
 		{
 			//sendAlarm(isn->ualarm);
 			Sensor_enqueue(sn);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s to HIGH", (sn->name));
+			Log(LOGL_ALARM, LOGT_SERVER, "%s: %s", sn->name ,isn->ualarm);
 		} 
 		else if (isn->value < isn->lbound)
 		{
 			//sendAlarm(isn->lalarm);
 			Sensor_enqueue(sn);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s to LOW", (sn->name));
+			Log(LOGL_ALARM, LOGT_SERVER, "%s: %s", sn->name ,isn->lalarm);
 		}
 	} 
 	
@@ -33,8 +33,7 @@ void AlarmDetection(Sensor* sn)
 		if(bsn->value)
 		{		
 			//sendAlarm(bsn->alarm);	
-			Sensor_enqueue(sn);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s is TRUE", (sn->name));
+			Log(LOGL_ALARM, LOGT_SERVER, "%s: %s", sn->name ,bsn->alarm);
 		}
 	}
 }
@@ -54,17 +53,18 @@ void Sensor_enqueue(Sensor* sn)
 {	
 	if(!q.size)
 	{
+		init_queue(&q);
 		enqueue(&q, sn);
 	}
 	else
 	{
-		init_queue(&q);
 		enqueue(&q, sn);
 	}	
 }
 
 Sensor* Sensor_dequeue()
 {
+
 	if(q.size) return dequeue(&q);
 	else return NULL;
 }

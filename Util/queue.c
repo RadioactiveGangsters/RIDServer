@@ -36,6 +36,8 @@ enqueue(queue *q, void*x)
 void* dequeue(queue *q)
 {
     void*x;
+    
+	if(q->count <= 0) return NULL;
 	
         x = q->array[ q->first];
         q->first = (q->first+1) % q->size;
@@ -67,13 +69,13 @@ bool Queue_has(queue *q, void*x){
 	
 		if(q->array[first] == x)
 		{
-			return TRUE;
+			return true;
 		}
 		first=(first+1);
 	
 	}while(first < q->last);
 	
-	return FALSE;
+	return false;
 }
 
 void resize(queue *q)
@@ -97,8 +99,8 @@ void resize(queue *q)
 	
 	
 }
+/*
 #ifndef FRONTEND_H
-
 int main(void){
 	queue i,*q=&i;
 	init_queue(q);
@@ -115,4 +117,5 @@ int main(void){
 	
 }
 #define FRONTEND_H
-#endef
+#endif
+*/
