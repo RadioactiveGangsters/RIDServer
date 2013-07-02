@@ -32,10 +32,8 @@ iPacket*readGraph(const int source)
 	iPacket u=
 	{
 		.op=OPC_UNDEFINED,
-	},g=
-	{
-		.op=OPC_GRAPH,
 	},*p=malloc(sizeof(struct iGraph));
+	struct iGraph*g=(struct iGraph*)p;
 
 	uint32_t requestsize=0;
 	size_t wanted;
@@ -51,31 +49,25 @@ iPacket*readGraph(const int source)
 	{
 		return p;
 	}
+	// only needed for int sizes
 	requestsize=ntohl(requestsize);
+	if(!requestsize)
+	{
+		return p;
+	}
 
-	wanted=((sizeof(char)*requestsize)*2)+1;
+	wanted=(sizeof(char)*requestsize);
 	expected=(ssize_t)wanted;
-	sensor=malloc(wanted);
+	sensor=malloc(wanted+sizeof(char));
 	if(!sensor)return NULL;
 	if(recv(source, sensor, wanted,MSG_WAITALL)!=expected)
 	{
 		return p;
 	}
-	sensor[requestsize]='\0';
-	{
-		uint32_t i=requestsize<<1;
-		do
-		{
-			sensor[i]|='.';
-		}
-		while(i-=2);
-		sensor[i]|='.';
-	}
+	printf("%s\n",sensor);
 
-	*p=*(iPacket*)(struct iGraph[]){{
-		.base=g,
-		.name=sensor
-	}};
+	g->base.op=OPC_GRAPH;
+	g->name=sensor;
 	return p;
 }
 

@@ -44,7 +44,8 @@ void*_iLoop(void*const c)
 			opcode ch;
 			if(read(client->fd, &ch, 1)!=1)
 			{
-				Log(LOGL_CLIENT_ACTIVITY,LOGT_NETWORK,"client read error");
+				Log(LOGL_CLIENT_ACTIVITY,LOGT_NETWORK,"client disconnected");
+				// TODO: cleanup
 				break;
 			}
 			else
@@ -76,7 +77,7 @@ void*_iLoop(void*const c)
 							Log(LOGL_BUG,LOGT_CLIENT,"Cannot read packet");
 							continue;
 						}
-						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet.");
+						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet requesting sensor %s.",((struct iGraph*)p)->name);
 						break;
 					case OPC_UPDATE:
 						Log(LOGL_BUG,LOGT_NETWORK,"packet %d not supported yet",ch);

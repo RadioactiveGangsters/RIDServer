@@ -11,7 +11,6 @@ void*socklisten(void*connection)
 	else
 	{
 		int server_sockfd = *(int*)connection;
-	    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, ready for Client connections.");
 		while(1)
 		{
 			struct sockaddr client_address;
@@ -87,6 +86,7 @@ int AcceptClients(void)
 		{
 			int*server_ret = malloc(sizeof*server_ret);
 			*server_ret = server_sockfd;
+		    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, listening for Client connections on port %d.",ntohs(server_address.sin_port));
 			pthread_create(&netthread,NULL,&socklisten,server_ret);
 		}
 	}
