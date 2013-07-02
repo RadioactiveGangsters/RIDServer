@@ -1,7 +1,9 @@
+#include "queue.h"
+
 init_queue(queue *q)
 {
 	q->size=INIT_SIZE_QUEUE;
-	q->array=malloc(sizeof(void*)*q->size));
+	q->array=malloc(sizeof(void*)*q->size);
 	q->first = 0;
 	q->last = q->size-1;
 	q->count = 0;
@@ -10,7 +12,7 @@ init_queue(queue *q)
 init_bigqueue(queue *b, int s)
 {
 	b->size=s;
-	b->array=malloc(sizeof(void*)*b->size));
+	b->array=malloc(sizeof(void*)*b->size);
 	b->first=0;
 	b->last=b->size-1;
 	b->count = 0;
@@ -18,33 +20,40 @@ init_bigqueue(queue *b, int s)
 
 enqueue(queue *q, void*x)
 {
-        if (q->count >= q->size)
+    if (q->count >= q->size)
 	{
-		printf("Warning: queue overflow enqueue x=%d\n",x);
-		//TODO: Make it Dynamic!!
-		//resize();
+		resize(q);
 	}
-        else 
-	{
-                q->last = (q->last+1) % q->size;
-                q->array[ q->last ] = x;    
-                q->count = q->count + 1;
-        }
+  
+		//printf("Push: %d\n", *(int*)x);
+        q->last = (q->last+1) % q->size;
+        q->array[ q->last ] = x;    
+        q->count = q->count + 1;
 }
 
 void* dequeue(queue *q)
 {
-        void*x;
+    void*x;
+	
+        x = q->array[ q->first];
+        q->first = (q->first+1) % q->size;
+        q->count = q->count - 1;
 
-        if (q->count <= 0) printf("Warning: empty queue dequeue.\n");
-        else 
+    return(x);
+}
+
+void print(queue *q)
+{
+	int count = q->first;
+	printf("Queue: [");
+	do
 	{
-                x = q->array[ q->first];
-                q->first = (q->first+1) % q->size;
-                q->count = q->count - 1;
-        }
-
-        return(x);
+		if(q->array[count]) printf("%d", *(int*)(q->array[count]));
+		printf(", ");
+		count++;
+	}
+	while(count < q->size);
+	printf("]\n");
 }
 
 void resize(queue *q)
@@ -61,8 +70,9 @@ void resize(queue *q)
 	// it can be done with temparray, but to do that beautifully you need Level 2 Pointermagic (try it sometime!)
 	
 	//Making that delicious double sauced queue
-	init_bigqueue(temp, q->size*2);
+	queue i, *temp=&i;
 	
+	init_bigqueue(temp, q->size*2);
 	
 	//While those ingredients are hopping on ya whopper
 	while(q->count)
@@ -71,9 +81,9 @@ void resize(queue *q)
 	}
 	
 	//Cleaning that shit 
-	free(q->array):
+	free(q->array);
 	//DONE, get the f*ck out of here
-	memcpy(q, temp, sizeof(temp));
+	memcpy(q, temp, sizeof(*temp));
 	
 	
 /*	prev solution:
@@ -89,6 +99,47 @@ void resize(queue *q)
 	q->array = temparray
 */
 }
+#ifndef FRONTEND_H
 
-
--
+int main(void){
+	queue i,*q=&i;
+	init_queue(q);
+	int bliep = 1,blap = 2, blop = 3, blup = 4, blip = 5, bloep = 6, blaup = 7, bluup = 8, blep = 9;
+	int xiep = 1,xap = 2, xop = 3, xup = 4, xip = 5, xoep = 6, xaup = 7, xuup = 8, xep = 9;
+	
+	enqueue(q, &bliep);	print(q);
+	enqueue(q, &blap);	print(q);
+	enqueue(q, &blop);	print(q);
+	enqueue(q, &blup);	print(q);
+	enqueue(q, &blip);	print(q);
+	enqueue(q, &bloep);	print(q);
+	enqueue(q, &blaup);	print(q);
+	enqueue(q, &bluup);	print(q);
+	enqueue(q, &blep);	print(q);
+	
+	enqueue(q, &xiep);	print(q);
+	enqueue(q, &xap);	print(q);
+	enqueue(q, &xop);	print(q);
+	enqueue(q, &xup);	print(q);
+	enqueue(q, &xip);	print(q);
+	enqueue(q, &xoep);	print(q);
+	enqueue(q, &xaup);	print(q);
+	enqueue(q, &xuup);	print(q);
+	enqueue(q, &xep);	print(q);
+	
+	
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	printf("Pop: %d\n", *(int*)dequeue(q));	print(q);
+	
+	
+	return 0;
+	
+}
+#define FRONTEND_H
+#endef

@@ -1,8 +1,8 @@
 
-
-#include "queue.h"
-#include "bool.h"
-
+#include <stdbool.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 
 #define	INIT_SIZE_QUEUE 8
