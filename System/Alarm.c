@@ -1,6 +1,7 @@
 #include "Alarm.h"
 
 static queue q={.size=0}; 
+
 void AlarmDetection(Sensor* sn)
 {
 			
@@ -12,15 +13,15 @@ void AlarmDetection(Sensor* sn)
 		
 		if(isn->value > isn->ubound)
 		{
+			//sendAlarm(isn->ualarm);
+			Sensor_enqueue(sn);
 			Log(LOGL_ALARM, LOGT_SERVER, "%s to HIGH", (sn->name));
-			SensorQueue(sn);
-			//sendAlarm(isn->ualarm);		
 		} 
 		else if (isn->value < isn->lbound)
 		{
 			//sendAlarm(isn->lalarm);
+			Sensor_enqueue(sn);
 			Log(LOGL_ALARM, LOGT_SERVER, "%s to LOW", (sn->name));
-			SensorQueue(sn);
 		}
 	} 
 	
@@ -32,13 +33,24 @@ void AlarmDetection(Sensor* sn)
 		if(bsn->value)
 		{		
 			//sendAlarm(bsn->alarm);	
+			Sensor_enqueue(sn);
 			Log(LOGL_ALARM, LOGT_SERVER, "%s is TRUE", (sn->name));
-			SensorQueue(sn);
 		}
 	}
 }
 
-void SensorQueue(Sensor* sn)
+void resetNextAlarm()
+{
+	Sensor* sn = Sensor_dequeue();
+	if(sn)
+	{
+		ResetSensor(sn);
+		Log(LOGL_DEBUG,LOGT_SERVER,"Alarm %s has been reset.", (sn->name));
+	}
+	else Log(LOGL_DEBUG,LOGT_SERVER,"There are no more alarms to reset.");
+}
+
+void Sensor_enqueue(Sensor* sn)
 {	
 	if(!q.size)
 	{
@@ -51,9 +63,9 @@ void SensorQueue(Sensor* sn)
 	}	
 }
 
-Sensor* Sensor_dequeue(queue *q)
+Sensor* Sensor_dequeue()
 {
-	if(q.size) return *dequeue(&q);
+	if(q.size) return dequeue(&q);
 	else return NULL;
 }
 
@@ -67,7 +79,7 @@ Sensor* Sensor_dequeue(queue *q)
 	//TODO: freepkt
 //}
 
-void SendAlarm(Sensor*fb)
+void sendAlarm(Sensor*fb)
 {
 	if(!fb)return;
 //	forClient(&warn);

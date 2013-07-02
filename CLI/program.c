@@ -38,15 +38,15 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 		//UNDEFINED
 		": ",
 		//ERROR
-		" error: ",
+		" Error: ",
 		//WARNING
-		" warning: ",
+		" Warning: ",
 		//BUG
 		" BUG: ",
 		//SERIOUS_ERROR
 		" ERROR: ",
 		//ALARM
-		" alarm: ",
+		" Alarm: ",
 		// DEBUG
 		": ",
 		// SYSTEM_ACTIVITY
@@ -169,7 +169,7 @@ int main(int argc, char**argv)
 	Log(LOGL_DEBUG,LOGT_SERVER,"To reset alarm press 'r' and then enter.");
 	while(1)
 	{	//114 = r  Resets alarm that is first in queue
-		if(getchar() == 114) Log(LOGL_DEBUG,LOGT_SERVER,"Reset Alarm!");
+		if(getchar() == 114) resetNextAlarm();
 	}
 
 	return EXIT_SUCCESS;

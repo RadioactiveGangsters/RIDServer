@@ -6,7 +6,8 @@
 #include "../Util/queue.h"
 
 void AlarmDetection(Sensor* sn);
+void resetNextAlarm();
+void Sensor_enqueue(Sensor* sn);
+Sensor* Sensor_dequeue();
 void sendAlarm();
-Sensor* Sensor_dequeue(queue *q);
-
 #endif
