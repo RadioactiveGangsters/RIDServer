@@ -103,7 +103,8 @@ void*_oLoop(void*const c)
 	else
 	{
 		Client*client=c;
-		write(client->fd,makePing(),sizeof(Packet));
+		// TODO: check if successful
+		(void)write(client->fd,makePing(),sizeof(Packet));
 		while(true)
 		{
 			if(client->_queue)

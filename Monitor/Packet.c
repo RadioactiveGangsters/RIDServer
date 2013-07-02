@@ -27,6 +27,31 @@ Packet*makeLogin(void)
 	return (Packet*)p;
 }
 
+Packet*makeGraph(Sensor const*const s)
+{
+	if(!s||!s->delta)
+	{
+		return NULL;
+	}
+	{
+		Packet const b={.op=OPC_LOGIN,};
+		struct oGraph const g=
+		{
+			.base=b,
+			.namelen=SENSOR_HNAMELEN,
+			.name=s->name,
+			.qlen=AutoQcount(s->delta),
+			.queue=s->delta,
+		};
+		struct oGraph*const p=malloc(sizeof*p);
+		if(!p) return NULL;
+		memcpy(p,&g,sizeof*p);
+
+		return(Packet*)p;
+		
+	}
+}
+
 iPacket*readGraph(const int source)
 {
 	iPacket u=
