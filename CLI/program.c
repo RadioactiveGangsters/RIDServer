@@ -161,12 +161,16 @@ int main(int argc, char**argv)
 
 	// TODO: check if successful.
 	(void)StartServer();
-	printf("Done.");
 
 	// TODO: I don't know.
 	// join some other thread, maybe?
-	Log(LOGL_BUG,LOGT_PROGRAM,"server will exit on keypress.");
-	getchar();
+	printf("\n");
+	Log(LOGL_BUG,LOGT_PROGRAM,"Server will exit on keypress.");
+	Log(LOGL_DEBUG,LOGT_SERVER,"To reset alarm press 'r' and then enter.");
+	while(1)
+	{	//114 = r  Resets alarm that is first in queue
+		if(getchar() == 114) Log(LOGL_DEBUG,LOGT_SERVER,"Reset Alarm!");
+	}
 
 	return EXIT_SUCCESS;
 }
