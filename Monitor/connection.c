@@ -11,7 +11,7 @@ void*socklisten(void*connection)
 	else
 	{
 		int server_sockfd = *(int*)connection;
-	    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, ready for Client connections.");
+	    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Ready for Client connections");
 		while(1)
 		{
 			struct sockaddr client_address;

@@ -54,13 +54,7 @@ void DestroySensor(Sensor*const s)
 	free(s);
 }
 
-bSensor*
-makebSensor(
-		char const*const name,
-		char const*const unit,
-		unsigned int const interval,
-		char const*const alarm
-		)
+bSensor* makebSensor(char const*const name,char const*const unit,unsigned int const interval,char const*const alarm)
 {
 	Sensor base=
 	{
@@ -93,16 +87,7 @@ makebSensor(
 	}
 }
 
-iSensor*
-makeiSensor(
-		char const*const name,
-		char const*const unit,
-		unsigned int const interval,
-		int const lbound,
-		int const ubound,
-		char const*const lalarm,
-		char const*const ualarm
-		)
+iSensor* makeiSensor(char const*const name,char const*const unit,unsigned int const interval,int const lbound,int const ubound,char const*const lalarm,char const*const ualarm)
 {
 	Sensor base=
 	{

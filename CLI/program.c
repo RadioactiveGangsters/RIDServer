@@ -139,7 +139,7 @@ int main(int argc, char**argv)
 	(void)subscribe(&console);
 	if(InitServer(argc, (char const*const*const)argv) != EXIT_SUCCESS)
 	{
-		printf("Failed to initialize.\n");
+		Log(LOGL_ERROR,LOGT_SERVER,"Failed to initialize!");
 		return EXIT_FAILURE;
 	}
 
@@ -149,8 +149,11 @@ int main(int argc, char**argv)
 	sleep(10);
 	#endif
 	
-	// TODO: check if successful.
-	(void)StartServer();
+	if(StartServer() != EXIT_SUCCESS)
+	{
+		Log(LOGL_ERROR,LOGT_SERVER,"Failed to start secondary operators!");
+		return EXIT_FAILURE;
+	}
 
 	while(1)
 	{	

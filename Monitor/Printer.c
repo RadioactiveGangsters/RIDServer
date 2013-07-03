@@ -157,17 +157,19 @@ int storeToFile(char const*const path, char const*const data)
     }
 }
 
-void StartPrinter()
+int StartPrinter(void)
 {
     pthread_t printThread;
     
     // Create new thread for printer, if failed print error to log
     if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) 
     {
-        Log(LOGL_ERROR, LOGT_SERVER, "Error creating thread for printer");
+        Log(LOGL_ERROR, LOGT_SERVER, "Error starting Printer");
+		return EXIT_FAILURE;
     }
     else
     {
-        Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Printer Started"); 
+        Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Printer ready"); 
+		return EXIT_SUCCESS;
     }
 }
