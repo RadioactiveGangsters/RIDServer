@@ -3,44 +3,44 @@
 int InitServer(const int argc, char const*const*const argv)
 {
 	int i;
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Initializing..");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Initializing..");
 
 	for(i=1;i<argc;i++)
 	{
-		Log(LOGL_DEBUG,LOGT_PROGRAM,"has: %s",argv[i]);
+		Log(LOGT_PROGRAM, LOGL_DEBUG, "has: %s",argv[i]);
 	}
 	
 	// need not unsubscribe
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Activating Alarm Detection..");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Activating Alarm Detection..");
 	if(!Sub(&AlarmDetection))
 	{
-		Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Could not activate Alarm Detection!");
+		Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Could not activate Alarm Detection!");
 		return EXIT_FAILURE;
 	}
-	else Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Alarm Detection active");
+	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Alarm Detection active");
 
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Database initialization..");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Database initialization..");
 	if(OpenDatabase()!=EXIT_SUCCESS)return EXIT_FAILURE;
-	else Log(LOGL_SYSTEM_ACTIVITY, LOGT_DB, "Database active");
+	else Log(LOGT_DB, LOGL_SYSTEM_ACTIVITY, "Database active");
 
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Configuring Network settings..");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Configuring Network settings..");
 	if(AcceptClients()!=EXIT_SUCCESS)return EXIT_FAILURE;
-	else Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete");
+	else Log(LOGT_NETWORK, LOGL_SYSTEM_ACTIVITY, "Configuring complete");
 	
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Initialization complete");	
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Initialization complete");	
 	return EXIT_SUCCESS;
 }
 
 int StartServer(void)
 {
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Enabling Printer..");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Enabling Printer..");
 	if(StartPrinter()!=EXIT_SUCCESS)return EXIT_FAILURE;
 	
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Starting Simulators..");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Starting Simulators..");
 	//if(StartSensorSimulation()!=EXIT_SUCCESS)return EXIT_FAILURE;
 	StartSensorSimulation();
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Simulators running");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Simulators running");
 
-	Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "System started");
+	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "System started");
 	return EXIT_SUCCESS;
 }

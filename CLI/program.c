@@ -1,6 +1,6 @@
 #include "program.h"
 
-void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
+void console(const LOGT lt, const LOGL ll, char const*const le, va_list ap)
 {
 	#ifdef _WIN32
 	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -139,7 +139,7 @@ int main(int argc, char**argv)
 	(void)subscribe(&console);
 	if(InitServer(argc, (char const*const*const)argv) != EXIT_SUCCESS)
 	{
-		Log(LOGL_ERROR,LOGT_SERVER,"Failed to initialize!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Failed to initialize!");
 		return EXIT_FAILURE;
 	}
 
@@ -151,7 +151,7 @@ int main(int argc, char**argv)
 	
 	if(StartServer() != EXIT_SUCCESS)
 	{
-		Log(LOGL_ERROR,LOGT_SERVER,"Failed to start secondary operators!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Failed to start secondary operators!");
 		return EXIT_FAILURE;
 	}
 
@@ -164,7 +164,7 @@ int main(int argc, char**argv)
 				break;
 			
 			case 120: //x
-				Log(LOGL_SYSTEM_ACTIVITY,LOGT_SERVER,"Server shutting down..");
+				Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Server shutting down..");
 				return EXIT_SUCCESS;
 				break;
 		}

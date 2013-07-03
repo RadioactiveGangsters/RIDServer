@@ -85,7 +85,7 @@ int registerSensor(Sensor*const s)
 		// Make a new Trie with the sensor
 		if(!tbl)
 		{
-			Log(LOGL_ERROR, LOGT_DB, "Cannot register unit type %s", s->unit);
+			Log(LOGT_DB, LOGL_ERROR, "Cannot register unit type %s", s->unit);
 			return EXIT_SUCCESS;
 		}
 
@@ -93,7 +93,7 @@ int registerSensor(Sensor*const s)
 		db=triee(s->unit, tbl);
 		if(!db)
 		{
-			Log(LOGL_ERROR, LOGT_DB, "Cannot create database", s->unit);
+			Log(LOGT_DB, LOGL_ERROR, "Cannot create database", s->unit);
 			DestroyTable(tbl);
 			return EXIT_FAILURE;
 		}
@@ -109,7 +109,7 @@ int registerSensor(Sensor*const s)
 			Trie*const newtable=triee(s->name, s);
 			if(!newtable)
 			{
-				Log(LOGL_ERROR, LOGT_DB, "Cannot create new table for %s", s->unit);
+				Log(LOGT_DB, LOGL_ERROR, "Cannot create new table for %s", s->unit);
 			}
 			else
 			{
@@ -117,7 +117,7 @@ int registerSensor(Sensor*const s)
 				tbl=trieadd(db, s->unit, newtable);
 				if(!tbl)
 				{
-					Log(LOGL_ERROR, LOGT_DB, "Cannot expand database with table for %s", s->unit);
+					Log(LOGT_DB, LOGL_ERROR, "Cannot expand database with table for %s", s->unit);
 					DestroyTable(newtable);
 					// FIXME: double deallocation of s by caller?
 					return EXIT_FAILURE;
@@ -130,14 +130,14 @@ int registerSensor(Sensor*const s)
 			Trie*const newtable=triee(s->name, s);
 			if(!newtable)
 			{
-				Log(LOGL_ERROR, LOGT_DB, "Cannot create new table for %s", s->unit);
+				Log(LOGT_DB, LOGL_ERROR, "Cannot create new table for %s", s->unit);
 				return EXIT_FAILURE;
 			}
 			// linking like this saves a traversal.
 			tbl=trieadd(tbl, s->unit, triee(s->name, s));
 			if(!tbl)
 			{
-				Log(LOGL_ERROR, LOGT_DB, "Cannot expand database with table for %s", s->unit);
+				Log(LOGT_DB, LOGL_ERROR, "Cannot expand database with table for %s", s->unit);
 				DestroyTable(newtable);
 				return EXIT_FAILURE;
 			}
@@ -151,11 +151,11 @@ int registerSensor(Sensor*const s)
 				// the table has no... table?
 				if(!tbl->e)
 				{
-					Log(LOGL_SERIOUS_ERROR, LOGT_DB, "Structure corrupt, this is a bug");
+					Log(LOGT_DB, LOGL_SERIOUS_ERROR, "Structure corrupt, this is a bug");
 				}
 				else
 				{
-					Log(LOGL_ERROR, LOGT_DB, "Cannot add to table %s", ((Trie*)tbl->e)->id);
+					Log(LOGT_DB, LOGL_ERROR, "Cannot add to table %s", ((Trie*)tbl->e)->id);
 				}
 				return EXIT_FAILURE;
 			}

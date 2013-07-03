@@ -36,7 +36,7 @@ void getSensorData(Trie* s)
     
     if(!storeToFile(path, data))
     {
-        Log(LOGL_ERROR, LOGT_PRINTER, "Cannot store data of %s to file", sensorName);
+        Log(LOGT_PRINTER, LOGL_ERROR, "Cannot store data of %s to file", sensorName);
     }
 }
 
@@ -56,7 +56,7 @@ void *getSensorTable(void *param)
 
 	if(!iniparser_find_entry(ini, "printer"))
 	{
-		Log(LOGL_ERROR, LOGT_SERVER, "File %s does not contain printer config section",  printerinipath());
+		Log(LOGT_PRINTER, LOGL_ERROR, "File %s does not contain printer config section",  printerinipath());
 	}
 	else timer = iniparser_getint(ini, "printer:timer", 3600);
 
@@ -71,7 +71,7 @@ void *getSensorTable(void *param)
     while(true)
     {
 		char data[32];
-		Log(LOGL_SYSTEM_ACTIVITY, LOGT_PRINTER, "Printing new data");
+		Log(LOGT_PRINTER, LOGL_SYSTEM_ACTIVITY, "Printing new data");
 		
 		// Print current time and date
 		data[0] = '\0';
@@ -164,12 +164,12 @@ int StartPrinter(void)
     // Create new thread for printer, if failed print error to log
     if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) 
     {
-        Log(LOGL_ERROR, LOGT_SERVER, "Error starting Printer");
+        Log(LOGT_SERVER, LOGL_ERROR, "Error starting Printer");
 		return EXIT_FAILURE;
     }
     else
     {
-        Log(LOGL_SYSTEM_ACTIVITY, LOGT_SERVER, "Printer ready"); 
+        Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Printer ready"); 
 		return EXIT_SUCCESS;
     }
 }
