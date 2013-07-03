@@ -48,14 +48,25 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-    	time_t t;
+	int timer = 3600; //1 hour
+
+	//load the iniparser on the printer path
+	dictionary*ini = iniparser_load(printerinipath());
+	if(!ini) return EXIT_FAILURE;
+
+	if(!iniparser_find_entry(ini, "printer"))
+	{
+		Log(LOGL_ERROR, LOGT_SERVER, "File %s does not contain printer config section",  printerinipath());
+	}
+	else timer = iniparser_getint(ini, "printer:timer", 3600);
+
     // 5 second; to wait for some data to be generated
 	#ifdef _WIN32
-	Sleep(5000
+	Sleep(5000);
 	#else
-	sleep(5
+	sleep(5);
 	#endif
-	);
+	
 
     while(true)
     {
@@ -65,7 +76,7 @@ void *getSensorTable(void *param)
 		// Print current time and date
 		data[0] = '\0';
 		strcat(data, " --- ");
-		t=time(NULL);
+		time_t t = time(NULL);
 		strcat(data, ctime(&t));
 		data[24+3+2]='\0';
 		strcat(data, " --- ");
@@ -73,14 +84,13 @@ void *getSensorTable(void *param)
 
 		// Get all sensors types from table and for each type do printTable()
         fortrie(Tables(), &getSensors);
-	   // Wait 10 minutes for the next printout
-	   // TODO: configurable
+
+	    // Wait [timer] seconds for the next printout
 		#ifdef _WIN32
-		Sleep(600000
+		Sleep(timer*1000);
 		#else
-		sleep(600
+		sleep(timer);
 		#endif
-		);
     }
 }
 

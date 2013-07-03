@@ -15,6 +15,9 @@
 #include <pthread.h>
 #include <time.h>
 #include <unistd.h>
+
+#include "../deps/iniparser/src/iniparser.h"
+
 #include "../Data/sensor.h"
 #include "../System/Log.h"
 #include "../Util/util.h"
