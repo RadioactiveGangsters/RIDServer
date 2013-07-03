@@ -65,7 +65,7 @@ void *getSensorTable(void *param)
 		// Print current time and date
 		data[0] = '\0';
 		strcat(data, " --- ");
-		time(&t);
+		t=time(NULL);
 		strcat(data, ctime(&t));
 		data[24+3+2]='\0';
 		strcat(data, " --- ");

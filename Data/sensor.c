@@ -10,19 +10,19 @@ unsigned int _sensseed;
 bool binaryflux()
 {
 	srand(_sensseed=(unsigned)rand());
-	return !(rand()%10000);
+	return ((!(rand()%225) && !(rand()%225)));
 }
 
 /* Generates a flux value for integer sensors.
  * This value will be used to increase or decrease
  * the original value. The random generated value
- * will be between -2 and 3.
+ * will be between -1 and 2.
  */
 int integerflux(int pvalue)
 {
 	int flux;
 	srand(_sensseed=(unsigned)rand());
-	flux = (rand()%5)-2;
+	flux = (rand()%3)-1;
 
 	if(pvalue == 0)
 	{
@@ -33,7 +33,6 @@ int integerflux(int pvalue)
 	else pvalue += flux;
 
 	return pvalue;
-	// return pvalue + ((pvalue+flux<0)?-1*flux:flux);
 }
 
 void SetupSensors(void)

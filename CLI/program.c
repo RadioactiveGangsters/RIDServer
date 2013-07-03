@@ -11,7 +11,7 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 	    GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
 	    saved_attributes = consoleInfo.wAttributes;
     #else
-		char colour[] ="\x1B[41;37;1m";
+		char colour[] ="\x1B[41;37;";
 	#endif
 	size_t lcolour=sizeof(char)*10;
 	
@@ -38,15 +38,15 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 		//UNDEFINED
 		": ",
 		//ERROR
-		" error: ",
+		" Error: ",
 		//WARNING
-		" warning: ",
+		" Warning: ",
 		//BUG
-		" BUG: ",
+		"BUG: ",
 		//SERIOUS_ERROR
 		" ERROR: ",
 		//ALARM
-		" alarm: ",
+		" Alarm: ",
 		// DEBUG
 		": ",
 		// SYSTEM_ACTIVITY
@@ -125,7 +125,12 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			printf("%s", colour);
 		#endif
 	}
-	printf("%s%s",porigin, phead);
+	time_t t = time(NULL);
+	struct tm * timeinfo = localtime(&t);
+	char timestring [12];
+	strftime (timestring, 12, "[%T] ", timeinfo);
+
+	printf("%s%s%s", timestring, porigin, phead);
 
 	(void)vprintf(le, ap);
 
@@ -158,15 +163,19 @@ int main(int argc, char**argv)
 	#else
 	sleep(10);
 	#endif
-
+	
 	// TODO: check if successful.
 	(void)StartServer();
-	printf("Done.");
 
 	// TODO: I don't know.
 	// join some other thread, maybe?
-	Log(LOGL_BUG,LOGT_PROGRAM,"server will exit on keypress.");
-	getchar();
+	printf("\n");
+	Log(LOGL_BUG,LOGT_PROGRAM,"Server will exit on keypress.");
+	Log(LOGL_DEBUG,LOGT_SERVER,"To reset alarm press 'r' and then enter.");
+	while(1)
+	{	//114 = r  Resets alarm that is first in queue
+		if(getchar() == 114) resetNextAlarm();
+	}
 
 	return EXIT_SUCCESS;
 }
