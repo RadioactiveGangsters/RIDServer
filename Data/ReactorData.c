@@ -172,7 +172,10 @@ static void genbSensors(char const*const type,  const int amount,
 			// set in log that all sensors of the group are generated
 			if(i==(amount-1))
 			{
-				Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s\n{%s, %d, %d, %d, %s}", 
+				Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s", 
+				(i+1), s->type==binarysensor?"binary":"integer", s->unit, "Sensors");
+
+		/*		Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s\n{%s, %d, %d, %d, %s}", 
 				(i+1), 
 				s->type==binarysensor?"binary":"integer", 
 				s->unit, 
@@ -182,6 +185,7 @@ static void genbSensors(char const*const type,  const int amount,
 				s->stamp, 
 				((bSensor*)s)->value, 
 				((bSensor*)s)->alarm);
+		*/	
 			}
 		}
 	}
@@ -227,7 +231,10 @@ static void geniSensors(char const*const type,  const int amount,
 			// set in log that all sensors of the group are generated
 			if(i==(amount-1))
 			{
-				Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s\n{%s, %d, %d, %d, %d, %s, %s}", 
+				Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s", 
+				(i+1), s->type==binarysensor?"binary":"integer", s->unit, "Sensors");
+
+		/*		Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s\n{%s, %d, %d, %d, %d, %s, %s}", 
 				(i+1), 
 				s->type==binarysensor?"binary":"integer", 
 				s->unit, 
@@ -239,6 +246,7 @@ static void geniSensors(char const*const type,  const int amount,
 				((iSensor*)s)->ubound, 
 				((iSensor*)s)->lalarm, 
 				((iSensor*)s)->ualarm);
+		*/
 			}
 		}
 	}

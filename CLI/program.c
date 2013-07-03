@@ -17,26 +17,26 @@ void console(const LOGT lt, const LOGL ll, char const*const le, va_list ap)
 	
 	char const*const origin[]=
 	{   //Log Types
-		"", 		//UNDEFINED
-		"", 		//PROGRAM
-		"Server", 	//SERVER
-		"Database", //DB
-		"Printer", 	//PRINTER
-		"Network", 	//NETWORK
-		"Client", 	//CLIENT
+		"", 			//UNDEFINED
+		"", 			//PROGRAM
+		"Server:   ", 	//SERVER
+		"Database: ",   //DB
+		"Printer:  ", 	//PRINTER
+		"Network:  ", 	//NETWORK
+		"Client:   ", 	//CLIENT
 	},
 
 	*const head[]=
 	{   //Log Levels
-		": ", 			//UNDEFINED
-		" Error: ", 	//ERROR
-		" Warning: ", 	//WARNING
-		" BUG: ", 		//BUG
-		" ERROR: ", 	//SERIOUS_ERROR
-		" Alarm: ", 	//ALARM
-		": ", 			// DEBUG
-		": ", 			// SYSTEM_ACTIVITY
-		": ", 			// CLIENT_ACTIVITY
+		"", 			//UNDEFINED
+		"Error:   ", 	//ERROR
+		"Warning: ", 	//WARNING
+		"Bug:     ",	//BUG
+		"ERROR:   ", 	//SERIOUS_ERROR
+		"Alarm:   ", 	//ALARM
+		"", 			//DEBUG
+		"", 			//SYSTEM_ACTIVITY
+		"", 			//CLIENT_ACTIVITY
 	};
 
 	const char*const porigin = origin[lt], *const phead = head[ll];

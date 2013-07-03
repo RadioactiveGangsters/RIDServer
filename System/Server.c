@@ -21,11 +21,11 @@ int InitServer(const int argc, char const*const*const argv)
 
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Database initialization..");
 	if(OpenDatabase()!=EXIT_SUCCESS)return EXIT_FAILURE;
-	else Log(LOGT_DB, LOGL_SYSTEM_ACTIVITY, "Database active");
+	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Database active");
 
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Configuring Network settings..");
 	if(AcceptClients()!=EXIT_SUCCESS)return EXIT_FAILURE;
-	else Log(LOGT_NETWORK, LOGL_SYSTEM_ACTIVITY, "Configuring complete");
+	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Configuring Network complete");
 	
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Initialization complete");	
 	return EXIT_SUCCESS;
