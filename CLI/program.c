@@ -11,7 +11,7 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 	    GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
 	    saved_attributes = consoleInfo.wAttributes;
     #else
-		char colour[] ="\x1B[41;37;1m";
+		char colour[] ="\x1B[41;37;";
 	#endif
 	size_t lcolour=sizeof(char)*10;
 	
@@ -42,7 +42,7 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 		//WARNING
 		" Warning: ",
 		//BUG
-		" BUG: ",
+		"BUG: ",
 		//SERIOUS_ERROR
 		" ERROR: ",
 		//ALARM
@@ -125,7 +125,12 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			printf("%s", colour);
 		#endif
 	}
-	printf("%s%s",porigin, phead);
+	time_t t = time(NULL);
+	struct tm * timeinfo = localtime(&t);
+	char timestring [12];
+	strftime (timestring, 12, "[%T] ", timeinfo);
+
+	printf("%s%s%s", timestring, porigin, phead);
 
 	(void)vprintf(le, ap);
 
@@ -158,7 +163,7 @@ int main(int argc, char**argv)
 	#else
 	sleep(10);
 	#endif
-
+	
 	// TODO: check if successful.
 	(void)StartServer();
 

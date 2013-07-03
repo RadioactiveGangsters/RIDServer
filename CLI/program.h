@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "../System/Log.h"
 #include "../System/Server.h"
