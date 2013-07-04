@@ -51,6 +51,7 @@ void*_iLoop(void*const c)
 			else
 			{
 				Packet*p;
+				struct iGraph const*ip;
 				Log(LOGL_DEBUG, LOGT_NETWORK, "Client send: %c (%d)", ch, ch);
 				switch(ch)
 				{
@@ -66,18 +67,27 @@ void*_iLoop(void*const c)
 
 					case OPC_GRAPH:
 						Log(LOGL_DEBUG,LOGT_CLIENT,"reading graph packet");
-						p=readGraph(client->fd);
-						if(!p)
+						ip = readGraph(client->fd);
+						if(!ip)
 						{
 							Log(LOGL_SERIOUS_ERROR,LOGT_CLIENT,"Out of memory!");
 							break;
 						}
-						if(p->op==OPC_UNDEFINED)
+						if(ip->base.op==OPC_UNDEFINED)
 						{
 							Log(LOGL_BUG,LOGT_CLIENT,"Cannot read packet");
 							continue;
 						}
-						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet requesting sensor %s.",((struct iGraph*)p)->name);
+						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet requesting sensor %s.",ip->name);
+						Sensor const*const s = findSensor(ip->name);
+						p=makeGraph(s);
+						if(!p)
+						{
+							Log(LOGL_BUG,LOGT_CLIENT,"requested sensor %s invalid.",ip->name);
+							break;
+						}
+						
+						sendPacket(client,p);
 						break;
 					case OPC_UPDATE:
 						Log(LOGL_BUG,LOGT_NETWORK,"packet %d not supported yet",ch);
@@ -176,5 +186,6 @@ void sendPacket(Client*const c,Packet*const p)
 		if(p->op==OPC_UNDEFINED)return;
 		//enqueue(c,p);
 	}
+	Log(LOGL_BUG,LOGT_CLIENT,"sendPacket(%d) failed, no queue.",p->op);
 }
 

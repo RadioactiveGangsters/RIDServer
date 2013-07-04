@@ -13,13 +13,9 @@ Packet*makePing(void)
 
 Packet*makeLogin(void)
 {
-	Packet b=
-	{
-		.op=OPC_LOGIN,
-	};
 	struct LoginPacket l=
 	{
-		.base=b,
+		.base={.op=OPC_LOGIN,},
 		.zero=0,
 	},*p=malloc(sizeof*p);
 	if(!p)return NULL;
@@ -34,11 +30,10 @@ Packet*makeGraph(Sensor const*const s)
 		return NULL;
 	}
 	{
-		Packet const b={.op=OPC_LOGIN,};
 		struct oGraph const g=
 		{
-			.base=b,
-			.namelen=SENSOR_HNAMELEN,
+			.base={.op=OPC_GRAPH,},
+			.namelen=strlen(s->name),
 			.name=s->name,
 			.qlen=AutoQcount(s->delta),
 			.queue=s->delta,
@@ -52,13 +47,13 @@ Packet*makeGraph(Sensor const*const s)
 	}
 }
 
-iPacket*readGraph(const int source)
+struct iGraph*readGraph(const int source)
 {
-	iPacket u=
+	struct iGraph u=
 	{
-		.op=OPC_UNDEFINED,
+		.base={.op=OPC_UNDEFINED,},
+		.name=NULL,
 	},*p=malloc(sizeof(struct iGraph));
-	struct iGraph*g=(struct iGraph*)p;
 
 	uint32_t requestsize=0;
 	size_t wanted;
@@ -89,10 +84,9 @@ iPacket*readGraph(const int source)
 	{
 		return p;
 	}
-	printf("%s\n",sensor);
 
-	g->base.op=OPC_GRAPH;
-	g->name=sensor;
+	p->base.op=OPC_GRAPH;
+	p->name=sensor;
 	return p;
 }
 

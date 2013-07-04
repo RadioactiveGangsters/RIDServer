@@ -51,6 +51,6 @@ Packet*makePing(void);
 Packet*makeLogin(void);
 Packet*makeGraph(Sensor const*const);
 
-iPacket*readGraph(const int);
+struct iGraph*readGraph(const int);
 
 #endif

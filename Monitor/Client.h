@@ -22,6 +22,7 @@
 
 #include "Packet.h"
 #include "../System/Log.h"
+#include "../Data/Database.h"
 
 typedef struct
 {
