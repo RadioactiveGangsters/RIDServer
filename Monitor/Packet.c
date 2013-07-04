@@ -47,6 +47,30 @@ Packet*makeGraph(Sensor const*const s)
 	}
 }
 
+ssize_t writeGraph(const int fd,struct oGraph*packet)
+{
+	AutoQ const*e;
+	int i=0;
+	if(!fd)return -1;
+	if(!packet)return -1;
+	if(packet->base.op==OPC_UNDEFINED)return -1;
+
+	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
+	if( write(fd,&packet->namelen,sizeof(int)) == -1 ) return -1;
+	if( write(fd,&packet->name,sizeof(char)*packet->namelen) == -1 ) return -1;
+	if( write(fd,&packet->qlen,sizeof(int)) == -1 ) return -1;
+	
+	e=packet->queue;
+	while(e && i++<packet->qlen);
+	{
+		// TODO: binary sensors?
+		if( write(fd,e->e,sizeof(int)) == -1 ) return -1;
+		e=e->n;
+	}
+
+	return (ssize_t)sizeof(struct oGraph);
+}
+
 struct iGraph*readGraph(const int source)
 {
 	struct iGraph u=

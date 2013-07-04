@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #include "../System/Log.h"
 #include "../Data/sensor.h"
 
@@ -50,6 +51,8 @@ struct oGraph
 Packet*makePing(void);
 Packet*makeLogin(void);
 Packet*makeGraph(Sensor const*const);
+
+ssize_t writeGraph(const int,struct oGraph*);
 
 struct iGraph*readGraph(const int);
 
