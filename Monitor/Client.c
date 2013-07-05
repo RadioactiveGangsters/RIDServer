@@ -52,6 +52,7 @@ void*_iLoop(void*const c)
 			{
 				Packet*p;
 				struct iGraph const*ip;
+				Sensor const* s;
 				Log(LOGL_DEBUG, LOGT_NETWORK, "Client send: %c (%d)", ch, ch);
 				switch(ch)
 				{
@@ -79,7 +80,7 @@ void*_iLoop(void*const c)
 							continue;
 						}
 						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet requesting sensor %s.",ip->name);
-						Sensor const*const s = findSensor(ip->name);
+						s = findSensor(ip->name);
 						p=makeGraph(s);
 						if(!p)
 						{
@@ -184,8 +185,7 @@ void sendPacket(Client*const c,Packet*const p)
 	else
 	{
 		if(p->op==OPC_UNDEFINED)return;
-		//enqueue(c,p);
+		enqueue(c->_queue,p);
 	}
-	Log(LOGL_BUG,LOGT_CLIENT,"sendPacket(%d) failed, no queue.",p->op);
 }
 
