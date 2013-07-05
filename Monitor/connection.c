@@ -23,7 +23,7 @@ void*socklisten(void*connection)
 				Log(LOGT_NETWORK,LOGL_BUG,"Unable to accept connection, dying.");
 				break;
 			}
-			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected");       
+			Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY, "Client connected");       
 
 			c=SpawnClient(client_sockfd);
 			if(!c)
@@ -66,7 +66,7 @@ int AcceptClients(void)
 		// did not get file descriptor?
 		if (!server_sockfd)
 		{
-		    Log(LOGL_ERROR, LOGT_NETWORK, "Network unavailable.");
+		    Log(LOGT_NETWORK,LOGL_ERROR, "Network unavailable.");
 		    return EXIT_FAILURE;
 		}
 
@@ -86,7 +86,7 @@ int AcceptClients(void)
 		{
 			int*server_ret = malloc(sizeof*server_ret);
 			*server_ret = server_sockfd;
-		    Log(LOGL_SYSTEM_ACTIVITY, LOGT_NETWORK, "Configuring complete, listening for Client connections on port %d.",ntohs(server_address.sin_port));
+		    Log(LOGT_NETWORK,LOGL_SYSTEM_ACTIVITY, "Configuring complete, listening for Client connections on port %d.",ntohs(server_address.sin_port));
 			pthread_create(&netthread,NULL,&socklisten,server_ret);
 		}
 	}

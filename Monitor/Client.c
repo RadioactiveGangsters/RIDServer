@@ -23,7 +23,7 @@ void writePacket(const int fd,Packet*const p)
 	
 		if(write(fd,p,packsize)<(ssize_t)packsize)
 		{
-			Log(LOGL_WARNING, LOGT_NETWORK, "Could not send complete packet %",p->op);
+			Log(LOGT_NETWORK,LOGL_WARNING, "Could not send complete packet %",p->op);
 			return;
 		}
 	}
@@ -38,7 +38,7 @@ void*_iLoop(void*const c)
 	else
 	{
 		Client*client=c;
-		Log(LOGL_DEBUG, LOGT_NETWORK, "waiting for input");
+		Log(LOGT_NETWORK,LOGL_DEBUG, "waiting for input");
 		while(true)
 		{
 			opcode ch;
@@ -53,7 +53,7 @@ void*_iLoop(void*const c)
 				Packet*p;
 				struct iGraph const*ip;
 				Sensor const* s;
-				Log(LOGL_DEBUG, LOGT_NETWORK, "Client send: %c (%d)", ch, ch);
+				Log(LOGT_NETWORK,LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
 				switch(ch)
 				{
 					case OPC_LOGIN:
@@ -163,15 +163,15 @@ void test(void)
 	{
 //		ssize_t x;
 //		if((x = write(address, pp, sizeof(char))) != sizeof(char))
-//		Log(LOGL_ERROR, LOGT_NETWORK, "Cannot send %d: %d",x, errno);
+//		Log(LOGT_NETWORK,LOGL_ERROR, "Cannot send %d: %d",x, errno);
 
-//		Log(LOGL_DEBUG, LOGT_NETWORK, "Send char %d ", *pp);
+//		Log(LOGT_NETWORK,LOGL_DEBUG, "Send char %d ", *pp);
 
 
 		//Log(LOGL_CLIENT_ACTIVITY, "send char %c ", t );
 	}
 
-//	Log(LOGL_DEBUG, LOGT_NETWORK, "Server send: %c", ch);
+//	Log(LOGT_NETWORK,LOGL_DEBUG, "Server send: %c", ch);
 //	if(write(address, &ch, 1)) continue;
 //	printf("Send: %c", ch);
 
