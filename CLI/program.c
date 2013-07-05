@@ -16,47 +16,30 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 	size_t lcolour=sizeof(char)*10;
 	
 	char const*const origin[]=
-	{
-		//UNDEFINED
-		"",
-		// PROGRAM
-		"",
-		//SERVER
-		"Server",
-		//DB
-		"Database",
-		//PRINTER
-		"Printer",
-		//NETWORK
-		"Network",
-		//CLIENT
-		"Client",
+	{   //Log Types
+		"", 		//UNDEFINED
+		"", 		//PROGRAM
+		"Server", 	//SERVER
+		"Database", //DB
+		"Printer", 	//PRINTER
+		"Network", 	//NETWORK
+		"Client", 	//CLIENT
 	},
 
 	*const head[]=
-	{
-		//UNDEFINED
-		": ",
-		//ERROR
-		" Error: ",
-		//WARNING
-		" Warning: ",
-		//BUG
-		"BUG: ",
-		//SERIOUS_ERROR
-		" ERROR: ",
-		//ALARM
-		" Alarm: ",
-		// DEBUG
-		": ",
-		// SYSTEM_ACTIVITY
-		": ",
-		// CLIENT_ACTIVITY
-		": ",
+	{   //Log Levels
+		": ", 			//UNDEFINED
+		" Error: ", 	//ERROR
+		" Warning: ", 	//WARNING
+		" BUG: ", 		//BUG
+		" ERROR: ", 	//SERIOUS_ERROR
+		" Alarm: ", 	//ALARM
+		": ", 			// DEBUG
+		": ", 			// SYSTEM_ACTIVITY
+		": ", 			// CLIENT_ACTIVITY
 	};
 
-
-	const char*const porigin=origin[lt],*const phead=head[ll];
+	const char*const porigin = origin[lt], *const phead = head[ll];
 
 	switch(ll)
 	{
@@ -125,6 +108,8 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 			printf("%s", colour);
 		#endif
 	}
+
+	//Add server time to message
 	time_t t = time(NULL);
 	struct tm * timeinfo = localtime(&t);
 	char timestring [12];
@@ -167,14 +152,19 @@ int main(int argc, char**argv)
 	// TODO: check if successful.
 	(void)StartServer();
 
-	// TODO: I don't know.
-	// join some other thread, maybe?
-	printf("\n");
-	Log(LOGL_BUG,LOGT_PROGRAM,"Server will exit on keypress.");
-	Log(LOGL_DEBUG,LOGT_SERVER,"To reset alarm press 'r' and then enter.");
 	while(1)
-	{	//114 = r  Resets alarm that is first in queue
-		if(getchar() == 114) resetNextAlarm();
+	{	
+		switch(getchar())
+		{
+			case 114: //r  
+				resetNextAlarm();
+				break;
+			
+			case 120: //x
+				Log(LOGL_SYSTEM_ACTIVITY,LOGT_SERVER,"Server shutting down..");
+				return EXIT_SUCCESS;
+				break;
+		}
 	}
 
 	return EXIT_SUCCESS;

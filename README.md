@@ -31,7 +31,7 @@ Ther server will not start without sensor section, but may run without sensors i
 * `typeXname`: The human-readable name for this type of sensor. `X` is replaced by a positive integer, effectively limited by `typecount`.
 * `typeXcount`: The amount of instances of sensors of type `typeX`, instances are numbered from 0 up, so the sensors range from `XXX0` to `XXX(N-1)` for a type of `XXX` and a `typeXcount` of `N`.
 * `typeXtype`: The type of sensor, can either be `integer` or `binary`. Different sensortypes are handled differently from here on. (Default is `integer`)
-* `typeXinterval`: The minimum polling time of this type of sensor in milliseconds.
+* `typeXinterval`: The minimum polling time of this type of sensor in milliseconds. (Default is `1000` milliseconds)
 
 ####binary
 Binary sensors can be on or off, on means it's giving off an alarm.

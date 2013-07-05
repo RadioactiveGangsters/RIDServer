@@ -6,8 +6,9 @@ typedef struct
 	char sensor[256];
 } _path;
 
-char*sensorinipath(void);
-char*fileprinterpath(void);
 char*networkinipath(void);
+char*sensorinipath(void);
+char*printerinipath(void);
+char*fileprinterpath(void);
 
 #endif

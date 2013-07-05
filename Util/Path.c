@@ -10,6 +10,11 @@ inline char*sensorinipath(void)
 	return "reactor.ini";
 }
 
+inline char*printerinipath(void)
+{
+	return "reactor.ini";
+}
+
 inline char*fileprinterpath(void)
 {
 	return "printer.txt";
