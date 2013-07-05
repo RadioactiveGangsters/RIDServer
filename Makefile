@@ -41,6 +41,7 @@ clean :
 	-rm $(OBJS)
 	-cd deps/iniparser && make veryclean
 	-rm printer.txt
+	-find . -type f -name "*.h.ghc" -exec rm -f {} \;
 
 $(TARGET) : $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) $(OBJS) $(LINKERFLAGS) -o $(TARGET)
