@@ -1,6 +1,6 @@
 #include "program.h"
 
-void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
+void console(const LOGT lt, const LOGL ll, char const*const le, va_list ap)
 {
 	#ifdef _WIN32
 	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -17,26 +17,26 @@ void console(const LOGL ll, const LOGT lt, char const*const le, va_list ap)
 	
 	char const*const origin[]=
 	{   //Log Types
-		"", 		//UNDEFINED
-		"", 		//PROGRAM
-		"Server", 	//SERVER
-		"Database", //DB
-		"Printer", 	//PRINTER
-		"Network", 	//NETWORK
-		"Client", 	//CLIENT
+		"", 			//UNDEFINED
+		"", 			//PROGRAM
+		"Server:   ", 	//SERVER
+		"Database: ",   //DB
+		"Printer:  ", 	//PRINTER
+		"Network:  ", 	//NETWORK
+		"Client:   ", 	//CLIENT
 	},
 
 	*const head[]=
 	{   //Log Levels
-		": ", 			//UNDEFINED
-		" Error: ", 	//ERROR
-		" Warning: ", 	//WARNING
-		" BUG: ", 		//BUG
-		" ERROR: ", 	//SERIOUS_ERROR
-		" Alarm: ", 	//ALARM
-		": ", 			// DEBUG
-		": ", 			// SYSTEM_ACTIVITY
-		": ", 			// CLIENT_ACTIVITY
+		"", 			//UNDEFINED
+		"Error:   ", 	//ERROR
+		"Warning: ", 	//WARNING
+		"Bug:     ",	//BUG
+		"ERROR:   ", 	//SERIOUS_ERROR
+		"Alarm:   ", 	//ALARM
+		"", 			//DEBUG
+		"", 			//SYSTEM_ACTIVITY
+		"", 			//CLIENT_ACTIVITY
 	};
 
 	const char*const porigin = origin[lt], *const phead = head[ll];
@@ -139,7 +139,7 @@ int main(int argc, char**argv)
 	(void)subscribe(&console);
 	if(InitServer(argc, (char const*const*const)argv) != EXIT_SUCCESS)
 	{
-		printf("Failed to initialize.\n");
+		Log(LOGT_SERVER, LOGL_ERROR, "Failed to initialize!");
 		return EXIT_FAILURE;
 	}
 
@@ -149,8 +149,11 @@ int main(int argc, char**argv)
 	sleep(10);
 	#endif
 	
-	// TODO: check if successful.
-	(void)StartServer();
+	if(StartServer() != EXIT_SUCCESS)
+	{
+		Log(LOGT_SERVER, LOGL_ERROR, "Failed to start secondary operators!");
+		return EXIT_FAILURE;
+	}
 
 	while(1)
 	{	
@@ -161,7 +164,7 @@ int main(int argc, char**argv)
 				break;
 			
 			case 120: //x
-				Log(LOGL_SYSTEM_ACTIVITY,LOGT_SERVER,"Server shutting down..");
+				Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Server shutting down..");
 				return EXIT_SUCCESS;
 				break;
 		}

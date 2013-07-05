@@ -15,13 +15,13 @@ void AlarmDetection(Sensor* sn)
 		{
 			//sendAlarm(isn->ualarm);
 			Sensor_enqueue(sn);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s: %s", sn->name ,isn->ualarm);
+			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,isn->ualarm);
 		} 
 		else if (isn->value < isn->lbound)
 		{
 			//sendAlarm(isn->lalarm);
 			Sensor_enqueue(sn);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s: %s", sn->name ,isn->lalarm);
+			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,isn->lalarm);
 		}
 	} 
 	
@@ -34,7 +34,7 @@ void AlarmDetection(Sensor* sn)
 		{		
 			//sendAlarm(bsn->alarm);	
 			Sensor_enqueue(sn);
-			Log(LOGL_ALARM, LOGT_SERVER, "%s: %s", sn->name ,bsn->alarm);
+			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,bsn->alarm);
 		}
 	}
 }
@@ -45,9 +45,9 @@ void resetNextAlarm()
 	if(sn)
 	{
 		ResetSensor(sn);
-		Log(LOGL_DEBUG,LOGT_SERVER,"Alarm %s has been reset.", (sn->name));
+		Log(LOGT_SERVER, LOGL_DEBUG, "Alarm %s has been reset.", (sn->name));
 	}
-	else Log(LOGL_DEBUG,LOGT_SERVER,"There are no more alarms to reset.");
+	else Log(LOGT_SERVER, LOGL_DEBUG, "There are no more alarms to reset.");
 }
 
 void Sensor_enqueue(Sensor* sn)
@@ -65,7 +65,6 @@ void Sensor_enqueue(Sensor* sn)
 
 Sensor* Sensor_dequeue()
 {
-
 	if(q.size) return dequeue(&q);
 	else return NULL;
 }

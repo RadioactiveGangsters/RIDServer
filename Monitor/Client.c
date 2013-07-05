@@ -44,7 +44,7 @@ void*_iLoop(void*const c)
 			opcode ch;
 			if(read(client->fd, &ch, 1)!=1)
 			{
-				Log(LOGL_CLIENT_ACTIVITY,LOGT_NETWORK,"client disconnected");
+				Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY,"client disconnected");
 				// TODO: cleanup
 				break;
 			}
@@ -57,7 +57,7 @@ void*_iLoop(void*const c)
 				switch(ch)
 				{
 					case OPC_LOGIN:
-						Log(LOGL_WARNING,LOGT_NETWORK,"A superior client tried to log in, this server version does not yet support client initialisation.");
+						Log(LOGT_NETWORK,LOGL_WARNING,"A superior client tried to log in, this server version does not yet support client initialisation.");
 						p=makeLogin();
 						sendPacket(client,p);
 						break;
@@ -67,34 +67,34 @@ void*_iLoop(void*const c)
 						break;
 
 					case OPC_GRAPH:
-						Log(LOGL_DEBUG,LOGT_CLIENT,"reading graph packet");
+						Log(LOGT_CLIENT,LOGL_DEBUG,"reading graph packet");
 						ip = readGraph(client->fd);
 						if(!ip)
 						{
-							Log(LOGL_SERIOUS_ERROR,LOGT_CLIENT,"Out of memory!");
+							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
 							break;
 						}
 						if(ip->base.op==OPC_UNDEFINED)
 						{
-							Log(LOGL_BUG,LOGT_CLIENT,"Cannot read packet");
+							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
 							continue;
 						}
-						Log(LOGL_DEBUG,LOGT_CLIENT,"read graph packet requesting sensor %s.",ip->name);
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read graph packet requesting sensor %s.",ip->name);
 						s = findSensor(ip->name);
 						p=makeGraph(s);
 						if(!p)
 						{
-							Log(LOGL_BUG,LOGT_CLIENT,"requested sensor %s invalid.",ip->name);
+							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ip->name);
 							break;
 						}
 						
 						sendPacket(client,p);
 						break;
 					case OPC_UPDATE:
-						Log(LOGL_BUG,LOGT_NETWORK,"packet %d not supported yet",ch);
+						Log(LOGT_NETWORK,LOGL_BUG,"packet %d not supported yet",ch);
 					case OPC_ALARM:
 					case OPC_UNDEFINED:
-						Log(LOGL_ERROR,LOGT_NETWORK,"Client violates protocol");
+						Log(LOGT_NETWORK,LOGL_ERROR,"Client violates protocol");
 						goto dead;
 						break;
 				}

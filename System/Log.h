@@ -33,12 +33,12 @@ typedef enum
 
 struct LOGCB
 {
-	void(*log)(const LOGL,const LOGT,char const*const,va_list);
+	void(*log)(const LOGT,const LOGL,char const*const,va_list);
 };
 
-void Log(const LOGL,const LOGT,char const*const, ...);
+void Log(const LOGT,const LOGL,char const*const, ...);
 
 /*@null@*/void const*
-subscribe(void(*)(const LOGL,const LOGT,char const*const,va_list));
+subscribe(void(*)(const LOGT,const LOGL,char const*const,va_list));
 
 #endif

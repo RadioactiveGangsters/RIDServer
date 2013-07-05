@@ -33,6 +33,6 @@ int getMin(AutoQ* list);
 int getMax(AutoQ* list);
 int calcMean(AutoQ* list);
 int storeToFile(char const*const path, char const*const data);
-void StartPrinter(void);
+int StartPrinter(void);
 
 #endif	/* PRINTER_H */

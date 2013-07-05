@@ -5,7 +5,7 @@ void*socklisten(void*connection)
 {
 	if(!connection)
 	{
-		Log(LOGL_BUG,LOGT_NETWORK,"Cannot listen without connection");
+		Log(LOGT_NETWORK,LOGL_BUG,"Cannot listen without connection");
 		pthread_exit(NULL);
 	}
 	else
@@ -20,7 +20,7 @@ void*socklisten(void*connection)
 
 			if((client_sockfd = accept(server_sockfd, &client_address, &clien_len)) < 1 )
 			{
-				Log(LOGL_BUG,LOGT_NETWORK,"Unable to accept connection, dying.");
+				Log(LOGT_NETWORK,LOGL_BUG,"Unable to accept connection, dying.");
 				break;
 			}
 			Log(LOGL_CLIENT_ACTIVITY, LOGT_NETWORK, "Client connected");       
@@ -28,7 +28,7 @@ void*socklisten(void*connection)
 			c=SpawnClient(client_sockfd);
 			if(!c)
 			{
-				Log(LOGL_SERIOUS_ERROR,LOGT_NETWORK,"Out of memory!");
+				Log(LOGT_NETWORK,LOGL_SERIOUS_ERROR,"Out of memory!");
 				pthread_exit(NULL);
 			}
 		}
@@ -47,7 +47,7 @@ int AcceptClients(void)
 	dictionary*config=iniparser_load(networkinipath());
 	if(!config||!iniparser_find_entry(config,"network"))
 	{
-		Log(LOGL_WARNING,LOGT_NETWORK, "Network configuration missing from %s, using defaults.",networkinipath());
+		Log(LOGT_NETWORK,LOGL_WARNING, "Network configuration missing from %s, using defaults.",networkinipath());
 	}
 	// continue using defaults
 	{
@@ -72,14 +72,14 @@ int AcceptClients(void)
 
 		if(bind(server_sockfd, (struct sockaddr*)&server_address, (socklen_t)sizeof(server_address)))
 		{
-			Log(LOGL_ERROR,LOGT_NETWORK,"Network Address in use.");
+			Log(LOGT_NETWORK,LOGL_ERROR,"Network Address in use.");
 			return EXIT_FAILURE;
 		}
 
 		// we now accept connections
 		if(listen(server_sockfd, iniparser_getint(config,"network:clients",10)))
 		{
-			Log(LOGL_ERROR,LOGT_NETWORK,"Cannot accept any incoming connections.");
+			Log(LOGT_NETWORK,LOGL_ERROR,"Cannot accept any incoming connections.");
 			return EXIT_FAILURE;
 		}
 
