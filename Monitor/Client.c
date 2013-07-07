@@ -41,7 +41,7 @@ void*_iLoop(void*const c)
 		Log(LOGT_NETWORK,LOGL_DEBUG, "waiting for input");
 		while(true)
 		{
-			opcode ch;
+			opcode ch=OPC_UNDEFINED;
 			if(read(client->fd, &ch, 1)!=1)
 			{
 				Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY,"client disconnected");
@@ -99,6 +99,7 @@ void*_iLoop(void*const c)
 						break;
 				}
 			}
+			sleep(1);
 		}
 		dead:;
 	}
@@ -113,20 +114,16 @@ void*_oLoop(void*const c)
 	}
 	else
 	{
-		Client*client=c;
-		// TODO: check if successful
-		(void)write(client->fd,makePing(),sizeof(Packet));
+		Client const*const client=c;
 		while(true)
 		{
 			if(client->_queue)
 			{
-//				ssize_t x;
-//				if((x=write(client->fd, dequeue(client->_queue), sizeof(char)))!=sizeof(char))
-				{
-					// TODO: assume client is dead; cleanup
-					break;
-				}
+				Packet const*const p=dequeue(client->_queue);
+				if(!p||p->op==OPC_UNDEFINED)continue;
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writing out packet %d: %d",p->op,writeGraph(client->fd,c));
 			}
+			sleep(1);
 		}
 	}
 	pthread_exit(NULL);
@@ -185,6 +182,12 @@ void sendPacket(Client*const c,Packet*const p)
 	else
 	{
 		if(p->op==OPC_UNDEFINED)return;
+		if(!c->_queue)
+		{
+			c->_queue=malloc(sizeof(queue));
+			if(!c->_queue)return;
+			init_queue(c->_queue);
+		}
 		enqueue(c->_queue,p);
 	}
 }

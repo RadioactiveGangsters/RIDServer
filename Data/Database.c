@@ -166,7 +166,7 @@ int registerSensor(Sensor*const s)
 				return EXIT_FAILURE;
 			}
 			// linking like this saves a traversal.
-			tbl=trieadd(tbl, s->unit, triee(s->name, s));
+			tbl=trieadd(tbl, s->unit, newtable);
 			if(!tbl)
 			{
 				Log(LOGT_DB, LOGL_ERROR, "Cannot expand database with table for %s", s->unit);

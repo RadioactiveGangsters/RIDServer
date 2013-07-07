@@ -48,6 +48,7 @@ int AcceptClients(void)
 	if(!config||!iniparser_find_entry(config,"network"))
 	{
 		Log(LOGT_NETWORK,LOGL_WARNING, "Network configuration missing from %s, using defaults.",networkinipath());
+		iniparser_freedict(config);
 	}
 	// continue using defaults
 	{
@@ -67,12 +68,14 @@ int AcceptClients(void)
 		if (!server_sockfd)
 		{
 		    Log(LOGT_NETWORK,LOGL_ERROR, "Network unavailable.");
+		    iniparser_freedict(config);
 		    return EXIT_FAILURE;
 		}
 
 		if(bind(server_sockfd, (struct sockaddr*)&server_address, (socklen_t)sizeof(server_address)))
 		{
 			Log(LOGT_NETWORK,LOGL_ERROR,"Network Address in use.");
+			iniparser_freedict(config);
 			return EXIT_FAILURE;
 		}
 
@@ -80,9 +83,11 @@ int AcceptClients(void)
 		if(listen(server_sockfd, iniparser_getint(config,"network:clients",10)))
 		{
 			Log(LOGT_NETWORK,LOGL_ERROR,"Cannot accept any incoming connections.");
+			iniparser_freedict(config);
 			return EXIT_FAILURE;
 		}
 
+		iniparser_freedict(config);
 		{
 			int*server_ret = malloc(sizeof*server_ret);
 			*server_ret = server_sockfd;
