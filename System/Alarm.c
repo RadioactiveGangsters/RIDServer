@@ -1,6 +1,6 @@
 #include "Alarm.h"
 
-static queue q={.size=0}; 
+static queue q={.array=NULL,.first=-1,.last=-1,.count=0,.size=0}; 
 
 void AlarmDetection(Sensor* sn)
 {
