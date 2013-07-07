@@ -127,10 +127,13 @@ static void registerthread(Trie*const table)
 	}
 }
 
-void StartSensorSimulation(void)
+int StartSensorSimulation(void)
 {
 	Trie*const db=Tables();
 	fortrie(db, &registerthread);
+	//if() return EXIT_SUCCES;
+	//else return EXIT_FAILURE;
+	return EXIT_SUCCES; //Temporarily
 }
 
 static void genbSensors(char const*const type,  const int amount, 

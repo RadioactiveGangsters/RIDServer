@@ -19,11 +19,11 @@ void console(const LOGT lt, const LOGL ll, char const*const le, va_list ap)
 	{   //Log Types
 		"", 			//UNDEFINED
 		"", 			//PROGRAM
-		"Server:   ", 	//SERVER
-		"Database: ",   //DB
-		"Printer:  ", 	//PRINTER
-		"Network:  ", 	//NETWORK
-		"Client:   ", 	//CLIENT
+		"[Server]   ", 	//SERVER
+		"[Database] ",   //DB
+		"[Printer]  ", 	//PRINTER
+		"[Network]  ", 	//NETWORK
+		"[Client]   ", 	//CLIENT
 	},
 
 	*const head[]=
