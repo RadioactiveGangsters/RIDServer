@@ -131,9 +131,9 @@ int StartSensorSimulation(void)
 {
 	Trie*const db=Tables();
 	fortrie(db, &registerthread);
-	//if() return EXIT_SUCCES;
+	//if() return EXIT_SUCCESS;
 	//else return EXIT_FAILURE;
-	return EXIT_SUCCES; //Temporarily
+	return EXIT_SUCCESS; //Temporarily
 }
 
 static void genbSensors(char const*const type,  const int amount, 
