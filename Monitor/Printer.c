@@ -72,7 +72,7 @@ void *getSensorTable(void *param)
 	else timer = iniparser_getint(ini, "printer:timer", 3600);
 
 	Rest(5); // 5 second; to wait for some data to be generated
-	iniparser_freedict(ini);
+	iniparser_freedict(ini);git p
 
     while(true)
     {
