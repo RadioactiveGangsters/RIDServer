@@ -19,10 +19,11 @@
 #include "../deps/iniparser/src/iniparser.h"
 
 #include "../Data/sensor.h"
+#include "../Data/Database.h"
 #include "../System/Log.h"
 #include "../Util/util.h"
 #include "../Util/Path.h"
-#include "../Data/Database.h"
+#include "../Util/Rest.h"
 #include "../Util/Trie.h"
 #include "../Util/DeathRow.h"
 

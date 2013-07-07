@@ -60,13 +60,7 @@ void *getSensorTable(void *param)
 	}
 	else timer = iniparser_getint(ini, "printer:timer", 3600);
 
-    // 5 second; to wait for some data to be generated
-	#ifdef _WIN32
-	Sleep(5000);
-	#else
-	sleep(5);
-	#endif
-	
+	Rest(5); // 5 second; to wait for some data to be generated
 
     while(true)
     {
@@ -86,11 +80,7 @@ void *getSensorTable(void *param)
         fortrie(Tables(), &getSensors);
 
 	    // Wait [timer] seconds for the next printout
-		#ifdef _WIN32
-		Sleep(timer*1000);
-		#else
-		sleep(timer);
-		#endif
+		Rest(timer);
     }
 }
 

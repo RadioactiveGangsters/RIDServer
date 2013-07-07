@@ -143,11 +143,7 @@ int main(int argc, char**argv)
 		return EXIT_FAILURE;
 	}
 
-	#ifdef _WIN32
-	Sleep(10000);
-	#else
-	sleep(10);
-	#endif
+	Rest(10); //10 seconds
 	
 	if(StartServer() != EXIT_SUCCESS)
 	{
