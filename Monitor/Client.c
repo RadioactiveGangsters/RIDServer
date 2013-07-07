@@ -1,6 +1,6 @@
 #include "Client.h"
 
-void writePacket(const int fd,Packet*const p)
+void _writePacket(const int fd,Packet*const p)
 {
 	if(!p)return;
 	else
@@ -23,7 +23,7 @@ void writePacket(const int fd,Packet*const p)
 	
 		if(write(fd,p,packsize)<(ssize_t)packsize)
 		{
-			Log(LOGT_NETWORK, LOGL_WARNING, "Could not send complete packet %",p->op);
+			Log(LOGT_NETWORK,LOGL_WARNING, "Could not send complete packet %d",p->op);
 			return;
 		}
 	}
@@ -38,23 +38,26 @@ void*_iLoop(void*const c)
 	else
 	{
 		Client*client=c;
-		Log(LOGT_NETWORK, LOGL_DEBUG, "Waiting for input");
+		Log(LOGT_NETWORK,LOGL_DEBUG, "waiting for input");
 		while(true)
 		{
-			opcode ch;
+			opcode ch=OPC_UNDEFINED;
 			if(read(client->fd, &ch, 1)!=1)
 			{
-				Log(LOGT_NETWORK, LOGL_CLIENT_ACTIVITY, "Client read error");
+				Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY,"client disconnected");
+				// TODO: cleanup
 				break;
 			}
 			else
 			{
 				Packet*p;
-				Log(LOGT_NETWORK, LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
+				struct iGraph*ip;
+				Sensor const* s;
+				Log(LOGT_NETWORK,LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
 				switch(ch)
 				{
 					case OPC_LOGIN:
-						Log(LOGT_NETWORK, LOGL_WARNING, "A superior client tried to log in, this server version does not yet support client initialisation.");
+						Log(LOGT_NETWORK,LOGL_WARNING,"A superior client tried to log in, this server version does not yet support client initialisation.");
 						p=makeLogin();
 						sendPacket(client,p);
 						break;
@@ -64,29 +67,40 @@ void*_iLoop(void*const c)
 						break;
 
 					case OPC_GRAPH:
-						Log(LOGT_CLIENT, LOGL_DEBUG, "Reading graph packet");
-						p=readGraph(client->fd);
-						if(!p)
+						Log(LOGT_CLIENT,LOGL_DEBUG,"reading graph packet");
+						ip = readGraph(client->fd);
+						if(!ip)
 						{
-							Log(LOGT_CLIENT, LOGL_SERIOUS_ERROR, "Out of memory!");
+							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
 							break;
 						}
-						if(p->op==OPC_UNDEFINED)
+						if(ip->base.op==OPC_UNDEFINED)
 						{
-							Log(LOGT_CLIENT, LOGL_BUG, "Cannot read packet");
+							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
 							continue;
 						}
-						Log(LOGT_CLIENT, LOGL_DEBUG, "Read graph packet.");
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read graph packet requesting sensor %s.",ip->name);
+						s = findSensor(ip->name);
+						p=makeGraph(s);
+						if(!p)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ip->name);
+							break;
+						}
+						destroyiGraph(ip);
+						
+						sendPacket(client,p);
 						break;
 					case OPC_UPDATE:
-						Log(LOGT_NETWORK, LOGL_BUG, "Packet %d not supported yet",ch);
+						Log(LOGT_NETWORK,LOGL_BUG,"packet %d not supported yet",ch);
 					case OPC_ALARM:
 					case OPC_UNDEFINED:
-						Log(LOGT_NETWORK, LOGL_ERROR, "Client violates protocol");
+						Log(LOGT_NETWORK,LOGL_ERROR,"Client violates protocol");
 						goto dead;
 						break;
 				}
 			}
+			sleep(1);
 		}
 		dead:;
 	}
@@ -101,19 +115,18 @@ void*_oLoop(void*const c)
 	}
 	else
 	{
-		Client*client=c;
-		write(client->fd,makePing(),sizeof(Packet));
+		Client const*const client=c;
 		while(true)
 		{
 			if(client->_queue)
 			{
-//				ssize_t x;
-//				if((x=write(client->fd, dequeue(client->_queue), sizeof(char)))!=sizeof(char))
-				{
-					// TODO: assume client is dead; cleanup
-					break;
-				}
+
+				Packet const*const p=dequeue(client->_queue);
+				if(!p||p->op==OPC_UNDEFINED)continue;
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writing out packet %d: %d",p->op,writeGraph(client->fd,c));
+				destroyoGraph((struct oGraph*)p);
 			}
+			sleep(1);
 		}
 	}
 	pthread_exit(NULL);
@@ -139,25 +152,30 @@ Client*SpawnClient(const int fd)
 
 void test(void)
 {
-/*	int i = 0;
-	printf("Received: %c\n", ch);
+	int i = 0;
+	//printf("Received: %c\n", ch);
 
-	ch++;
-	if(sleep(5)) break;
+	//ch++;
+
+	//if(sleep(5)) break;
 
 	for(; i < 20; i++)
 	{
-		ssize_t x;
-		if((x = write(address, pp, sizeof(char))) != sizeof(char))
-		Log(LOGT_NETWORK, LOGL_ERROR, "Cannot send %d: %d",x, errno);
-		Log(LOGT_NETWORK, LOGL_DEBUG, "Send char %d ", *pp);
-		Log(LOGT_NETWORK, LOGL_CLIENT_ACTIVITY, "send char %c ", t );
+//		ssize_t x;
+//		if((x = write(address, pp, sizeof(char))) != sizeof(char))
+//		Log(LOGT_NETWORK,LOGL_ERROR, "Cannot send %d: %d",x, errno);
+
+//		Log(LOGT_NETWORK,LOGL_DEBUG, "Send char %d ", *pp);
+
+
+		//Log(LOGL_CLIENT_ACTIVITY, "send char %c ", t );
 	}
-	Log(LOGL_DEBUG, LOGT_NETWORK, "Server send: %c", ch);
-	if(write(address, &ch, 1)) continue;
-	printf("Send: %c", ch);
-	(void)close(address);
-*/
+
+//	Log(LOGT_NETWORK,LOGL_DEBUG, "Server send: %c", ch);
+//	if(write(address, &ch, 1)) continue;
+//	printf("Send: %c", ch);
+
+//	(void)close(address);
 }
 
 void sendPacket(Client*const c,Packet*const p)
@@ -167,7 +185,13 @@ void sendPacket(Client*const c,Packet*const p)
 	else
 	{
 		if(p->op==OPC_UNDEFINED)return;
-		//enqueue(c,p);
+		if(!c->_queue)
+		{
+			c->_queue=malloc(sizeof(queue));
+			if(!c->_queue)return;
+			init_queue(c->_queue);
+		}
+		enqueue(c->_queue,p);
 	}
 }
 

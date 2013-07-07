@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct _AutoQ
+typedef struct autoQ
 {
 	void*e;
-	struct _AutoQ*n;
+	struct autoQ*n;
 	unsigned int space;
 	
 } AutoQ;
@@ -17,6 +17,8 @@ void DestroyAutoQ(AutoQ*const);
 AutoQ*AutoQe(void*const,unsigned int const);
 /*@null@*/AutoQ*AutoQadd(AutoQ*const,void*const);
 
-void forautoq(AutoQ*const q,void(*cb)(AutoQ*const));
+void forautoq(AutoQ*const,void(*)(AutoQ*const));
+
+int AutoQcount(AutoQ const*const);
 
 #endif

@@ -1,17 +1,15 @@
-
 #include "connection.h"
 
 void*socklisten(void*connection)
 {
 	if(!connection)
 	{
-		Log(LOGT_NETWORK, LOGL_BUG, "Cannot listen without connection");
+		Log(LOGT_NETWORK,LOGL_BUG,"Cannot listen without connection");
 		pthread_exit(NULL);
 	}
 	else
 	{
 		int server_sockfd = *(int*)connection;
-	    Log(LOGT_NETWORK, LOGL_SYSTEM_ACTIVITY, "Ready for Client connections");
 		while(1)
 		{
 			struct sockaddr client_address;
@@ -21,15 +19,15 @@ void*socklisten(void*connection)
 
 			if((client_sockfd = accept(server_sockfd, &client_address, &clien_len)) < 1 )
 			{
-				Log(LOGL_BUG, LOGT_NETWORK, "Unable to accept connection, dying.");
+				Log(LOGT_NETWORK,LOGL_BUG,"Unable to accept connection, dying.");
 				break;
 			}
-			Log(LOGT_NETWORK, LOGL_CLIENT_ACTIVITY, "Client connected");       
+			Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY, "Client connected");       
 
 			c=SpawnClient(client_sockfd);
 			if(!c)
 			{
-				Log(LOGT_NETWORK, LOGL_SERIOUS_ERROR, "Out of memory!");
+				Log(LOGT_NETWORK,LOGL_SERIOUS_ERROR,"Out of memory!");
 				pthread_exit(NULL);
 			}
 		}
@@ -48,7 +46,8 @@ int AcceptClients(void)
 	dictionary*config=iniparser_load(networkinipath());
 	if(!config||!iniparser_find_entry(config,"network"))
 	{
-		Log(LOGT_NETWORK, LOGL_WARNING, "Network configuration missing from %s, using defaults.",networkinipath());
+		Log(LOGT_NETWORK,LOGL_WARNING, "Network configuration missing from %s, using defaults.",networkinipath());
+		iniparser_freedict(config);
 	}
 	// continue using defaults
 	{
@@ -67,26 +66,31 @@ int AcceptClients(void)
 		// did not get file descriptor?
 		if (!server_sockfd)
 		{
-		    Log(LOGT_NETWORK, LOGL_ERROR, "Network unavailable.");
+		    Log(LOGT_NETWORK,LOGL_ERROR, "Network unavailable.");
+		    iniparser_freedict(config);
 		    return EXIT_FAILURE;
 		}
 
 		if(bind(server_sockfd, (struct sockaddr*)&server_address, (socklen_t)sizeof(server_address)))
 		{
-			Log(LOGT_NETWORK, LOGL_ERROR, "Network Address in use.");
+			Log(LOGT_NETWORK,LOGL_ERROR,"Network Address in use.");
+			iniparser_freedict(config);
 			return EXIT_FAILURE;
 		}
 
 		// we now accept connections
 		if(listen(server_sockfd, iniparser_getint(config,"network:clients",10)))
 		{
-			Log(LOGT_NETWORK, LOGL_ERROR, "Cannot accept any incoming connections.");
+			Log(LOGT_NETWORK,LOGL_ERROR,"Cannot accept any incoming connections.");
+			iniparser_freedict(config);
 			return EXIT_FAILURE;
 		}
 
+		iniparser_freedict(config);
 		{
 			int*server_ret = malloc(sizeof*server_ret);
 			*server_ret = server_sockfd;
+		    Log(LOGT_NETWORK,LOGL_SYSTEM_ACTIVITY, "Configuring complete, listening for Client connections on port %d.",ntohs(server_address.sin_port));
 			pthread_create(&netthread,NULL,&socklisten,server_ret);
 		}
 	}

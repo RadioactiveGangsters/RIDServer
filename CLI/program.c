@@ -110,13 +110,15 @@ void console(const LOGT lt, const LOGL ll, char const*const le, va_list ap)
 	}
 
 	//Add server time to message
-	time_t t = time(NULL);
-	struct tm * timeinfo = localtime(&t);
-	char timestring [12];
-	strftime (timestring, 12, "[%T] ", timeinfo);
-
-	printf("%s%s%s", timestring, porigin, phead);
-
+	{
+		time_t t = time(NULL);
+		struct tm * timeinfo = localtime(&t);
+		char timestring [12];
+		if(strftime (timestring, 12, "[%T] ", timeinfo))
+		{
+			printf("%s%s%s", timestring, porigin, phead);
+		}
+	}
 	(void)vprintf(le, ap);
 
     /* Restore original attributes */

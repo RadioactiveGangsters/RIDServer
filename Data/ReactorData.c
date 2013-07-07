@@ -164,7 +164,7 @@ static void genbSensors(char const*const type,  const int amount,
 			// register them with the databases
 			if(registerSensor(s))
 			{
-				Log(LOGL_ERROR, LOGT_SERVER, "Cannot register %s", s->name);
+				Log(LOGT_SERVER,LOGL_ERROR, "Cannot register %s", s->name);
 				free(s);
 				continue;
 			}

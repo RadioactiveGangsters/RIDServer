@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <string.h>
+#include <stdint.h>
 
 #include "sensor.h"
 #include "../Util/Trie.h"
@@ -23,6 +24,8 @@ Sub(void(*)(Sensor*const));
 void UnSub(void const*const);
 
 Trie const*Sensortable(char const*const);
+
+Sensor* findSensor(char const*const);
 
 Trie*Tables(void);
 

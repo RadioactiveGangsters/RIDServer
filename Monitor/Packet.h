@@ -5,7 +5,9 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 #include "../System/Log.h"
+#include "../Data/sensor.h"
 
 typedef enum opcode
 {
@@ -36,9 +38,24 @@ struct iGraph
 	char*name;
 };
 
+struct oGraph
+{
+	Packet base;
+	int namelen;
+	const char*name;
+	int qlen;
+	const AutoQ*queue;
+};
+	
+
 Packet*makePing(void);
 Packet*makeLogin(void);
+Packet*makeGraph(Sensor const*const);
 
-iPacket*readGraph(int);
+ssize_t writeGraph(const int,struct oGraph*);
 
+struct iGraph*readGraph(const int);
+
+void destroyiGraph(struct iGraph*g);
+void destroyoGraph(struct oGraph*g);
 #endif
