@@ -97,11 +97,7 @@ static void*SimulateType(void*const rawtable)
 			while(!stopsimulation)
 			{
 				fortrie(table, &SimulateSensor);
-				#ifdef _WIN32
-				Sleep(example->interval);
-				#else
-				nanosleep((struct timespec[]){{example->interval/1000,example->interval%1000}},NULL);
-				#endif
+				Rest(example->interval);
 			}
 		}
 	}

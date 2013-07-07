@@ -4,11 +4,6 @@
 #include <pthread.h>
 #include <time.h>
 
-#ifdef _WIN32
-	#include <windows.h>
-#else
-	#include <unistd.h>
-#endif
 
 #include "../deps/iniparser/src/iniparser.h"
 
@@ -18,6 +13,7 @@
 #include "../Util/Trie.h"
 #include "../Util/Path.h"
 #include "../Util/util.h"
+#include "../Util/Rest.h"
 #include "sensor.h"
 #include "Database.h"
 

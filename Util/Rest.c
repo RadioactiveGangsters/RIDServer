@@ -1,6 +1,6 @@
 #include "Rest.h"
 
-void Rest(int s)
+void Rest(const unsigned int s)
 {
 	#ifdef _WIN32
 		Sleep(s*1000);
