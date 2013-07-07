@@ -56,4 +56,6 @@ ssize_t writeGraph(const int,struct oGraph*);
 
 struct iGraph*readGraph(const int);
 
+void destroyiGraph(struct iGraph*g);
+void destroyoGraph(struct oGraph*g);
 #endif

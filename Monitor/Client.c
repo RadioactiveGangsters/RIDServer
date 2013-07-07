@@ -1,6 +1,6 @@
 #include "Client.h"
 
-void writePacket(const int fd,Packet*const p)
+void _writePacket(const int fd,Packet*const p)
 {
 	if(!p)return;
 	else
@@ -23,7 +23,7 @@ void writePacket(const int fd,Packet*const p)
 	
 		if(write(fd,p,packsize)<(ssize_t)packsize)
 		{
-			Log(LOGT_NETWORK,LOGL_WARNING, "Could not send complete packet %",p->op);
+			Log(LOGT_NETWORK,LOGL_WARNING, "Could not send complete packet %d",p->op);
 			return;
 		}
 	}
@@ -51,7 +51,7 @@ void*_iLoop(void*const c)
 			else
 			{
 				Packet*p;
-				struct iGraph const*ip;
+				struct iGraph*ip;
 				Sensor const* s;
 				Log(LOGT_NETWORK,LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
 				switch(ch)
@@ -87,6 +87,7 @@ void*_iLoop(void*const c)
 							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ip->name);
 							break;
 						}
+						destroyiGraph(ip);
 						
 						sendPacket(client,p);
 						break;
@@ -119,9 +120,11 @@ void*_oLoop(void*const c)
 		{
 			if(client->_queue)
 			{
+
 				Packet const*const p=dequeue(client->_queue);
 				if(!p||p->op==OPC_UNDEFINED)continue;
 				Log(LOGT_CLIENT,LOGL_DEBUG,"writing out packet %d: %d",p->op,writeGraph(client->fd,c));
+				destroyoGraph((struct oGraph*)p);
 			}
 			sleep(1);
 		}

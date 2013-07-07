@@ -83,6 +83,7 @@ struct iGraph*readGraph(const int source)
 	size_t wanted;
 	ssize_t expected;
 	char*sensor;
+	unsigned int i;
 
 	if(!p)return NULL;
 	memcpy(p,&u,sizeof*p);
@@ -103,6 +104,10 @@ struct iGraph*readGraph(const int source)
 	wanted=(sizeof(char)*requestsize);
 	expected=(ssize_t)wanted;
 	sensor=malloc(wanted+sizeof(char));
+	for(i=(unsigned int)wanted+1;--i;)
+	{
+		sensor[i]=0;
+	}
 	if(!sensor)return NULL;
 	if(recv(source, sensor, wanted,MSG_WAITALL)!=expected)
 	{
@@ -114,3 +119,16 @@ struct iGraph*readGraph(const int source)
 	return p;
 }
 
+void destroyiGraph(struct iGraph*g)
+{
+	free(g->name);
+	g->name=NULL;
+	free(g);
+	g=NULL;
+}
+
+void destroyoGraph(struct oGraph*g)
+{
+	free(g);
+	g=NULL;
+}

@@ -5,11 +5,19 @@ void getSensorData(Trie* s)
     char const*const path = fileprinterpath(); 
     char *sensorName = ((Sensor*)s->e)->name;
     
-    int min = getMin(((Sensor*)s->e)->delta);
-    int max = getMax(((Sensor*)s->e)->delta);
-    int mean = calcMean(((Sensor*)s->e)->delta);
-    
-    char data[(35 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
+    int min=0,max=0,mean=0;
+    switch (((Sensor*)s->e)->type)
+    {
+	    case integersensor:
+    		min = getMin(((Sensor*)s->e)->delta);
+    		max = getMax(((Sensor*)s->e)->delta);
+    		mean = calcMean(((Sensor*)s->e)->delta);
+		break;
+		default:
+		break;
+    }
+    {
+	    char data[(35 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
     char buffer[numlen(max)];
     
     //Set array as empty
@@ -38,6 +46,7 @@ void getSensorData(Trie* s)
     {
         Log(LOGT_PRINTER, LOGL_ERROR, "Cannot store data of %s to file", sensorName);
     }
+    }
 }
 
 void getSensors(Trie* t)
@@ -48,17 +57,21 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-	int timer = 3600; //1 hour
+	if(param)Log(LOGT_PRINTER,LOGL_BUG,"did not expect printer thread parameters");
+	{
+		int timer = 3600; //1 hour
 
 	//load the iniparser on the printer path
 	dictionary*ini = iniparser_load(printerinipath());
-	if(!ini) return EXIT_FAILURE;
+	if(!ini) pthread_exit(NULL);
 
 	if(!iniparser_find_entry(ini, "printer"))
 	{
 		Log(LOGT_PRINTER, LOGL_ERROR, "File %s does not contain printer config section",  printerinipath());
 	}
 	else timer = iniparser_getint(ini, "printer:timer", 3600);
+
+	iniparser_freedict(ini);
 
     // 5 second; to wait for some data to be generated
 	#ifdef _WIN32
@@ -71,12 +84,13 @@ void *getSensorTable(void *param)
     while(true)
     {
 		char data[32];
+		time_t t;
 		Log(LOGT_PRINTER, LOGL_SYSTEM_ACTIVITY, "Printing new data");
 		
 		// Print current time and date
 		data[0] = '\0';
 		strcat(data, " --- ");
-		time_t t = time(NULL);
+		t = time(NULL);
 		strcat(data, ctime(&t));
 		data[24+3+2]='\0';
 		strcat(data, " --- ");
@@ -91,7 +105,7 @@ void *getSensorTable(void *param)
 		#else
 		sleep(timer);
 		#endif
-    }
+    }}
 }
 
 int getMin(AutoQ* list)

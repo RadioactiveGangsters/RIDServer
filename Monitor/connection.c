@@ -1,4 +1,3 @@
-
 #include "connection.h"
 
 void*socklisten(void*connection)
