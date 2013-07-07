@@ -52,6 +52,38 @@ void UnSub(void const*const ticket)
 	}
 }
 
+Sensor*findSensorinTable(Trie const*const table,char const*const name)
+{
+	if(!table)return NULL;
+	if(!name)return NULL;
+	{
+	const int diff = strcmp(table->id,name);
+
+	if(!diff)
+		return table->e;
+	
+	if(diff<0)
+		return findSensorinTable(table->l,name);
+	else
+		return findSensorinTable(table->g,name);
+	}
+}
+
+Sensor*findSensorinDB(Trie const*const db,char const*const name)
+{
+	if(!db){return NULL;};
+	if(!name){return NULL;};
+	return(Sensor*)(
+		(uintptr_t)findSensorinDB(db->l,name)^
+		(uintptr_t)findSensorinDB(db->g,name)^
+		(uintptr_t)findSensorinTable(db->e,name));
+}
+
+Sensor*findSensor(char const*const name)
+{
+	return findSensorinDB(db,name);
+}
+
 static void DestroyTable(Trie*const e)
 {
 	if(!e)return;
@@ -134,7 +166,7 @@ int registerSensor(Sensor*const s)
 				return EXIT_FAILURE;
 			}
 			// linking like this saves a traversal.
-			tbl=trieadd(tbl, s->unit, triee(s->name, s));
+			tbl=trieadd(tbl, s->unit, newtable);
 			if(!tbl)
 			{
 				Log(LOGT_DB, LOGL_ERROR, "Cannot expand database with table for %s", s->unit);

@@ -13,13 +13,9 @@ Packet*makePing(void)
 
 Packet*makeLogin(void)
 {
-	Packet b=
-	{
-		.op=OPC_LOGIN,
-	};
 	struct LoginPacket l=
 	{
-		.base=b,
+		.base={.op=OPC_LOGIN,},
 		.zero=0,
 	},*p=malloc(sizeof*p);
 	if(!p)return NULL;
@@ -27,20 +23,67 @@ Packet*makeLogin(void)
 	return (Packet*)p;
 }
 
-iPacket*readGraph(const int source)
+Packet*makeGraph(Sensor const*const s)
 {
-	iPacket u=
+	if(!s||!s->delta)
 	{
-		.op=OPC_UNDEFINED,
-	},g=
+		return NULL;
+	}
 	{
-		.op=OPC_GRAPH,
+		struct oGraph const g=
+		{
+			.base={.op=OPC_GRAPH,},
+			.namelen=strlen(s->name),
+			.name=s->name,
+			.qlen=AutoQcount(s->delta),
+			.queue=s->delta,
+		};
+		struct oGraph*const p=malloc(sizeof*p);
+		if(!p) return NULL;
+		memcpy(p,&g,sizeof*p);
+
+		return(Packet*)p;
+		
+	}
+}
+
+ssize_t writeGraph(const int fd,struct oGraph*packet)
+{
+	AutoQ const*e;
+	int i=0;
+	if(!fd)return -1;
+	if(!packet)return -1;
+	if(packet->base.op==OPC_UNDEFINED)return -1;
+
+	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
+	if( write(fd,&packet->namelen,sizeof(int)) == -1 ) return -1;
+	if( write(fd,&packet->name,sizeof(char)*packet->namelen) == -1 ) return -1;
+	if( write(fd,&packet->qlen,sizeof(int)) == -1 ) return -1;
+	
+	e=packet->queue;
+	while(e && i++<packet->qlen);
+	{
+		// TODO: binary sensors?
+		if( write(fd,e->e,sizeof(int)) == -1 ) return -1;
+		e=e->n;
+	}
+
+	return (ssize_t)sizeof(struct oGraph);
+}
+
+struct iGraph*readGraph(const int source)
+{
+	struct iGraph u=
+	{
+		.base={.op=OPC_UNDEFINED,},
+		.name=NULL,
 	},*p=malloc(sizeof(struct iGraph));
 
 	uint32_t requestsize=0;
 	size_t wanted;
 	ssize_t expected;
 	char*sensor;
+	unsigned int i;
 
 	if(!p)return NULL;
 	memcpy(p,&u,sizeof*p);
@@ -51,31 +94,41 @@ iPacket*readGraph(const int source)
 	{
 		return p;
 	}
+	// only needed for int sizes
 	requestsize=ntohl(requestsize);
+	if(!requestsize)
+	{
+		return p;
+	}
 
-	wanted=((sizeof(char)*requestsize)*2)+1;
+	wanted=(sizeof(char)*requestsize);
 	expected=(ssize_t)wanted;
-	sensor=malloc(wanted);
+	sensor=malloc(wanted+sizeof(char));
+	for(i=(unsigned int)wanted+1;--i;)
+	{
+		sensor[i]=0;
+	}
 	if(!sensor)return NULL;
 	if(recv(source, sensor, wanted,MSG_WAITALL)!=expected)
 	{
 		return p;
 	}
-	sensor[requestsize]='\0';
-	{
-		uint32_t i=requestsize<<1;
-		do
-		{
-			sensor[i]|='.';
-		}
-		while(i-=2);
-		sensor[i]|='.';
-	}
 
-	*p=*(iPacket*)(struct iGraph[]){{
-		.base=g,
-		.name=sensor
-	}};
+	p->base.op=OPC_GRAPH;
+	p->name=sensor;
 	return p;
 }
 
+void destroyiGraph(struct iGraph*g)
+{
+	free(g->name);
+	g->name=NULL;
+	free(g);
+	g=NULL;
+}
+
+void destroyoGraph(struct oGraph*g)
+{
+	free(g);
+	g=NULL;
+}

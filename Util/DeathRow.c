@@ -82,3 +82,8 @@ AutoQ*AutoQadd(AutoQ*q,void*const e)
 
 	return q=_AutoQe(e,q,(!!q&&(q->space>0))?q->space--:0);
 }
+
+int AutoQcount(AutoQ const*const q)
+{
+	return q->n?AutoQcount(q->n)+1:0;
+}

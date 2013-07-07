@@ -22,12 +22,14 @@
 
 #include "Packet.h"
 #include "../System/Log.h"
+#include "../Data/Database.h"
+#include "../Util/queue.h"
 
 typedef struct
 {
 	const int fd;
 	pthread_t iloop, oloop;
-	void*_queue;
+	queue*_queue;
 } Client;
 
 Client*SpawnClient(const int);
