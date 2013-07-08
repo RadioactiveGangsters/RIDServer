@@ -50,7 +50,7 @@ deps/iniparser/libiniparser.a : deps/iniparser/Makefile
 	cd deps/iniparser && make default
 
 %.o : %.c %.h.gch
-	$(LINT) $(LINTFLAGS) $<
+	-$(LINT) $(LINTFLAGS) $<
 	$(CC) $(CFLAGS) -o $@ -c $< 
 
 %.h.gch : %.h
