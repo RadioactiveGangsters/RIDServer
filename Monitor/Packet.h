@@ -3,9 +3,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
+#include <limits.h>
+#ifdef _WIN32
+	#include <windows.h>
+#else
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
+#endif
 #include "../System/Log.h"
 #include "../Data/sensor.h"
 
@@ -17,6 +22,7 @@ typedef enum opcode
 	OPC_UPDATE,
 	OPC_GRAPH,
 	OPC_ALARM,
+	OPC_BOUNDS,
 } opcode;
 
 typedef struct
@@ -46,7 +52,13 @@ struct oGraph
 	int qlen;
 	const AutoQ*queue;
 };
-	
+
+struct iBounds
+{
+	Packet base;
+	char*name;
+	int lbound,ubound;
+};
 
 Packet*makePing(void);
 Packet*makeLogin(void);
@@ -55,7 +67,9 @@ Packet*makeGraph(Sensor const*const);
 ssize_t writeGraph(const int,struct oGraph*);
 
 struct iGraph*readGraph(const int);
+struct iBounds*readBounds(const int);
 
 void destroyiGraph(struct iGraph*g);
 void destroyoGraph(struct oGraph*g);
+void destroyiBounds(struct iBounds*g);
 #endif

@@ -11,6 +11,7 @@ void _writePacket(const int fd,Packet*const p)
 			case OPC_ALARM:
 			case OPC_UPDATE:
 			case OPC_GRAPH:
+			case OPC_BOUNDS:
 			case OPC_UNDEFINED:
 				return;
 			case OPC_LOGIN:
@@ -18,9 +19,9 @@ void _writePacket(const int fd,Packet*const p)
 				break;
 			case OPC_PING:
 				packsize=sizeof(Packet);
-					break;
-			}
-	
+				break;
+		}
+
 		if(write(fd,p,packsize)<(ssize_t)packsize)
 		{
 			Log(LOGT_NETWORK,LOGL_WARNING, "Could not send complete packet %d",p->op);
@@ -51,7 +52,6 @@ void*_iLoop(void*const c)
 			else
 			{
 				Packet*p;
-				struct iGraph*ip;
 				Sensor const* s;
 				Log(LOGT_NETWORK,LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
 				switch(ch)
@@ -67,30 +67,58 @@ void*_iLoop(void*const c)
 						break;
 
 					case OPC_GRAPH:
+					{
+						struct iGraph*ig;
 						Log(LOGT_CLIENT,LOGL_DEBUG,"reading graph packet");
-						ip = readGraph(client->fd);
-						if(!ip)
+						ig = readGraph(client->fd);
+						if(!ig)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
 							break;
 						}
-						if(ip->base.op==OPC_UNDEFINED)
+						if(ig->base.op==OPC_UNDEFINED)
 						{
 							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
 							continue;
 						}
-						Log(LOGT_CLIENT,LOGL_DEBUG,"read graph packet requesting sensor %s.",ip->name);
-						s = findSensor(ip->name);
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read graph packet requesting sensor %s.",ig->name);
+						
+						s = findSensor(ig->name);
 						p=makeGraph(s);
 						if(!p)
 						{
-							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ip->name);
+							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ig->name);
 							break;
 						}
-						destroyiGraph(ip);
+						destroyiGraph(ig);
 						
 						sendPacket(client,p);
 						break;
+					}
+					case OPC_BOUNDS:
+					{
+						struct iBounds*ib;
+						Log(LOGT_CLIENT,LOGL_CLIENT_ACTIVITY,"bounds request");
+						ib=readBounds(client->fd);
+
+						if(!ib)
+						{
+							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
+							break;
+						}
+						if(ib->base.op==OPC_UNDEFINED)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
+							continue;
+						}
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read bonuds packet concerning %s (%d,%d)",ib->name,ib->lbound,ib->ubound);
+						s= findSensor(ib->name);
+						if(!s)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"but that sensor does not exist");
+						}
+						// TODO: setbounds
+					}
 					case OPC_UPDATE:
 						Log(LOGT_NETWORK,LOGL_BUG,"packet %d not supported yet",ch);
 					case OPC_ALARM:
@@ -118,6 +146,7 @@ void*_oLoop(void*const c)
 		Client const*const client=c;
 		while(true)
 		{
+			sleep(1);
 			if(client->_queue)
 			{
 
@@ -126,7 +155,6 @@ void*_oLoop(void*const c)
 				Log(LOGT_CLIENT,LOGL_DEBUG,"writing out packet %d: %d",p->op,writeGraph(client->fd,c));
 				destroyoGraph((struct oGraph*)p);
 			}
-			sleep(1);
 		}
 	}
 	pthread_exit(NULL);
