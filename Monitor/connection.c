@@ -90,7 +90,7 @@ int AcceptClients(void)
 		{
 			int*server_ret = malloc(sizeof*server_ret);
 			*server_ret = server_sockfd;
-		    Log(LOGT_NETWORK,LOGL_SYSTEM_ACTIVITY, "Configuring complete, listening for Client connections on port %d.",ntohs(server_address.sin_port));
+		    Log(LOGT_NETWORK, LOGL_SYSTEM_ACTIVITY, "Listening for Client connections on port %d.",ntohs(server_address.sin_port));
 			pthread_create(&netthread,NULL,&socklisten,server_ret);
 		}
 	}

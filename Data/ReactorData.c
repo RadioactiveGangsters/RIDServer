@@ -97,11 +97,7 @@ static void*SimulateType(void*const rawtable)
 			while(!stopsimulation)
 			{
 				fortrie(table, &SimulateSensor);
-				#ifdef _WIN32
-				Sleep(example->interval);
-				#else
-				nanosleep((struct timespec[]){{example->interval/1000,example->interval%1000}},NULL);
-				#endif
+				Rest(example->interval);
 			}
 		}
 	}
@@ -127,10 +123,13 @@ static void registerthread(Trie*const table)
 	}
 }
 
-void StartSensorSimulation(void)
+int StartSensorSimulation(void)
 {
 	Trie*const db=Tables();
 	fortrie(db, &registerthread);
+	//if() return EXIT_SUCCESS;
+	//else return EXIT_FAILURE;
+	return EXIT_SUCCESS; //Temporarily
 }
 
 static void genbSensors(char const*const type,  const int amount, 

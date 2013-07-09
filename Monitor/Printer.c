@@ -18,34 +18,34 @@ void getSensorData(Trie* s)
     }
     {
 	    char data[(35 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
-    char buffer[numlen(max)];
-    
-    //Set array as empty
-    data[0] = '\0';
+		char buffer[numlen(max)];
+		
+		//Set array as empty
+		data[0] = '\0';
 	
-    //Add Sensor name
-    strcat(data, "Sensor: ");
-    strcat(data, sensorName);
+		//Add Sensor name
+		strcat(data, "Sensor: ");
+		strcat(data, sensorName);
 	
-    //Add Minimum value
-    strcat(data,"  \t Min: "); 
-    snprintf(buffer, sizeof(char)*numlen(min)+1, "%1d", min);
-    strcat(data, buffer);
+		//Add Minimum value
+		strcat(data,"  \t Min: "); 
+		snprintf(buffer, sizeof(char)*numlen(min)+1, "%1d", min);
+		strcat(data, buffer);
 	
-    //Add Maximum value
-    strcat(data," \t Max: ");
-    snprintf(buffer, sizeof(char)*numlen(max)+1, "%1d", max);
-    strcat(data, buffer);
+		//Add Maximum value
+		strcat(data," \t Max: ");
+		snprintf(buffer, sizeof(char)*numlen(max)+1, "%1d", max);
+		strcat(data, buffer);
 	
-    //Add Mean value
-    strcat(data," \t Mean: ");
-    snprintf(buffer, sizeof(char)*numlen(mean)+1, "%1d", mean);
-    strcat(data, buffer);
-    
-    if(!storeToFile(path, data))
-    {
-        Log(LOGT_PRINTER, LOGL_ERROR, "Cannot store data of %s to file", sensorName);
-    }
+		//Add Mean value
+		strcat(data," \t Mean: ");
+		snprintf(buffer, sizeof(char)*numlen(mean)+1, "%1d", mean);
+		strcat(data, buffer);
+		
+		if(!storeToFile(path, data))
+		{
+		    Log(LOGT_PRINTER, LOGL_ERROR, "Cannot store data of %s to file", sensorName);
+		}
     }
 }
 
@@ -57,55 +57,44 @@ void getSensors(Trie* t)
 
 void *getSensorTable(void *param)
 {
-	if(param)Log(LOGT_PRINTER,LOGL_BUG,"did not expect printer thread parameters");
+	if(param)Log(LOGT_PRINTER, LOGL_BUG, "Did not expect printer thread parameters");
 	{
 		int timer = 3600; //1 hour
+		//load the iniparser on the printer path
+		dictionary*ini = iniparser_load(printerinipath());
+		if(!ini) pthread_exit(NULL);
 
-	//load the iniparser on the printer path
-	dictionary*ini = iniparser_load(printerinipath());
-	if(!ini) pthread_exit(NULL);
+		if(!iniparser_find_entry(ini, "printer"))
+		{
+			Log(LOGT_PRINTER, LOGL_ERROR, "File %s does not contain printer config section",  printerinipath());
+		}
+		else timer = iniparser_getint(ini, "printer:timer", 3600);
 
-	if(!iniparser_find_entry(ini, "printer"))
-	{
-		Log(LOGT_PRINTER, LOGL_ERROR, "File %s does not contain printer config section",  printerinipath());
-	}
-	else timer = iniparser_getint(ini, "printer:timer", 3600);
+		Rest(5); // 5 second; to wait for some data to be generated
+		iniparser_freedict(ini);
 
-	iniparser_freedict(ini);
-
-    // 5 second; to wait for some data to be generated
-	#ifdef _WIN32
-	Sleep(5000);
-	#else
-	sleep(5);
-	#endif
-	
-
-    while(true)
-    {
-		char data[32];
-		time_t t;
-		Log(LOGT_PRINTER, LOGL_SYSTEM_ACTIVITY, "Printing new data");
+		while(true)
+		{
+			char data[32];
+			time_t t;
+			Log(LOGT_PRINTER, LOGL_SYSTEM_ACTIVITY, "Printing new data");
 		
-		// Print current time and date
-		data[0] = '\0';
-		strcat(data, " --- ");
-		t = time(NULL);
-		strcat(data, ctime(&t));
-		data[24+3+2]='\0';
-		strcat(data, " --- ");
-		storeToFile(fileprinterpath(), data);
+			// Print current time and date
+			data[0] = '\0';
+			strcat(data, " --- ");
+			t = time(NULL);
+			strcat(data, ctime(&t));
+			data[24+3+2]='\0';
+			strcat(data, " --- ");
+			storeToFile(fileprinterpath(), data);
 
-		// Get all sensors types from table and for each type do printTable()
-        fortrie(Tables(), &getSensors);
+			// Get all sensors types from table and for each type do printTable()
+		    fortrie(Tables(), &getSensors);
 
-	    // Wait [timer] seconds for the next printout
-		#ifdef _WIN32
-		Sleep(timer*1000);
-		#else
-		sleep(timer);
-		#endif
-    }}
+			// Wait [timer] seconds for the next printout
+			Rest(timer);
+		}
+	}
 }
 
 int getMin(AutoQ* list)
@@ -164,7 +153,7 @@ int storeToFile(char const*const path, char const*const data)
         {
             return 0;
         }
-        fprintf(printFile, "%s", data);
+        fprintf(printFile, "%s\n", data);
 
         fclose(printFile);
         return 1;
@@ -176,14 +165,6 @@ int StartPrinter(void)
     pthread_t printThread;
     
     // Create new thread for printer, if failed print error to log
-    if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) 
-    {
-        Log(LOGT_SERVER, LOGL_ERROR, "Error starting Printer");
-		return EXIT_FAILURE;
-    }
-    else
-    {
-        Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Printer ready"); 
-		return EXIT_SUCCESS;
-    }
+    if(pthread_create(&printThread, NULL, &getSensorTable, NULL)) return EXIT_FAILURE;
+    else return EXIT_SUCCESS;
 }

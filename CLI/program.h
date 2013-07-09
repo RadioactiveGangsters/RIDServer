@@ -10,6 +10,7 @@
 #include "../System/Log.h"
 #include "../System/Server.h"
 #include "../System/Alarm.h" 
+#include "../Util/Rest.h"
 
 #ifdef _WIN32
 

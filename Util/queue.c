@@ -1,6 +1,6 @@
 #include "queue.h"
 
-init_queue(queue *q)
+void init_queue(queue *q)
 {
 	q->size=INIT_SIZE_QUEUE;
 	q->array=malloc(sizeof(void*)*q->size);
@@ -9,7 +9,7 @@ init_queue(queue *q)
 	q->count = 0;
 }
 
-init_bigqueue(queue *b, int s)
+void init_bigqueue(queue *b, int s)
 {
 	b->size=s;
 	b->array=malloc(sizeof(void*)*b->size);
@@ -18,7 +18,7 @@ init_bigqueue(queue *b, int s)
 	b->count = 0;
 }
 
-enqueue(queue *q, void*x)
+void enqueue(queue *q, void*x)
 {
     if (q->count >= q->size)
 	{
