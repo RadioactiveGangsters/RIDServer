@@ -47,8 +47,7 @@ struct iGraph
 struct oGraph
 {
 	Packet base;
-	int namelen;
-	const char*name;
+	unittype unit;
 	int qlen;
 	const AutoQ*queue;
 };
@@ -60,16 +59,27 @@ struct iBounds
 	int lbound,ubound;
 };
 
+struct Update
+{
+	Packet base;
+	unittype unit;
+	int sensorlen;
+	int*sensors;
+};
+
 Packet*makePing(void);
 Packet*makeLogin(void);
 Packet*makeGraph(Sensor const*const);
 
+ssize_t writeUpdate(const int, struct Update*);
 ssize_t writeGraph(const int,struct oGraph*);
 
 struct iGraph*readGraph(const int);
 struct iBounds*readBounds(const int);
+struct Update*readUpdate(const int);
 
-void destroyiGraph(struct iGraph*g);
-void destroyoGraph(struct oGraph*g);
-void destroyiBounds(struct iBounds*g);
+void destroyiGraph(struct iGraph*);
+void destroyoGraph(struct oGraph*);
+void destroyiBounds(struct iBounds*);
+void destroyUpdate(struct Update*);
 #endif

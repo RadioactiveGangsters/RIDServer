@@ -5,29 +5,88 @@ void _writePacket(const int fd,Packet*const p)
 	if(!p)return;
 	else
 	{
-		size_t packsize;
+		ssize_t packsize;
 		switch(p->op)
 		{
 			case OPC_ALARM:
 			case OPC_UPDATE:
+			{
+				struct Update*u=(struct Update*)p;
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writeUpdate: %d",packsize=writeUpdate(fd,u));
+				// TODO:destroyUpdate(u)
+				break;
+			}
 			case OPC_GRAPH:
+			{
+				struct oGraph*g=(struct oGraph*)p;
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writegraph: %d",packsize=writeGraph(fd,g));
+				destroyoGraph(g);
+				break;
+			}
 			case OPC_BOUNDS:
+				// TODO
 			case OPC_UNDEFINED:
 				return;
 			case OPC_LOGIN:
-				packsize=sizeof(struct LoginPacket);
 				break;
 			case OPC_PING:
-				packsize=sizeof(Packet);
+				Log( LOGT_CLIENT,LOGL_DEBUG,"writePing: %d",write(fd,&p->op,sizeof(char)));
+				free(p);
 				break;
 		}
 
-		if(write(fd,p,packsize)<(ssize_t)packsize)
+	}
+}
+
+static void fillarray(Trie const*const table,int*array,unsigned int*i)
+{
+	if(!table)return;
+	if(!array)return;
+	if(!i)return;
+	fillarray(table->l,array,i);
+	fillarray(table->g,array,i);
+	array[*i]=((iSensor*)table->e)->value;
+	*i=*i+1;
+}
+
+static void sendupdates(Trie*const table, Client*const client)
+{
+	if(!table)return;
+	{
+		struct Update u=
 		{
-			Log(LOGT_NETWORK,LOGL_WARNING, "Could not send complete packet %d",p->op);
-			return;
+			.base={.op=OPC_UNDEFINED,},
+			.unit=unit_temperature,
+			.sensorlen=triecount(table),
+			.sensors=NULL,
+		},*p=malloc(sizeof*p);
+
+		if(!p)return;
+		memcpy(p,&u,sizeof*p);
+		{
+			int*sensorarray=malloc(sizeof(int)*p->sensorlen);
+			unsigned int i=0;
+			if(!p)
+			{
+				free(p);
+				return;
+			}
+			fillarray(table,sensorarray,&i);
+			p->sensors=sensorarray;
+			p->base.op=OPC_UPDATE;
+			sendPacket(client,(Packet*)p);
 		}
 	}
+}
+
+void passclient(Trie*const table,Client*const client,void(*cb)(Trie*const,Client*const))
+{
+	if(!table)return;
+	if(!client)return;
+	if(!cb)return;
+	passclient(table->l,client,cb);
+	passclient(table->g,client,cb);
+	cb(table,client);
 }
 
 void*_iLoop(void*const c)
@@ -120,7 +179,11 @@ void*_iLoop(void*const c)
 						// TODO: setbounds
 					}
 					case OPC_UPDATE:
-						Log(LOGT_NETWORK,LOGL_BUG,"packet %d not supported yet",ch);
+					{
+						Trie*const db=Tables();
+						passclient(db,client,&sendupdates);
+						break;
+					}
 					case OPC_ALARM:
 					case OPC_UNDEFINED:
 						Log(LOGT_NETWORK,LOGL_ERROR,"Client violates protocol");
@@ -143,17 +206,20 @@ void*_oLoop(void*const c)
 	}
 	else
 	{
-		Client const*const client=c;
+		Client *const client=c;
+		unsigned int pingcounter=80;
 		while(true)
 		{
-			sleep(1);
-			if(client->_queue)
+			Rest(1);
+			if(!pingcounter--)
 			{
-
-				Packet const*const p=dequeue(client->_queue);
+				sendPacket(client,makePing());
+			}
+			while(client->_queue)
+			{
+				Packet*const p=dequeue(client->_queue);
 				if(!p||p->op==OPC_UNDEFINED)continue;
-				Log(LOGT_CLIENT,LOGL_DEBUG,"writing out packet %d: %d",p->op,writeGraph(client->fd,c));
-				destroyoGraph((struct oGraph*)p);
+				_writePacket(client->fd,p);
 			}
 		}
 	}

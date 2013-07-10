@@ -20,6 +20,7 @@
 #define SENSOR_HUNITLEN 15
 #define SENSOR_HALARMLEN 127
 
+typedef enum{unit_undefined,unit_temperature,unit_flow,unit_pressure,unit_fullness,unit_radiation} unittype;
 typedef enum{integersensor,binarysensor} sensortype;
 
 typedef struct

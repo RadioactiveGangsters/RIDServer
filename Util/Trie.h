@@ -30,4 +30,6 @@ Trie*trierm(Trie*const root,char const*const id);
 
 void fortrie(Trie*const,void(*)(Trie*const));
 
+int triecount(Trie const*const);
+
 #endif

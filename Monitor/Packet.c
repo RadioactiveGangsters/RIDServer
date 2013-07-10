@@ -33,8 +33,7 @@ Packet*makeGraph(Sensor const*const s)
 		struct oGraph const g=
 		{
 			.base={.op=OPC_GRAPH,},
-			.namelen=strlen(s->name),
-			.name=s->name,
+			.unit=unit_temperature,// FIXME: all units
 			.qlen=AutoQcount(s->delta),
 			.queue=s->delta,
 		};
@@ -47,6 +46,24 @@ Packet*makeGraph(Sensor const*const s)
 	}
 }
 
+ssize_t writeUpdate(const int fd, struct Update*packet)
+{
+	unsigned int i=0;
+	if(!fd)return -1;
+	if(!packet) return -1;
+	if(packet->base.op==OPC_UNDEFINED)return -1;
+	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
+	if( write(fd,&packet->unit,sizeof(int)) == -1 ) return -1;
+	if( write(fd,&packet->sensorlen,sizeof(int)) == -1 ) return -1;
+	for(i=(unsigned int)packet->sensorlen;i--;)
+	{
+		if( write(fd,packet->sensors+i,sizeof(int)) == -1 ) return -1;
+	}
+	
+	// TODO: recalculate size
+	return (ssize_t)sizeof*packet;
+}
+
 ssize_t writeGraph(const int fd,struct oGraph*packet)
 {
 	AutoQ const*e;
@@ -56,8 +73,8 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	if(packet->base.op==OPC_UNDEFINED)return -1;
 
 	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
-	if( write(fd,&packet->namelen,sizeof(int)) == -1 ) return -1;
-	if( write(fd,&packet->name,sizeof(char)*packet->namelen) == -1 ) return -1;
+	if( write(fd,&packet->unit,sizeof(int)) == -1 ) return -1;
+	//if( write(fd,&packet->name,sizeof(char)*packet->namelen) == -1 ) return -1;
 	if( write(fd,&packet->qlen,sizeof(int)) == -1 ) return -1;
 	
 	e=packet->queue;
@@ -149,7 +166,11 @@ struct iBounds*readBounds(const int source)
 
 	wanted=sizeof(char)*namelen;
 	sensor=malloc(wanted+sizeof(char));
-	if(!sensor)return NULL;
+	if(!sensor)
+	{
+		free(p);
+		return NULL;
+	}
 	{unsigned int i;for(i=(unsigned int)wanted+1;--i;)
 	{
 		sensor[i]=0;
