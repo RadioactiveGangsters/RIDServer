@@ -243,9 +243,21 @@ static void SimulateFullness(bool set)
 	}
 	else
 	{
-		//TODO loop trough fullness sensors and check value
-		// if value is true then set to false and stop
-		// if vlaue is false go to next sensor
+		Sensor*const sensor = checkFullnessValues(FullnessTable);
+		if(sensor)
+		{
+			bSensor*const bsensor = (bSensor*)sensor;
+			bool*p=malloc(sizeof*p);
+			if(!p)
+			{
+				Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
+				return;
+			}
+			*p = bsensor->value;
+			sensor->delta = AutoQadd(sensor->delta, p);
+			bsensor->value = false;
+			PushS(sensor);
+		}
 	}
 }
 
@@ -313,7 +325,7 @@ static void*Simulator(void*const rawtable)
 				pthread_exit(NULL);
 			}
 			{
-				int flowcoll, flowcollav, flowcolldelta, count;
+				int fwcollection, fwcollectionav, fwcollectiondelta, count;
 				Sensor*const fwsensor = FlowTable->e;
 				AutoQ *q = fwsensor->delta;
 				count = countTrie(FullnessTable);
@@ -332,18 +344,17 @@ static void*Simulator(void*const rawtable)
 					fortrie(TemperatureTable, &SimulateTemperature);
 				
 				//Fullness
-					while(count != 0)
+					while(count > 0)
 					{
-						flowcoll += *(int*)q->e;
+						fwcollection += *(int*)q->e;
+						if(count == 30) fwcollectiondelta = *(int*)q->e;
+						if(count == 1) fwcollectiondelta = fwcollectiondelta - (*(int*)q->e);
 						count--;
 						q=q->n;
 					}
-					
-					flowcollav = (flowcoll/countTrie(FullnessTable));
-
-					//TODO get Delta Flow history(30)	
-					if(flowcollav > 350 || flowcolldelta > 30) SimulateFlow(true);
-					if(flowcollav < 300) SimulateFlow(false);
+					fwcollectionav = (fwcollection/30);	
+					if(fwcollectionav > 350 || fwcollectiondelta > 30) SimulateFlow(true);
+					if(fwcollectionav < 300) SimulateFlow(false);
 
 				//Pressure
 					fortrie(PressureTable, &SimulatePressure);
@@ -383,6 +394,17 @@ int getSensorCollection(Trie*const trie)
 {
 	if(!trie)return 0;
 	return getSensorCollection(trie->l) + getSensorCollection(trie->g) + ((iSensor*)(trie->e))->value;
+}
+
+Sensor* checkFullnessValues(Trie*const trie)
+{
+	if(!trie)return NULL;
+	Sensor*e,g,l=checkfullnessvalues(trie->l);
+	if(l)return l;
+	g=checkfullnessvalues(trie->g);
+	if(g)return g;
+	e=trie->e->value?trie->e:null;
+	return e;
 }
 
 static void genbSensors(
