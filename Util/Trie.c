@@ -154,3 +154,32 @@ void fortrie(Trie*const trie,void(*cb)(Trie*const))
 	fortrie(trie->g,cb);
 	cb(trie);
 }
+
+int getCollectionForTrie(Trie*const trie)
+{
+	if(!trie)return 0;
+	return getCollectionForTrie(trie->l) + getCollectionForTrie(trie->g) + (iSensor*)(trie->e))->value;
+}
+
+int countTrie(Trie*const trie)
+{	
+	if(!trie)return 0;
+	return 1 + countTrie(trie->l) + countTrie(trie->g);
+}
+
+void*findinTrie(Trie const*const table,char const*const name)
+{
+	if(!table)return NULL;
+	if(!name)return NULL;
+	{
+	const int diff = strcmp(table->id,name);
+
+	if(!diff)
+		return table->e;
+	
+	if(diff<0)
+		return findinTrie(table->l,name);
+	else
+		return findinTrie(table->g,name);
+	}
+}

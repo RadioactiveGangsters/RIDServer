@@ -30,4 +30,8 @@ Trie*trierm(Trie*const root,char const*const id);
 
 void fortrie(Trie*const,void(*)(Trie*const));
 
+int getCollectionForTrie(Trie*const trie);
+
+void*findinTrie(Trie const*const table,char const*const name);
+
 #endif

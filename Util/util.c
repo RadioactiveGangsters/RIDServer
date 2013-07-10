@@ -20,3 +20,9 @@ unsigned int numlen(/*@+ignoresigns@*/const unsigned int t)
 	                  t<1000000000?9: 10);
 	// no int is larger than 10
 }
+
+int random(int range)
+{
+	srand(_seed=(unsigned)rand());
+	return ((rand()%(range)) + 1);
+}
