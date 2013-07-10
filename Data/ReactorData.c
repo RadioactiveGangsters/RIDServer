@@ -4,11 +4,11 @@ static LLNODE*threads = NULL;
 static volatile bool stopsimulation=false;
 unsigned int _seed;
 static int interval;
-static Trie*const RadiationTable;
-static Trie*const FlowTable;
-static Trie*const TemperatureTable;
-static Trie*const FullnessTable;
-static Trie*const PressureTable;
+static Trie* RadiationTable;
+static Trie* FlowTable;
+static Trie* TemperatureTable;
+static Trie* FullnessTable;
+static Trie* PressureTable;
 
 /*
 static void SimulateSensor(Trie*const sensor)
@@ -198,7 +198,7 @@ static void SimulateTemperature(Trie*const sensorbox)
 	if(!sensorbox)return;
 	if(!sensorbox->e)return;
 	{
-		int newValue, averageRadiation, avarageFlow;
+		int newValue, averageRadiation, averageFlow;
 		Sensor*const sensor = sensorbox->e;
 		
 		iSensor*const isensor = (iSensor*)sensor;
@@ -224,11 +224,10 @@ static void SimulateFullness(bool set)
 {
 	if(set)
 	{
-		int snr;
-		char name[namelen];
-		snr = random(countTrie(FullnessTable));
-		snprintf(name, sizeof(char)*namelen, "%s%d", "Fullness", snr);
-		Sensor*const sensor = (findinTrie(FullnessTable,name))->e;
+		int snr = random(countTrie(FullnessTable));
+		char name[9+numlen((unsigned)snr)];		
+		snprintf(name, sizeof(char)*(9+numlen((unsigned)snr)), "%s%d", "Fullness", snr);
+		Sensor*const sensor = (findinTrie(FullnessTable,name));
 
 		bSensor*const bsensor = (bSensor*)sensor;
 		bool*p=malloc(sizeof*p);
@@ -288,35 +287,36 @@ static void*Simulator(void*const rawtable)
 				
 		if(interval)
 		{			
-			if(!(RadiationTable = findinTrie("Radiation")))
+			if(!(RadiationTable = findinTrie(db, "Radiation")))
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Can not find Radiation Table in Database!");
 				pthread_exit(NULL);
 			}
-			if(!(FlowTable = findinTrie("Flow")))
+			if(!(FlowTable = findinTrie(db, "Flow")))
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Can not find Flow Table in Database!");
 				pthread_exit(NULL);
 			}
-			if(!(TemperatureTable = findinTrie("Temperature")))
+			if(!(TemperatureTable = findinTrie(db, "Temperature")))
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Can not find Temperature Table in Database!");
 				pthread_exit(NULL);
 			}
-			if(!(FullnessTable = findinTrie("Fullness")))
+			if(!(FullnessTable = findinTrie(db, "Fullness")))
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Can not find Fullness Table in Database!");
 				pthread_exit(NULL);
 			}
-			if(!(PressureTable = findinTrie("Pressure")))
+			if(!(PressureTable = findinTrie(db, "Pressure")))
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Can not find Pressure Table in Database!");
 				pthread_exit(NULL);
 			}
 			{
-				int flowcoll, flowcollav, flowcolldelta, count=0;
+				int flowcoll, flowcollav, flowcolldelta, count;
 				Sensor*const fwsensor = FlowTable->e;
 				AutoQ *q = fwsensor->delta;
+				count = countTrie(FullnessTable);
 			
 				while(!stopsimulation)
 				{
@@ -332,14 +332,14 @@ static void*Simulator(void*const rawtable)
 					fortrie(TemperatureTable, &SimulateTemperature);
 				
 				//Fullness
-					while(count < 31)
+					while(count != 0)
 					{
 						flowcoll += *(int*)q->e;
-						count++;
+						count--;
 						q=q->n;
 					}
-
-					flowcollav = flowcoll/30;
+					
+					flowcollav = (flowcoll/countTrie(FullnessTable));
 
 					//TODO get Delta Flow history(30)	
 					if(flowcollav > 350 || flowcolldelta > 30) SimulateFlow(true);
@@ -374,9 +374,15 @@ int flux(int bound)
 int getAverageValue(Trie*const Table)
 {
 	int collection, amount;
-	collection = getCollectionForTrie(Table);
+	collection = getSensorCollection(Table);
 	amount = countTrie(Table);
 	return (collection / amount);
+}
+
+int getSensorCollection(Trie*const trie)
+{
+	if(!trie)return 0;
+	return getSensorCollection(trie->l) + getSensorCollection(trie->g) + ((iSensor*)(trie->e))->value;
 }
 
 static void genbSensors(

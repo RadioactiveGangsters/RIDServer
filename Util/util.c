@@ -6,6 +6,8 @@
 
 #include "util.h"
 
+unsigned int _seed;
+
 unsigned int numlen(/*@+ignoresigns@*/const unsigned int t)
 {
 	// Beats including math.h, is also faster than log10

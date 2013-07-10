@@ -155,12 +155,6 @@ void fortrie(Trie*const trie,void(*cb)(Trie*const))
 	cb(trie);
 }
 
-int getCollectionForTrie(Trie*const trie)
-{
-	if(!trie)return 0;
-	return getCollectionForTrie(trie->l) + getCollectionForTrie(trie->g) + (iSensor*)(trie->e))->value;
-}
-
 int countTrie(Trie*const trie)
 {	
 	if(!trie)return 0;
