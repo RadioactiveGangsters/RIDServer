@@ -15,13 +15,13 @@ void AlarmDetection(Sensor* sn)
 		{
 			//sendAlarm(isn->ualarm);
 			Sensor_enqueue(sn);
-			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,isn->ualarm);
+			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s (%d > %d)", sn->name ,isn->ualarm, isn->value, isn->ubound);
 		} 
 		else if (isn->value < isn->lbound)
 		{
 			//sendAlarm(isn->lalarm);
 			Sensor_enqueue(sn);
-			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,isn->lalarm);
+			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s (%d < %d)", sn->name ,isn->ualarm, isn->value, isn->lbound);
 		}
 	} 
 	

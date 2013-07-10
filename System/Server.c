@@ -14,7 +14,7 @@ int InitServer(const int argc, char const*const*const argv)
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Activating Alarm Detection..");
 	if(!Sub(&AlarmDetection)) // need not unsubscribe
 	{
-		Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Could not activate Alarm Detection!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Could not activate Alarm Detection!");
 		return EXIT_FAILURE;
 	}
 	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Alarm Detection active");
@@ -23,7 +23,7 @@ int InitServer(const int argc, char const*const*const argv)
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Database initialization..");
 	if(OpenDatabase()!=EXIT_SUCCESS)
 	{
-		Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Could not initialize Database!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Could not initialize Database!");
 		return EXIT_FAILURE;
 	}
 	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Database active");
@@ -32,7 +32,7 @@ int InitServer(const int argc, char const*const*const argv)
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Configuring Network settings..");
 	if(AcceptClients()!=EXIT_SUCCESS)
 	{
-		Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Could not configure Network!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Could not configure Network!");
 		return EXIT_FAILURE;
 	}
 	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Configuring Network complete");
@@ -48,7 +48,7 @@ int StartServer(void)
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Enabling Printer..");
 	if(StartPrinter()!=EXIT_SUCCESS)
 	{
-		Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Could not start Printer!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Could not start Printer!");
 		return EXIT_FAILURE;
 	}
 	else Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Printer ready");
@@ -57,7 +57,7 @@ int StartServer(void)
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Starting Simulators..");
 	if(StartSensorSimulation()!=EXIT_SUCCESS)
 	{
-		Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Could not activate all Sensor Simulators!");
+		Log(LOGT_SERVER, LOGL_ERROR, "Could not activate all Sensor Simulators!");
 		return EXIT_FAILURE;
 	}
 	Log(LOGT_SERVER, LOGL_SYSTEM_ACTIVITY, "Simulators running");

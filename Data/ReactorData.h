@@ -3,7 +3,8 @@
 
 #include <pthread.h>
 #include <time.h>
-
+#include <limits.h>
+#include <math.h>
 
 #include "../deps/iniparser/src/iniparser.h"
 
@@ -18,7 +19,8 @@
 #include "Database.h"
 
 int LoadSensors(void);
-
 int StartSensorSimulation(void);
+int StartSensorSimulation2(void);
+int flux(int bound);
 
 #endif

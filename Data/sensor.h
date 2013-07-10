@@ -28,7 +28,6 @@ typedef struct
 	char name[SENSOR_HNAMELEN];
 	char unit[SENSOR_HUNITLEN];
 	time_t stamp;
-	unsigned int interval;
 	AutoQ*delta;
 } Sensor;
 
@@ -42,11 +41,14 @@ typedef struct
 typedef struct
 {
 	Sensor base;
+	int startvalue;
 	int value;
 	int lbound;
 	int ubound;
 	char lalarm[SENSOR_HALARMLEN];
 	char ualarm[SENSOR_HALARMLEN];
+	bool lboundcross;
+	bool uboundcross;
 } iSensor;
 
 void SetupSensors(void);
@@ -59,18 +61,19 @@ iSensor*
 makeiSensor(
 		char const*const name,
 		char const*const unit,
-		unsigned int const interval,
+		int const startvalue,
 		int const lbound,
 		int const ubound,
 		char const*const lalarm,
-		char const*const ualarm
+		char const*const ualarm,
+		bool const lboundcross,
+		bool const uboundcross
 		);
 
 bSensor*
 makebSensor(
 		char const*const name,
 		char const*const unit,
-		unsigned int const interval,
 		char const*const alarm
 		);
 

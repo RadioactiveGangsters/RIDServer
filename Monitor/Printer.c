@@ -17,7 +17,7 @@ void getSensorData(Trie* s)
 		break;
     }
     {
-	    char data[(35 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
+	    char data[(36 + SENSOR_HNAMELEN + numlen(min) + numlen(max) + numlen(mean))];
 		char buffer[numlen(max)];
 		
 		//Set array as empty
@@ -28,7 +28,7 @@ void getSensorData(Trie* s)
 		strcat(data, sensorName);
 	
 		//Add Minimum value
-		strcat(data,"  \t Min: "); 
+		strcat(data,"   \t Min: "); 
 		snprintf(buffer, sizeof(char)*numlen(min)+1, "%1d", min);
 		strcat(data, buffer);
 	

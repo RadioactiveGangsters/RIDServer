@@ -2,7 +2,10 @@
 
 static LLNODE*threads = NULL;
 static volatile bool stopsimulation=false;
+unsigned int _seed;
+static int interval;
 
+/*
 static void SimulateSensor(Trie*const sensor)
 {
 	if(!sensor)return;
@@ -43,7 +46,7 @@ static void SimulateSensor(Trie*const sensor)
 				}
 				//i->value=randSensorValue(i->lbound, i->ubound);
 				*p=i->value;
-				s->delta=AutoQe(p, s->interval);
+				s->delta=AutoQe(p, 1);
 				if(!s->delta)
 				{
 					Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
@@ -92,12 +95,12 @@ static void*SimulateType(void*const rawtable)
 	{
 		Trie*const table=rawtable;
 		Sensor const*const example=table->e;
-		if(example->interval)
+		if(1)
 		{
 			while(!stopsimulation)
 			{
 				fortrie(table, &SimulateSensor);
-				Rest(example->interval);
+				Rest(1);
 			}
 		}
 	}
@@ -123,7 +126,7 @@ static void registerthread(Trie*const table)
 	}
 }
 
-int StartSensorSimulation(void)
+int StartSensorSimulation2(void)
 {
 	Trie*const db=Tables();
 	fortrie(db, &registerthread);
@@ -131,9 +134,61 @@ int StartSensorSimulation(void)
 	//else return EXIT_FAILURE;
 	return EXIT_SUCCESS; //Temporarily
 }
+*/
 
-static void genbSensors(char const*const type,  const int amount, 
-			unsigned int const interval,  char const*const alarm)
+static void*Simulator(void*const rawtable)
+{
+	if(!rawtable)
+	{
+		Log(LOGT_SERVER, LOGL_ERROR, "No database for simulator!");
+ 		pthread_exit(NULL);
+	}
+	{
+		Trie*const table = rawtable;
+		
+		if(interval)
+		{
+			//TODO Get table for every sensortype
+
+			while(!stopsimulation)
+			{
+				Rest(interval);
+				
+				//TODO Change values Radiation 
+
+				//TODO Change values Flow 
+
+				//TODO Change values Temperature 
+
+				//TODO Change values Fullness 
+
+				//TODO Change values Pressure 
+			}
+		}
+	}
+	pthread_exit(NULL);
+}
+
+int StartSensorSimulation(void)
+{
+	Trie*const db=Tables();
+	pthread_t simulationthread;
+	if(pthread_create(&simulationthread, NULL, &Simulator, db)) return EXIT_FAILURE;
+	else return EXIT_SUCCESS;
+}
+
+int flux(int bound)
+{
+	int fx;
+	srand(_seed=(unsigned)rand());
+	fx = (rand()%(bound*2))-bound;
+	return fx;
+}
+
+static void genbSensors(
+	char const*const type,  
+	const int amount,  
+	char const*const alarm)
 {
 	// generate the requested amount
 	int i;
@@ -153,7 +208,7 @@ static void genbSensors(char const*const type,  const int amount,
 
 		// make one
 		{
-			Sensor*const s=(Sensor*)makebSensor(name, type, interval, alarm);
+			Sensor*const s=(Sensor*)makebSensor(name, type, alarm);
 			if(!s)
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Out of memory!");
@@ -173,26 +228,21 @@ static void genbSensors(char const*const type,  const int amount,
 			{
 				Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s", 
 				(i+1), s->type==binarysensor?"binary":"integer", s->unit, "Sensors");
-
-		/*		Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s\n{%s, %d, %d, %d, %s}", 
-				(i+1), 
-				s->type==binarysensor?"binary":"integer", 
-				s->unit, 
-				"Sensors", 
-				s->unit, 
-				s->interval, 
-				s->stamp, 
-				((bSensor*)s)->value, 
-				((bSensor*)s)->alarm);
-		*/	
 			}
 		}
 	}
 }
 
-static void geniSensors(char const*const type,  const int amount,  
-			unsigned int const interval,  int const lbound,  
-			int const ubound,  char const*const lalarm,  char const*const ualarm)
+static void geniSensors(
+	char const*const type,  
+	const int amount,  
+	int const start, 
+	int const lbound,  
+	int const ubound,  
+	char const*const lalarm,  
+	char const*const ualarm,
+	bool const lboundcross, 
+	bool const uboundcross)
 {
 	// generate the requested amount
 	int i;
@@ -212,7 +262,7 @@ static void geniSensors(char const*const type,  const int amount,
 
 		// make one
 		{
-			Sensor*const s=(Sensor*)makeiSensor(name, type, interval, lbound, ubound, lalarm, ualarm);
+			Sensor*const s=(Sensor*)makeiSensor(name, type, start, lbound, ubound, lalarm, ualarm, lboundcross, uboundcross);
 			if(!s)
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Out of memory!");
@@ -232,20 +282,6 @@ static void geniSensors(char const*const type,  const int amount,
 			{
 				Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s", 
 				(i+1), s->type==binarysensor?"binary":"integer", s->unit, "Sensors");
-
-		/*		Log(LOGT_SERVER, LOGL_DEBUG, "Generated %d %s %s %s\n{%s, %d, %d, %d, %d, %s, %s}", 
-				(i+1), 
-				s->type==binarysensor?"binary":"integer", 
-				s->unit, 
-				"Sensors", 
-				s->unit, 
-				s->interval, 
-				((iSensor*)s)->value, 
-				((iSensor*)s)->lbound, 
-				((iSensor*)s)->ubound, 
-				((iSensor*)s)->lalarm, 
-				((iSensor*)s)->ualarm);
-		*/
 			}
 		}
 	}
@@ -272,7 +308,8 @@ int LoadSensors(void)
 		goto exit_failure;
 	}
 	{
-		int typecount=iniparser_getint(ini, "sensor:typecount", 0);
+		int typecount = iniparser_getint(ini, "sensor:typecount", 0);
+		interval = iniparser_getint(ini, "sensor:interval", 1);
 
 		// user requested to turn off sensors.
 		if(typecount<1)goto exit_success;
@@ -282,20 +319,17 @@ int LoadSensors(void)
 			const unsigned int namelen=idstringlen+4;
 			const unsigned int amountlen=idstringlen+5;
 			const unsigned int typelen=idstringlen+4;
-			const unsigned int intervallen=idstringlen+8;
 			char idstring[idstringlen];
 			char name[namelen];
 			char amount[amountlen];
 			char typeq[typelen];
-			char intervalq[intervallen];
 			sensortype stype=integersensor;
 
 			snprintf(idstring, sizeof(char)*idstringlen, "sensor:type%d", typecount);
 			snprintf(name, sizeof(char)*namelen, "%s%s", idstring, "name");
 			snprintf(amount, sizeof(char)*amountlen, "%s%s", idstring, "count");
-			snprintf(intervalq, sizeof(char)*intervallen, "%s%s", idstring, "interval");
 
-			if(!iniparser_find_entry(ini, name)||!iniparser_find_entry(ini, amount)||!iniparser_find_entry(ini, intervalq))
+			if(!iniparser_find_entry(ini, name)||!iniparser_find_entry(ini, amount))
 			{
 				Log(LOGT_SERVER, LOGL_WARNING, "Skipping incomplete %s definition", idstring);
 				continue;
@@ -325,31 +359,44 @@ int LoadSensors(void)
 					genbSensors(
 						iniparser_getstring(ini, name, "genericb"), 
 						iniparser_getint(ini, amount, 0), 
-						(unsigned)iniparser_getint(ini, intervalq, 1000), 
 						iniparser_getstring(ini, alarmq, "Alarm!"));
 				}
 				else if(stype==integersensor)
 				{
+					const unsigned int startlen=idstringlen+5;
 					const unsigned int alarmlen=idstringlen+6;
 					const unsigned int boundlen=idstringlen+6;
+					const unsigned int boundcrosslen=idstringlen+11;
+					signed int min, max;
+					char startq[startlen];
 					char lalarmq[alarmlen];
 					char ualarmq[alarmlen];
 					char lboundq[boundlen];
 					char uboundq[boundlen];
+					char lboundcrossq[boundcrosslen];
+					char uboundcrossq[boundcrosslen];
 
+					snprintf(startq, sizeof(char)*startlen, "%s%s", idstring, "start");
 					snprintf(lalarmq, sizeof(char)*alarmlen, "%s%s", idstring, "lalarm");
 					snprintf(ualarmq, sizeof(char)*alarmlen, "%s%s", idstring, "ualarm");
 					snprintf(lboundq, sizeof(char)*boundlen, "%s%s", idstring, "lbound");
 					snprintf(uboundq, sizeof(char)*boundlen, "%s%s", idstring, "ubound");
+					snprintf(lboundcrossq, sizeof(char)*boundcrosslen, "%s%s", idstring, "lboundcross");
+					snprintf(uboundcrossq, sizeof(char)*boundcrosslen, "%s%s", idstring, "uboundcross");
+					
+					min = iniparser_getint(ini, lboundq, INT_MIN);
+					max = iniparser_getint(ini, uboundq, INT_MAX);
 
 					geniSensors(
 						iniparser_getstring(ini, name, "generici"), 
 						iniparser_getint(ini, amount, 0), 
-						(unsigned)iniparser_getint(ini, intervalq, 1000), 
-						iniparser_getint(ini, lboundq, 0), 
-						iniparser_getint(ini, uboundq, 100), 
+						iniparser_getint(ini, startq, ((min+max)/2)),
+						min,
+						max, 
 						iniparser_getstring(ini, lalarmq, "lower bound Alarm!"), 
-						iniparser_getstring(ini, ualarmq, "upper bound Alarm!"));
+						iniparser_getstring(ini, ualarmq, "upper bound Alarm!"),
+						iniparser_getboolean(ini, lboundcrossq, true), 
+						iniparser_getboolean(ini, uboundcrossq, true));
 				}
 				else
 				{

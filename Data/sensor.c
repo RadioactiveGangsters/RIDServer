@@ -44,7 +44,7 @@ void SetupSensors(void)
 void ResetSensor(Sensor*const s)
 {
 	if(s->type == binarysensor) ((bSensor*)s)->value = 0;
-	else ((iSensor*)s)->value = ((((iSensor*)s)->lbound)+(((iSensor*)s)->ubound))/2;
+	else ((iSensor*)s)->value = ((iSensor*)s)->startvalue;
 }
 
 void DestroySensor(Sensor*const s)
@@ -54,7 +54,10 @@ void DestroySensor(Sensor*const s)
 	free(s);
 }
 
-bSensor* makebSensor(char const*const name,char const*const unit,unsigned int const interval,char const*const alarm)
+bSensor* makebSensor(
+	char const*const name,
+	char const*const unit,
+	char const*const alarm)
 {
 	Sensor base=
 	{
@@ -62,7 +65,6 @@ bSensor* makebSensor(char const*const name,char const*const unit,unsigned int co
 		.unit="on/off",
 		.type=binarysensor,
 		.stamp=time(0),
-		.interval=interval,
 		.delta=NULL,
 	};
 
@@ -87,26 +89,35 @@ bSensor* makebSensor(char const*const name,char const*const unit,unsigned int co
 	}
 }
 
-iSensor* makeiSensor(char const*const name,char const*const unit,unsigned int const interval,int const lbound,int const ubound,char const*const lalarm,char const*const ualarm)
+iSensor* makeiSensor(
+	char const*const name,
+	char const*const unit,
+	int const startvalue,
+	int const lbound,
+	int const ubound,
+	char const*const lalarm,
+	char const*const ualarm,
+	bool const lboundcross,
+	bool const uboundcross)
 {
-	Sensor base=
-	{
-		.name="generici",
-		.unit="generici",
-		.type=integersensor,
-		.stamp=time(0),
-		.interval=interval,
-		.delta=NULL,
-	};
-
 	iSensor s=
 	{
-		.base=base,
+		.base=
+		{
+			.name="generici",
+			.unit="generici",
+			.type=integersensor,
+			.stamp=time(0),
+			.delta=NULL,
+		},
+		.startvalue=startvalue,
 		.lbound=lbound,
 		.ubound=ubound,
 		.lalarm="lower bound Alarm!",
 		.ualarm="upper bound Alarm!",
-		.value=(lbound+ubound)/2,
+		.value=startvalue,
+		.lboundcross=lboundcross,
+		.uboundcross=uboundcross,
 	};
 
 	strncpy(s.base.name, name, sizeof(char)*SENSOR_HNAMELEN);
