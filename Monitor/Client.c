@@ -57,7 +57,7 @@ static void sendupdates(Trie*const table, Client*const client)
 		{
 			.base={.op=OPC_UNDEFINED,},
 			.unit=unit_temperature,
-			.sensorlen=triecount(table),
+			.sensorlen=triecount(table->e),
 			.sensors=NULL,
 		},*p=malloc(sizeof*p);
 
@@ -97,6 +97,7 @@ void*_iLoop(void*const c)
 	}
 	else
 	{
+		bool debug=false;
 		Client*client=c;
 		Log(LOGT_NETWORK,LOGL_DEBUG, "waiting for input");
 		while(true)
@@ -112,6 +113,7 @@ void*_iLoop(void*const c)
 			{
 				Packet*p;
 				Sensor const* s;
+				if(debug)ch-=48;
 				Log(LOGT_NETWORK,LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
 				switch(ch)
 				{
@@ -119,6 +121,7 @@ void*_iLoop(void*const c)
 						Log(LOGT_NETWORK,LOGL_WARNING,"A superior client tried to log in, this server version does not yet support client initialisation.");
 						p=makeLogin();
 						sendPacket(client,p);
+						debug=true;
 						break;
 
 					case OPC_PING:
@@ -215,7 +218,7 @@ void*_oLoop(void*const c)
 			{
 				sendPacket(client,makePing());
 			}
-			while(client->_queue)
+			if(client->_queue)while(client->_queue->count)
 			{
 				Packet*const p=dequeue(client->_queue);
 				if(!p||p->op==OPC_UNDEFINED)continue;
