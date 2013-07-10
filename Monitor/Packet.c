@@ -46,6 +46,16 @@ Packet*makeGraph(Sensor const*const s)
 	}
 }
 
+ssize_t writeLogin(const int fd, struct LoginPacket*p)
+{
+	if(!fd)return -1;
+	if(!p)return -1;
+	if(p->base.op!=OPC_LOGIN)return -1;
+	if( write(fd,&p->base.op,sizeof(opcode)) == -1 ) return -1;
+	if( write(fd,&p->zero,sizeof(int)) == -1 ) return -1;
+	return (ssize_t)sizeof(struct LoginPacket);
+}
+
 ssize_t writeUpdate(const int fd, struct Update*packet)
 {
 	unsigned int i=0;
@@ -198,6 +208,19 @@ struct iBounds*readBounds(const int source)
 	p->lbound=(int)lbound;
 	p->ubound=(int)ubound;
 	return p;
+}
+
+void destroyLogin(struct LoginPacket*l)
+{
+	free(l);
+}
+
+void destroyUpdate(struct Update*u)
+{
+	free(u->sensors);
+	u->sensors=NULL;
+	free(u);
+	u=NULL;
 }
 
 void destroyiGraph(struct iGraph*g)

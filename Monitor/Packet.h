@@ -73,6 +73,7 @@ Packet*makeGraph(Sensor const*const);
 
 ssize_t writeUpdate(const int, struct Update*);
 ssize_t writeGraph(const int,struct oGraph*);
+ssize_t writeLogin(const int,struct LoginPacket*);
 
 struct iGraph*readGraph(const int);
 struct iBounds*readBounds(const int);
@@ -82,4 +83,5 @@ void destroyiGraph(struct iGraph*);
 void destroyoGraph(struct oGraph*);
 void destroyiBounds(struct iBounds*);
 void destroyUpdate(struct Update*);
+void destroyLogin(struct LoginPacket*);
 #endif

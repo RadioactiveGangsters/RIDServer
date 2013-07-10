@@ -13,7 +13,7 @@ void _writePacket(const int fd,Packet*const p)
 			{
 				struct Update*u=(struct Update*)p;
 				Log(LOGT_CLIENT,LOGL_DEBUG,"writeUpdate: %d",packsize=writeUpdate(fd,u));
-				// TODO:destroyUpdate(u)
+				destroyUpdate(u);
 				break;
 			}
 			case OPC_GRAPH:
@@ -28,7 +28,12 @@ void _writePacket(const int fd,Packet*const p)
 			case OPC_UNDEFINED:
 				return;
 			case OPC_LOGIN:
+			{
+				struct LoginPacket*l=(struct LoginPacket*)p; 
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writeLogin: %d",writeLogin(fd,l));
+				destroyLogin(l);
 				break;
+			}
 			case OPC_PING:
 				Log( LOGT_CLIENT,LOGL_DEBUG,"writePing: %d",write(fd,&p->op,sizeof(char)));
 				free(p);
