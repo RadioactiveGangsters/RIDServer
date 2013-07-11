@@ -1,6 +1,6 @@
 #include "ReactorData.h"
 
-static LLNODE*threads = NULL;
+//static LLNODE*threads = NULL;
 static volatile bool stopsimulation=false;
 unsigned int _seed;
 static int interval;
@@ -282,24 +282,26 @@ int getSensorCollection(Trie*const trie)
 Sensor* checkFullnessValues(Trie*const trie)
 {
 	if(!trie) return NULL;
-	Sensor*e,g,l=checkFullnessValues(trie->l);
-	if(l) return l;
-	g=checkFullnessValues(trie->g);
-	if(g) return g;
-	e=trie->e->value?trie->e:null;
-	return e;
+	{
+		Sensor*e,*g,*l = checkFullnessValues(trie->l);
+		if(l) return l;
+		g = checkFullnessValues(trie->g);
+		if(g) return g;
+		e = ((bSensor*)trie->e)->value?trie->e:NULL;
+		return e;
+	}
 }
 
 /**	Returns the amount of TRUE values from the 
 	assigned half of the assigned table 
 	skip = how many to skip before counting
 	upto = how many sensors to count */
-int countTrueInSet(Trie*db, int*skip, int*upto)
+int countTrueInSet(Trie*table, int*skip, int*upto)
 {
-	if(!db || !upto) return 0;
+	if(!table || !upto) return 0;
     int counted = 0;
-	counted += countTrueInSet(db->l, skip, upto);
-    counted += countTrueInSet(db->g, skip, upto);
+	counted += countTrueInSet(table->l, skip, upto);
+    counted += countTrueInSet(table->g, skip, upto);
     if(*skip)
     {
          *skip = *skip - 1;
@@ -307,7 +309,7 @@ int countTrueInSet(Trie*db, int*skip, int*upto)
     }
     if(!*upto) return counted;
     *upto = *upto - 1;
-    return counted + sensoristrue(db->e)?1:0;
+    return counted + ((bSensor*)(Sensor*)table->e)->value?1:0;
 }	
 
 /** Generates all Binary Sensors */
