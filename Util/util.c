@@ -23,8 +23,14 @@ unsigned int numlen(/*@+ignoresigns@*/const unsigned int t)
 	// no int is larger than 10
 }
 
-int random(int range)
+int singlerandom(int bound)
 {
 	srand(_seed=(unsigned)rand());
-	return ((rand()%(range)) + 1);
+	return ((rand()%(bound))+1);
+}
+
+int multirandom(int bound)
+{
+	srand(_seed=(unsigned)rand());
+	return ((rand()%(bound*2))-bound);
 }

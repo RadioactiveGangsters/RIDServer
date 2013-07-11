@@ -15,7 +15,8 @@ typedef struct
 } delegate;
 
 unsigned int numlen(/*@+ignoresigns@*/unsigned const int);
-int random(int range);
+int singlerandom(int bound);
+int multirandom(int bound);
 
 #endif	/* UTIL_H */
 

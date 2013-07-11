@@ -155,6 +155,7 @@ void fortrie(Trie*const trie,void(*cb)(Trie*const))
 	cb(trie);
 }
 
+/**	Returns the amount of objects in the trie */
 int countTrie(Trie*const trie)
 {	
 	if(!trie)return 0;

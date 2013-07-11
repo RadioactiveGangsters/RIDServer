@@ -20,9 +20,9 @@
 
 int LoadSensors(void);
 int StartSensorSimulation(void);
-int StartSensorSimulation2(void);
-int flux(int bound);
 int getAverageValue(Trie*const Table);
 int getSensorCollection(Trie*const trie);
+Sensor* checkFullnessValues(Trie*const trie);
+int countTrueInSet(Trie*db, int*skip, int*upto);
 
 #endif
