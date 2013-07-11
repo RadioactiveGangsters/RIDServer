@@ -1,6 +1,24 @@
 #include "Client.h"
 
-void _writePacket(const int fd,Packet*const p)
+#ifdef _WIN32
+
+	#include <windows.h>
+
+#else
+
+	#include <unistd.h>
+	#include <signal.h>
+	#include <sys/un.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <arpa/inet.h>
+	#include <netinet/in.h>
+
+#endif
+#include "../System/Log.h"
+#include "../Data/Database.h"
+
+static void _writePacket(const int fd,Packet*const p)
 {
 	if(!p)return;
 	else
@@ -12,7 +30,7 @@ void _writePacket(const int fd,Packet*const p)
 			case OPC_UPDATE:
 			{
 				struct Update*u=(struct Update*)p;
-				Log(LOGT_CLIENT,LOGL_DEBUG,"writeUpdate: %d",packsize=writeUpdate(fd,u));
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writeUpdate for %d: %d",u->unit,packsize=writeUpdate(fd,u));
 				destroyUpdate(u);
 				break;
 			}
@@ -61,7 +79,7 @@ static void sendupdates(Trie*const table, Client*const client)
 		struct Update u=
 		{
 			.base={.op=OPC_UNDEFINED,},
-			.unit=unit_temperature,
+			.unit=unitbystring(table->id),
 			.sensorlen=triecount(table->e),
 			.sensors=NULL,
 		},*p=malloc(sizeof*p);
@@ -84,7 +102,7 @@ static void sendupdates(Trie*const table, Client*const client)
 	}
 }
 
-void passclient(Trie*const table,Client*const client,void(*cb)(Trie*const,Client*const))
+static void passclient(Trie*const table,Client*const client,void(*cb)(Trie*const,Client*const))
 {
 	if(!table)return;
 	if(!client)return;
@@ -94,7 +112,7 @@ void passclient(Trie*const table,Client*const client,void(*cb)(Trie*const,Client
 	cb(table,client);
 }
 
-void*_iLoop(void*const c)
+static void*_iLoop(void*const c)
 {
 	if(!c)
 	{
@@ -206,7 +224,7 @@ void*_iLoop(void*const c)
 	pthread_exit(NULL);
 }
 
-void*_oLoop(void*const c)
+static void*_oLoop(void*const c)
 {
 	if(!c)
 	{
@@ -250,34 +268,6 @@ Client*SpawnClient(const int fd)
 	pthread_create(&p->iloop,NULL,&_iLoop,p);
 	pthread_create(&p->oloop,NULL,&_oLoop,p);
 	return p;
-}
-
-void test(void)
-{
-	int i = 0;
-	//printf("Received: %c\n", ch);
-
-	//ch++;
-
-	//if(sleep(5)) break;
-
-	for(; i < 20; i++)
-	{
-//		ssize_t x;
-//		if((x = write(address, pp, sizeof(char))) != sizeof(char))
-//		Log(LOGT_NETWORK,LOGL_ERROR, "Cannot send %d: %d",x, errno);
-
-//		Log(LOGT_NETWORK,LOGL_DEBUG, "Send char %d ", *pp);
-
-
-		//Log(LOGL_CLIENT_ACTIVITY, "send char %c ", t );
-	}
-
-//	Log(LOGT_NETWORK,LOGL_DEBUG, "Server send: %c", ch);
-//	if(write(address, &ch, 1)) continue;
-//	printf("Send: %c", ch);
-
-//	(void)close(address);
 }
 
 void sendPacket(Client*const c,Packet*const p)

@@ -1,5 +1,17 @@
 #include "Packet.h"
 
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
+#ifdef _WIN32
+	#include <windows.h>
+#else
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
+#endif
+#include "../System/Log.h"
+
 Packet*makePing(void)
 {
 	Packet b=
@@ -33,7 +45,7 @@ Packet*makeGraph(Sensor const*const s)
 		struct oGraph const g=
 		{
 			.base={.op=OPC_GRAPH,},
-			.unit=unit_temperature,// FIXME: all units
+			.unit=unitbystring(s->unit),// FIXME: all units
 			.qlen=AutoQcount(s->delta),
 			.queue=s->delta,
 		};

@@ -1,6 +1,40 @@
 #include"sensor.h"
 
-unsigned int _sensseed;
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+static unsigned int _sensseed;
+
+#ifndef S_SPLINT_S
+unittype unitbystring(char const id[static 2])
+#else
+unittype unitbystring(char const*const id)
+#endif
+{
+	if(!id)return unit_undefined;
+
+	switch(id[0])
+	{
+		case 'T':
+			return unit_temperature;
+		case 'P':
+			return unit_pressure;
+		case 'R':
+			return unit_radiation;
+		case 'F':
+			switch(id[1])
+			{
+				case 'l':
+					return unit_flow;
+				case 'u':
+					return unit_fullness;
+			}
+	}
+
+	return unit_undefined;
+}
 
 /* Generates a flux value for binary sensors. 
  * This value is randomly generated between the 

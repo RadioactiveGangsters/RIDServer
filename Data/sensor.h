@@ -7,13 +7,8 @@
 #ifndef SENSOR_H
 #define	SENSOR_H
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 #include <stdbool.h>
-#include <string.h>
-#include <math.h>
-
 #include "../Util/DeathRow.h"
 
 #define SENSOR_HNAMELEN 41
@@ -75,5 +70,11 @@ makebSensor(
 		char const*const alarm
 		);
 
+
+#ifndef S_SPLINT_S
+unittype unitbystring(char const[static 2]);
+#else
+unittype unitbystring(char const*const);
+#endif
 #endif	/* SENSOR_H */
 
