@@ -282,9 +282,9 @@ int getSensorCollection(Trie*const trie)
 Sensor* checkFullnessValues(Trie*const trie)
 {
 	if(!trie) return NULL;
-	Sensor*e,g,l=checkfullnessvalues(trie->l);
+	Sensor*e,g,l=checkFullnessValues(trie->l);
 	if(l) return l;
-	g=checkfullnessvalues(trie->g);
+	g=checkFullnessValues(trie->g);
 	if(g) return g;
 	e=trie->e->value?trie->e:null;
 	return e;
