@@ -76,7 +76,7 @@ static void sendupdates(Trie*const table, Client*const client)
 				free(p);
 				return;
 			}
-			fillarray(table,sensorarray,&i);
+			fillarray(table->e,sensorarray,&i);
 			p->sensors=sensorarray;
 			p->base.op=OPC_UPDATE;
 			sendPacket(client,(Packet*)p);
