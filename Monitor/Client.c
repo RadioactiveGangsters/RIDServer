@@ -75,11 +75,13 @@ static void fillarray(Trie const*const table,int*array,unsigned int*i)
 		{
 			iSensor*s=table->e;
 			v=s->value;
+			break;
 		}
 		case binarysensor:
 		{
 			bSensor*s=table->e;
 			v=s->value?1:0;
+			break;
 		}
 	}
 	array[*i]=v;
