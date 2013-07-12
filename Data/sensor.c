@@ -1,23 +1,23 @@
 #include"sensor.h"
 
-unsigned int _sensseed;
+/*unsigned int _sensseed;
 
-/* Generates a flux value for binary sensors. 
+ * Generates a flux value for binary sensors. 
  * This value is randomly generated between the 
  * reed 1 and the -10000. The opportunity for 
  * '1' is 1 to 10000.
- */
+ *
 bool binaryflux()
 {
 	srand(_sensseed=(unsigned)rand());
 	return ((!(rand()%225) && !(rand()%225)));
 }
 
-/* Generates a flux value for integer sensors.
+ * Generates a flux value for integer sensors.
  * This value will be used to increase or decrease
  * the original value. The random generated value
  * will be between -1 and 2.
- */
+ *
 int integerflux(int pvalue)
 {
 	int flux;
@@ -40,10 +40,10 @@ void SetupSensors(void)
 	srand((unsigned int)time(NULL));
 	_sensseed=(unsigned)rand();    
 }
-
+*/
 void ResetSensor(Sensor*const s)
 {
-	if(s->type == binarysensor) ((bSensor*)s)->value = 0;
+	if(s->type == binarysensor) ((bSensor*)s)->value = false;
 	else ((iSensor*)s)->value = ((iSensor*)s)->startvalue;
 }
 
@@ -59,13 +59,16 @@ bSensor* makebSensor(
 	char const*const unit,
 	char const*const alarm)
 {
+	int*ptrtomyint=malloc(sizeof(int));
+	*ptrtomyint=false;
+
 	Sensor base=
 	{
 		.name="genericb",
 		.unit="on/off",
 		.type=binarysensor,
 		.stamp=time(0),
-		.delta=NULL,
+		.delta=AutoQe(ptrtomyint,(60*60)),
 	};
 
 	bSensor s=
@@ -108,7 +111,7 @@ iSensor* makeiSensor(
 			.unit="generici",
 			.type=integersensor,
 			.stamp=time(0),
-			.delta=NULL,
+			.delta=AutoQe(malloc(sizeof(startvalue)),(60*60)),
 		},
 		.startvalue=startvalue,
 		.lbound=lbound,

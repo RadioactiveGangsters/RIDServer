@@ -86,7 +86,7 @@ static void SimulateTemperature(Trie*const sensorbox)
 		averageRadiation = getAverageValue(RadiationTable);
 		averageFlow = getAverageValue(FlowTable);
 		
-		newValue = (isensor->value) + ((averageRadiation/100) + (multirandom(1)) - (averageFlow/50));
+		newValue = (isensor->value) + ((averageRadiation/90) + (multirandom(1)) - (averageFlow/50));
 		isensor->value = newValue;
 		PushS(sensor);
 	}
@@ -208,10 +208,7 @@ static void*Simulator(void*const rawtable)
 				pthread_exit(NULL);
 			}
 			{
-				int fwcollection, fwcollectionav, fwcollectiondelta, count;
-				Sensor*const fwsensor = FlowTable->e;
-				AutoQ *q = fwsensor->delta;
-				count = countTrie(FullnessTable);
+				int fwcollection, fwcollectionav, fwcollectiondelta, count, amount;
 			
 				while(!stopsimulation)
 				{
@@ -227,19 +224,30 @@ static void*Simulator(void*const rawtable)
 					fortrie(TemperatureTable, &SimulateTemperature);
 				
 				//Fullness
+					Sensor*const fwsensor = FlowTable->e;
+					AutoQ *q = fwsensor->delta;
+					amount = countTrie(FullnessTable);	
+					count = amount;
+					fwcollection = 0;
 					while(count > 0)
 					{
-						fwcollection += *(int*)q->e;
-						if(count == 30) fwcollectiondelta = *(int*)q->e;
-						if(count == 1) fwcollectiondelta = fwcollectiondelta - (*(int*)q->e);
-						count--;
-						q=q->n;
+						if(!q) break;
+						{
+							if(!(*(int*)q->e)) break;
+							fwcollection += *(int*)q->e;
+							if(count == 30) fwcollectiondelta = *(int*)q->e;
+							if(count == 1) fwcollectiondelta = (fwcollectiondelta - (*(int*)q->e));
+							count--;
+							q=q->n;
+						}
 					}
-					fwcollectionav = (fwcollection/30);	
+					fwcollectionav = (fwcollection/(amount-count));	
+					if(count > 0) fwcollectiondelta = 0;
 					if(fwcollectionav > 350 || fwcollectiondelta > 30) SimulateFullness(true);
 					if(fwcollectionav < 300) SimulateFullness(false);
 
 				//Pressure
+Log(LOGT_SERVER, LOGL_DEBUG, "Simulating Pressure..");
 					fortrie(PressureTable, &SimulatePressure);
 				}
 			}
@@ -426,7 +434,7 @@ int LoadSensors(void)
 		return EXIT_FAILURE;
 
 	// just to be sure
-	SetupSensors();
+	//SetupSensors();
 
 	if(!iniparser_find_entry(ini, "sensor"))
 	{

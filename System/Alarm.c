@@ -21,7 +21,7 @@ void AlarmDetection(Sensor* sn)
 		{
 			//sendAlarm(isn->lalarm);
 			Sensor_enqueue(sn);
-			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s (%d < %d)", sn->name ,isn->ualarm, isn->value, isn->lbound);
+			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s (%d < %d)", sn->name ,isn->lalarm, isn->value, isn->lbound);
 		}
 	} 
 	
