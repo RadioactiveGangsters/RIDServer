@@ -70,18 +70,14 @@ ssize_t writeLogin(const int fd, struct LoginPacket*p)
 
 ssize_t writeUpdate(const int fd, struct Update*packet)
 {
-	unsigned int i=0;
 	if(!fd)return -1;
 	if(!packet) return -1;
 	if(packet->base.op==OPC_UNDEFINED)return -1;
 	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
 	if( write(fd,&packet->unit,sizeof(int)) == -1 ) return -1;
 	if( write(fd,&packet->sensorlen,sizeof(int)) == -1 ) return -1;
-	for(i=(unsigned int)packet->sensorlen;i--;)
-	{
-		if( write(fd,packet->sensors+i,sizeof(int)) == -1 ) return -1;
-	}
-	
+	if( write(fd,packet->sensors,sizeof(int)*packet->sensorlen) == -1 ) return -1;
+
 	// TODO: recalculate size
 	return (ssize_t)sizeof*packet;
 }
