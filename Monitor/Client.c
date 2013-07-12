@@ -63,12 +63,26 @@ static void _writePacket(const int fd,Packet*const p)
 
 static void fillarray(Trie const*const table,int*array,unsigned int*i)
 {
+	int v=0;
 	if(!table)return;
 	if(!array)return;
 	if(!i)return;
 	fillarray(table->l,array,i);
 	fillarray(table->g,array,i);
-	array[*i]=((iSensor*)table->e)->value;
+	switch(((Sensor*)table->e)->type)
+	{
+		case integersensor:
+		{
+			iSensor*s=table->e;
+			v=s->value;
+		}
+		case binarysensor:
+		{
+			bSensor*s=table->e;
+			v=s->value?1:0;
+		}
+	}
+	array[*i]=v;
 	*i=*i+1;
 }
 
