@@ -27,8 +27,8 @@
 #include "../Util/Trie.h"
 #include "../Util/DeathRow.h"
 
-void getSensorData(Trie* s);
-void getSensors(Trie* t);
+void getSensorData(Trie* sensor);
+void getSensors(Trie* table);
 void *getSensorTable(void *param);
 int getMin(AutoQ* list);
 int getMax(AutoQ* list);

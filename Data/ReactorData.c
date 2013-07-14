@@ -10,7 +10,12 @@ static Trie* TemperatureTable;
 static Trie* FullnessTable;
 static Trie* PressureTable;
 
-/**	Simulates all Radiation Sensors */
+/**	
+ *	Simulates all Radiation Sensors 
+ *
+ *	Formula: 
+ *	Oldvalue + [-19..20]
+ */
 static void SimulateRadiation(Trie*const sensorbox)
 {
 	if(!sensorbox)return;
@@ -18,27 +23,34 @@ static void SimulateRadiation(Trie*const sensorbox)
 	{
 		int newValue, fx;
 		Sensor*const sensor = sensorbox->e;
-		
 		iSensor*const isensor = (iSensor*)sensor;
 		int*p = malloc(sizeof*p);
+		
 		if(!p)
 		{
 			Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
 			return;
 		}
+		// Set current value in history queue
 		*p = isensor->value;
 		sensor->delta = AutoQadd(sensor->delta, p);
 		
 		srand(_seed=(unsigned)rand());
 		fx = ((rand()%(39))-20);
-
+		
+		// Get new value and set as current value
 		newValue = (isensor->value) + fx;
+		if((strcmp((sensor->name), "Radiation0") == 0)) Log(LOGT_SERVER, LOGL_DEBUG, "%s Old Value: %d   New Value: %d", sensor->name, isensor->value, newValue);
 		isensor->value = newValue;
 		PushS(sensor);
 	}
 }
 
-/**	Simulates all Flow Sensors */
+/**	
+ *	Simulates all Flow Sensors 
+ *
+ *	Only operator can change value 
+ */
 static void SimulateFlow(Trie*const sensorbox)
 {
 	if(!sensorbox)return;
@@ -46,25 +58,33 @@ static void SimulateFlow(Trie*const sensorbox)
 	{
 		int newValue;
 		Sensor*const sensor = sensorbox->e;
-		
 		iSensor*const isensor = (iSensor*)sensor;
 		int*p = malloc(sizeof*p);
+		
 		if(!p)
 		{
 			Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
 			return;
 		}
+		// Set current value in history queue
 		*p = isensor->value;
 		sensor->delta = AutoQadd(sensor->delta, p);
 		
 		//TODO change value by operator
+		// Get new value and set as current value
 		newValue = (isensor->value);
 		isensor->value = newValue;
 		PushS(sensor);
 	}
 }
 
-/**	Simulates all Temperature Sensors */
+/**	
+ *	Simulates all Temperature Sensors 
+ *
+ *	Formula: 
+ *	Oldvalue + [1,15% of average Radiation] +
+ *	[-1..1] - [2% of average Flow] 
+ */
 static void SimulateTemperature(Trie*const sensorbox)
 {
 	if(!sensorbox)return;
@@ -72,27 +92,33 @@ static void SimulateTemperature(Trie*const sensorbox)
 	{
 		int newValue, averageRadiation, averageFlow;
 		Sensor*const sensor = sensorbox->e;
-		
 		iSensor*const isensor = (iSensor*)sensor;
 		int*p = malloc(sizeof*p);
+		
 		if(!p)
 		{
 			Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
 			return;
 		}
+		// Set current value in history queue
 		*p = isensor->value;
 		sensor->delta = AutoQadd(sensor->delta, p);
 		
 		averageRadiation = getAverageValue(RadiationTable);
 		averageFlow = getAverageValue(FlowTable);
 		
-		newValue = (isensor->value) + ((averageRadiation/90) + (multirandom(1)) - (averageFlow/50));
+		// Get new value and set as current value
+		newValue = (isensor->value) + ((averageRadiation/87) + (multirandom(1)) - (averageFlow/50));
 		isensor->value = newValue;
 		PushS(sensor);
 	}
 }
 
-/**	Simulates all Fullness Sensors */
+/**	
+ *	Simulates all Fullness Sensors 
+ *	
+ *	Formula: 
+ */
 static void SimulateFullness(bool set)
 {
 	if(set)
@@ -100,17 +126,21 @@ static void SimulateFullness(bool set)
 		int snr = singlerandom(countTrie(FullnessTable));
 		char name[9+numlen((unsigned)snr)];		
 		snprintf(name, sizeof(char)*(9+numlen((unsigned)snr)), "%s%d", "Fullness", snr);
+		
 		Sensor*const sensor = (findinTrie(FullnessTable,name));
-
 		bSensor*const bsensor = (bSensor*)sensor;
 		bool*p=malloc(sizeof*p);
+
 		if(!p)
 		{
 			Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
 			return;
 		}
+		// Set current value in history queue
 		*p = bsensor->value;
 		sensor->delta = AutoQadd(sensor->delta, p);
+
+		// Get new value and set as current value
 		bsensor->value = true;
 		PushS(sensor);		
 	}
@@ -121,20 +151,32 @@ static void SimulateFullness(bool set)
 		{
 			bSensor*const bsensor = (bSensor*)sensor;
 			bool*p=malloc(sizeof*p);
+			
 			if(!p)
 			{
 				Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
 				return;
 			}
+			// Set current value in history queue
 			*p = bsensor->value;
 			sensor->delta = AutoQadd(sensor->delta, p);
+
+			// Get new value and set as current value
 			bsensor->value = false;
 			PushS(sensor);
 		}
 	}
 }
 
-/**	Simulates all Pressure Sensors */
+/**	
+ *	Simulates all Pressure Sensors
+ *
+ *	Formula: 
+ *	Startvalue + ( [0..1200] * [average Temperature] * 
+ *	(( [amount of true in FnSet1] / 2) + 1) ) -
+ *	( [0..1200] * [5% of average Flow] * 
+ *	(( [amount of true in FnSet2] / 2) + 1) )		 
+ */
 static void SimulatePressure(Trie*const sensorbox)
 {
 	if(!sensorbox)return;
@@ -142,14 +184,15 @@ static void SimulatePressure(Trie*const sensorbox)
 	{
 		int newValue, averageTemperature, averageFlow, halfFnSet, amountFnSet1, amountFnSet2;
 		Sensor*const sensor = sensorbox->e;
-		
 		iSensor*const isensor = (iSensor*)sensor;
 		int*p = malloc(sizeof*p);
+		
 		if(!p)
 		{
 			Log(LOGT_SERVER, LOGL_SERIOUS_ERROR, "Out of memory!");
 			return;
 		}
+		// Set current value in history queue
 		*p = isensor->value;
 		sensor->delta = AutoQadd(sensor->delta, p);
 		
@@ -159,6 +202,7 @@ static void SimulatePressure(Trie*const sensorbox)
 		amountFnSet1 = countTrueInSet(FullnessTable, 0, &halfFnSet);
 		amountFnSet2 = countTrueInSet(FullnessTable, &halfFnSet, &halfFnSet);
 		
+		// Get new value and set as current value
 		newValue = 	( (isensor->startvalue) + 
 					( singlerandom(1200) * averageTemperature * ((amountFnSet1 / 2) + 1) ) - 
 					( singlerandom(1200) * (averageFlow / 20) * ((amountFnSet2 / 2) + 1) ) );	
@@ -168,8 +212,10 @@ static void SimulatePressure(Trie*const sensorbox)
 	}
 }
 
-/**	The Simulator Thread which will update all
-	Sensors every 'interval' */
+/**	
+ *	The Simulator Thread which will update all
+ *	Sensors every 'interval' 
+ */
 static void*Simulator(void*const rawtable)
 {
 	if(!rawtable)
@@ -179,9 +225,10 @@ static void*Simulator(void*const rawtable)
 	}
 	{
 		Trie*const db = rawtable;
-				
+		
 		if(interval)
-		{			
+		{
+			// Get all tables			
 			if(!(RadiationTable = findinTrie(db, "Radiation")))
 			{
 				Log(LOGT_SERVER, LOGL_ERROR, "Can not find Radiation Table in Database!");
@@ -209,21 +256,21 @@ static void*Simulator(void*const rawtable)
 			}
 			{
 				int fwcollection, fwcollectionav, fwcollectiondelta, count, amount;
-			
+				
 				while(!stopsimulation)
 				{
 					Rest(interval);
-												
-				//Radiation
+					
+				// Radiation
 					fortrie(RadiationTable, &SimulateRadiation);
-				
-				//Flow
+					
+				// Flow
 					fortrie(FlowTable, &SimulateFlow);
-				
-				//Temperature
+					
+				// Temperature
 					fortrie(TemperatureTable, &SimulateTemperature);
-				
-				//Fullness
+					
+				// Fullness
 					Sensor*const fwsensor = FlowTable->e;
 					AutoQ *q = fwsensor->delta;
 					amount = countTrie(FullnessTable);	
@@ -245,9 +292,8 @@ static void*Simulator(void*const rawtable)
 					if(count > 0) fwcollectiondelta = 0;
 					if(fwcollectionav > 350 || fwcollectiondelta > 30) SimulateFullness(true);
 					if(fwcollectionav < 300) SimulateFullness(false);
-
-				//Pressure
-Log(LOGT_SERVER, LOGL_DEBUG, "Simulating Pressure..");
+					
+				// Pressure
 					fortrie(PressureTable, &SimulatePressure);
 				}
 			}
@@ -257,8 +303,10 @@ Log(LOGT_SERVER, LOGL_DEBUG, "Simulating Pressure..");
 	pthread_exit(NULL);
 }
 
-/**	Create new thread that will handle with all
-   	Simulators for all sensors */
+/**	
+ *	Create new thread that will handle with all
+ * 	Simulators for all sensors 
+ */
 int StartSensorSimulation(void)
 {
 	Trie*const db=Tables();
@@ -267,8 +315,10 @@ int StartSensorSimulation(void)
 	else return EXIT_SUCCESS;
 }
 
-/**	Returns the average value of all sensors in
-	the assigned table */
+/**	
+ *	Returns the average value of all sensors in
+ *	the assigned table 
+ */
 int getAverageValue(Trie*const Table)
 {
 	int collection, amount;
@@ -277,16 +327,20 @@ int getAverageValue(Trie*const Table)
 	return (collection / amount);
 }
 
-/**	Returns the collection value of all sensors
-	in the assigned table */ 
+/**	
+ *	Returns the collection value of all sensors
+ *	in the assigned table 
+ */ 
 int getSensorCollection(Trie*const trie)
 {
 	if(!trie) return 0;
 	return getSensorCollection(trie->l) + getSensorCollection(trie->g) + ((iSensor*)(trie->e))->value;
 }
 
-/**	Returns the first sensor it will cross
-	whose value is TRUE */
+/**	
+ *	Returns the first sensor it will cross
+ *	whose value is TRUE 
+ */
 Sensor* checkFullnessValues(Trie*const trie)
 {
 	if(!trie) return NULL;
@@ -300,17 +354,19 @@ Sensor* checkFullnessValues(Trie*const trie)
 	}
 }
 
-/**	Returns the amount of TRUE values from the 
-	assigned half of the assigned table 
-	skip = how many to skip before counting
-	upto = how many sensors to count */
+/**	
+ *	Returns the amount of TRUE values from the 
+ *	assigned half of the assigned table 
+ *	skip = how many to skip before counting
+ *	upto = how many sensors to count 
+ */
 int countTrueInSet(Trie*table, int*skip, int*upto)
 {
 	if(!table || !upto) return 0;
     int counted = 0;
 	counted += countTrueInSet(table->l, skip, upto);
     counted += countTrueInSet(table->g, skip, upto);
-    if(*skip)
+    if(skip && *skip)
     {
          *skip = *skip - 1;
          return counted;
@@ -320,7 +376,9 @@ int countTrueInSet(Trie*table, int*skip, int*upto)
     return counted + ((bSensor*)(Sensor*)table->e)->value?1:0;
 }	
 
-/** Generates all Binary Sensors */
+/** 
+ *	Generates all Binary Sensors 
+ */
 static void genbSensors(
 	char const*const type,  
 	const int amount,  
@@ -369,7 +427,9 @@ static void genbSensors(
 	}
 }
 
-/** Generates all Integer Sensors */
+/** 
+ *	Generates all Integer Sensors 
+ */
 static void geniSensors(
 	char const*const type,  
 	const int amount,  
@@ -424,8 +484,10 @@ static void geniSensors(
 	}
 }
 
-/** Load all Sensors and read their
-	preferences from the ini file */
+/** 
+ *	Load all Sensors and read their
+ *	preferences from the ini file 
+ */
 int LoadSensors(void)
 {
 	//load the iniparser on the sensor path
