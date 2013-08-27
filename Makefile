@@ -32,6 +32,10 @@ LIBS = deps/iniparser/libiniparser.a \
 .PHONY : all
 all : $(TARGET)
 
+.PHONY : coloured
+coloured :
+	@$(MAKE) 2>&1 | sed '{s/\(error\)/[31m\1[m/}' | sed '{s/\(warning\|note\)/[33m\1[m/}'
+
 .PHONY : install
 install : $(TARGET)
 	cp $(TARGET) $(INSTALLATIONDIR)
@@ -51,7 +55,7 @@ deps/iniparser/libiniparser.a : deps/iniparser/Makefile
 
 %.o : %.c %.h.gch
 	-$(LINT) $(LINTFLAGS) $<
-	$(CC) $(CFLAGS) -o $@ -c $< 
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 %.h.gch : %.h
 	$(CC) $(CFLAGS) -o $@ -c $^

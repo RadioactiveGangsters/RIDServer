@@ -56,7 +56,7 @@ int AcceptClients(void)
 		{
 			.sin_family=AF_INET,
 			.sin_port = htons((uint16_t)iniparser_getint(config,"network:port",61014)),
-			.sin_addr.s_addr = inet_addr(iniparser_getstring(config,"network:address","127.0.0.1")),
+			.sin_addr.s_addr = inet_addr(iniparser_getstring(config,"network:address","0.0.0.0")),
 			// padding
 			.sin_zero = {0},
 		};

@@ -154,3 +154,10 @@ void fortrie(Trie*const trie,void(*cb)(Trie*const))
 	fortrie(trie->g,cb);
 	cb(trie);
 }
+
+int triecount(Trie const*const db)
+{
+	if(!db)return 0;
+	return triecount(db->l)+triecount(db->g)+1;
+}
+
