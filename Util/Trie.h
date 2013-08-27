@@ -25,4 +25,6 @@ int countTrie(Trie*const trie);
 void*findinTrie(Trie const*const table,char const*const name);
 
 
+int triecount(Trie const*const);
+
 #endif

@@ -3,9 +3,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
+#include <limits.h>
+#ifdef _WIN32
+	#include <windows.h>
+#else
+	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
+#endif
 #include "../System/Log.h"
 #include "../Data/sensor.h"
 
@@ -17,6 +22,7 @@ typedef enum opcode
 	OPC_UPDATE,
 	OPC_GRAPH,
 	OPC_ALARM,
+	OPC_BOUNDS,
 } opcode;
 
 typedef struct
@@ -41,21 +47,41 @@ struct iGraph
 struct oGraph
 {
 	Packet base;
-	int namelen;
-	const char*name;
+	unittype unit;
 	int qlen;
 	const AutoQ*queue;
 };
-	
+
+struct iBounds
+{
+	Packet base;
+	char*name;
+	int lbound,ubound;
+};
+
+struct Update
+{
+	Packet base;
+	unittype unit;
+	int sensorlen;
+	int*sensors;
+};
 
 Packet*makePing(void);
 Packet*makeLogin(void);
 Packet*makeGraph(Sensor const*const);
 
+ssize_t writeUpdate(const int, struct Update*);
 ssize_t writeGraph(const int,struct oGraph*);
+ssize_t writeLogin(const int,struct LoginPacket*);
 
 struct iGraph*readGraph(const int);
+struct iBounds*readBounds(const int);
+struct Update*readUpdate(const int);
 
-void destroyiGraph(struct iGraph*g);
-void destroyoGraph(struct oGraph*g);
+void destroyiGraph(struct iGraph*);
+void destroyoGraph(struct oGraph*);
+void destroyiBounds(struct iBounds*);
+void destroyUpdate(struct Update*);
+void destroyLogin(struct LoginPacket*);
 #endif

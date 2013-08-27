@@ -155,6 +155,7 @@ void fortrie(Trie*const trie,void(*cb)(Trie*const))
 	cb(trie);
 }
 
+
 /**	Returns the amount of objects in the trie */
 int countTrie(Trie*const trie)
 {	
@@ -178,3 +179,11 @@ void*findinTrie(Trie const*const table,char const*const name)
 		return findinTrie(table->g,name);
 	}
 }
+
+int triecount(Trie const*const db)
+{
+	if(!db)return 0;
+	return triecount(db->l)+triecount(db->g)+1;
+}
+
+

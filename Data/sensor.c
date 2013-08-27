@@ -1,46 +1,40 @@
 #include"sensor.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
 
-/*unsigned int _sensseed;
+static unsigned int _sensseed;
 
- * Generates a flux value for binary sensors. 
- * This value is randomly generated between the 
- * reed 1 and the -10000. The opportunity for 
- * '1' is 1 to 10000.
- *
-bool binaryflux()
+#ifndef S_SPLINT_S
+unittype unitbystring(char const id[static 2])
+#else
+unittype unitbystring(char const*const id)
+#endif
 {
-	srand(_sensseed=(unsigned)rand());
-	return ((!(rand()%225) && !(rand()%225)));
-}
+	if(!id)return unit_undefined;
 
- * Generates a flux value for integer sensors.
- * This value will be used to increase or decrease
- * the original value. The random generated value
- * will be between -1 and 2.
- *
-int integerflux(int pvalue)
-{
-	int flux;
-	srand(_sensseed=(unsigned)rand());
-	flux = (rand()%3)-1;
-
-	if(pvalue == 0)
+	switch(id[0])
 	{
-		if(flux < 0) flux = abs(flux);
-		pvalue += flux;
+		case 'T':
+			return unit_temperature;
+		case 'P':
+			return unit_pressure;
+		case 'R':
+			return unit_radiation;
+		case 'F':
+			switch(id[1])
+			{
+				case 'l':
+					return unit_flow;
+				case 'u':
+					return unit_fullness;
+			}
 	}
-	else if((pvalue+flux)<0) pvalue = 0;
-	else pvalue += flux;
 
-	return pvalue;
+	return unit_undefined;
 }
 
-void SetupSensors(void)
-{
-	srand((unsigned int)time(NULL));
-	_sensseed=(unsigned)rand();    
-}
-*/
 void ResetSensor(Sensor*const s)
 {
 	if(s->type == binarysensor) ((bSensor*)s)->value = false;
