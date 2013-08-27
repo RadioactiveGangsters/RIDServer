@@ -40,7 +40,6 @@ static void SimulateRadiation(Trie*const sensorbox)
 		
 		// Get new value and set as current value
 		newValue = (isensor->value) + fx;
-		if((strcmp((sensor->name), "Radiation0") == 0)) Log(LOGT_SERVER, LOGL_DEBUG, "%s Old Value: %d   New Value: %d", sensor->name, isensor->value, newValue);
 		isensor->value = newValue;
 		PushS(sensor);
 	}
