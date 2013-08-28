@@ -107,7 +107,7 @@ static void SimulateTemperature(Trie*const sensorbox)
 		averageFlow = getAverageValue(FlowTable);
 		
 		// Get new value and set as current value
-		newValue = (isensor->value) + ((averageRadiation/87) + (multirandom(1)) - (averageFlow/50));
+		newValue = (isensor->value) + ((averageRadiation/85) + (multirandom(1)) - (averageFlow/57));
 		isensor->value = newValue;
 		PushS(sensor);
 	}

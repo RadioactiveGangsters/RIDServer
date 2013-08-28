@@ -23,6 +23,7 @@ typedef enum opcode
 	OPC_GRAPH,
 	OPC_ALARM,
 	OPC_BOUNDS,
+	OPC_VALUE,
 } opcode;
 
 typedef struct
@@ -59,6 +60,13 @@ struct iBounds
 	int lbound,ubound;
 };
 
+struct iValue
+{
+	Packet base;
+	char*name;
+	int value;
+};
+
 struct Update
 {
 	Packet base;
@@ -77,11 +85,13 @@ ssize_t writeLogin(const int,struct LoginPacket*);
 
 struct iGraph*readGraph(const int);
 struct iBounds*readBounds(const int);
+struct iValue*readValue(const int);
 struct Update*readUpdate(const int);
 
 void destroyiGraph(struct iGraph*);
 void destroyoGraph(struct oGraph*);
 void destroyiBounds(struct iBounds*);
+void destroyiValue(struct iValue*);
 void destroyUpdate(struct Update*);
 void destroyLogin(struct LoginPacket*);
 #endif

@@ -218,6 +218,64 @@ struct iBounds*readBounds(const int source)
 	return p;
 }
 
+struct iValue*readValue(const int source)
+{
+	struct iValue v=
+	{
+		.base={.op=OPC_UNDEFINED,},
+		.name=NULL,
+		.value=INT_MIN,
+	},*p=malloc(sizeof*p);
+	size_t wanted;
+	uint32_t namelen,value;
+	char*sensor;
+
+	if(!p)return NULL;
+	memcpy(p,&v,sizeof*p);
+
+	wanted=sizeof(int);
+	if(recv(source,&namelen,wanted,MSG_WAITALL)==-1)
+	{
+		return p;
+	}
+	namelen=ntohl(namelen);
+
+	if(namelen<1)
+	{
+		return p;
+	}
+
+	wanted=sizeof(char)*namelen;
+	sensor=malloc(wanted+sizeof(char));
+	if(!sensor)
+	{
+		free(p);
+		return NULL;
+	}
+	{unsigned int i;for(i=(unsigned int)wanted+1;--i;)
+	{
+		sensor[i]=0;
+	}}
+
+	if(recv(source,sensor,wanted,MSG_WAITALL)==-1)
+	{
+		return p;
+	}
+
+	wanted=sizeof(int);
+	if(recv(source,&value,wanted,MSG_WAITALL)==-1)
+	{
+		return p;
+	}
+	value=ntohl(value);
+
+	p->base.op=OPC_VALUE;
+	p->name=sensor;
+	p->value=(int)value;
+	return p;
+}
+
+
 void destroyLogin(struct LoginPacket*l)
 {
 	free(l);
@@ -251,5 +309,13 @@ void destroyiBounds(struct iBounds*b)
 	b->name=NULL;
 	free(b);
 	b=NULL;
+}
+
+void destroyiValue(struct iValue*v)
+{
+	free(v->name);
+	v->name=NULL;
+	free(v);
+	v=NULL;
 }
 

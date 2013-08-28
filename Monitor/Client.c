@@ -175,7 +175,7 @@ static void*_iLoop(void*const c)
 						if(!ig)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
-							break;
+							goto dead;
 						}
 						if(ig->base.op==OPC_UNDEFINED)
 						{
@@ -194,6 +194,7 @@ static void*_iLoop(void*const c)
 						destroyiGraph(ig);
 						
 						sendPacket(client,p);
+						destroyiGraph(ig);
 						break;
 					}
 					case OPC_BOUNDS:
@@ -205,7 +206,7 @@ static void*_iLoop(void*const c)
 						if(!ib)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
-							break;
+							goto dead;
 						}
 						if(ib->base.op==OPC_UNDEFINED)
 						{
@@ -231,8 +232,43 @@ static void*_iLoop(void*const c)
 								((iSensor*)s)->ubound = ib->ubound;
 							}
 							Log(LOGT_CLIENT,LOGL_DEBUG,"%s bounds have been changed(LOWERBOUND: %d,UPPERBOUND: %d)",s->name,((iSensor*)s)->lbound,((iSensor*)s)->ubound);
+							destroyiBounds(ib);
 							break;
 						}
+						
+					}
+					case OPC_VALUE:
+					{
+						struct iValue*iv;
+						Log(LOGT_CLIENT,LOGL_CLIENT_ACTIVITY,"value request");
+						iv = readValue(client->fd);
+
+						if(!iv)
+						{
+							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
+							goto dead;
+						}
+						if(iv->base.op==OPC_UNDEFINED)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
+							continue;
+						}
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read value packet concerning %s (%d)",iv->name,iv->value);
+						s = findSensor(iv->name);
+						if(!s)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"but that sensor does not exist");
+							continue;
+						}
+						
+						if(!(iv->value < 1))
+						{
+							((iSensor*)s)->value = iv->value;
+							Log(LOGT_CLIENT,LOGL_DEBUG,"%s value have been changed(VALUE: %d)",s->name,((iSensor*)s)->value);
+						} 
+						else Log(LOGT_CLIENT,LOGL_CLIENT_ACTIVITY,"VALUE seems to be invalid");
+						destroyiValue(iv);
+						break;
 						
 					}
 					case OPC_UPDATE:
