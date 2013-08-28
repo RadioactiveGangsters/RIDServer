@@ -212,13 +212,28 @@ static void*_iLoop(void*const c)
 							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
 							continue;
 						}
-						Log(LOGT_CLIENT,LOGL_DEBUG,"read bonuds packet concerning %s (%d,%d)",ib->name,ib->lbound,ib->ubound);
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read bounds packet concerning %s (%d,%d)",ib->name,ib->lbound,ib->ubound);
 						s= findSensor(ib->name);
 						if(!s)
 						{
 							Log(LOGT_CLIENT,LOGL_BUG,"but that sensor does not exist");
+							continue;
 						}
-						// TODO: setbounds
+						
+						if(!s->type==binarysensor)
+						{
+							if(!(ib->lbound < 1))
+							{
+								((iSensor*)s)->lbound = ib->lbound;
+								((iSensor*)s)->ubound = ib->ubound;
+							} else {
+								Log(LOGT_CLIENT,LOGL_CLIENT_ACTIVITY,"LOWERBOUND seems to be invalid");
+								((iSensor*)s)->ubound = ib->ubound;
+							}
+							Log(LOGT_CLIENT,LOGL_DEBUG,"%s bounds have been changed(LOWERBOUND: %d,UPPERBOUND: %d)",s->name,((iSensor*)s)->lbound,((iSensor*)s)->ubound);
+							break;
+						}
+						
 					}
 					case OPC_UPDATE:
 					{
