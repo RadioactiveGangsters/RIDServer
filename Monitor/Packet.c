@@ -87,7 +87,7 @@ ssize_t writeUpdate(const int fd, struct Update*packet)
 ssize_t writeGraph(const int fd,struct oGraph*packet)
 {
 	AutoQ const*e;
-	int i=0;
+	int i=0,skippable=0;
 	if(!fd)return -1;
 	if(!packet)return -1;
 	if(packet->base.op==OPC_UNDEFINED)return -1;
@@ -98,9 +98,11 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	if( write(fd,&packet->qlen,sizeof(int)) == -1 ) return -1;
 	
 	e=packet->queue;
-	while(e && i++<packet->qlen);
+	skippable=AutoQcount(e)-packet->qlen;
+	while(e && i++<packet->qlen)
 	{
 		// TODO: binary sensors?
+		if( skippable > 0 ){skippable--;continue;}
 		if( write(fd,e->e,sizeof(int)) == -1 ) return -1;
 		e=e->n;
 	}
