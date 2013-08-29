@@ -99,12 +99,13 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	
 	e=packet->queue;
 	skippable=AutoQcount(e)-packet->qlen;
-	while(e && i++<packet->qlen)
+	while(e && i<packet->qlen)
 	{
 		// TODO: binary sensors?
-		if( skippable > 0 ){skippable--;continue;}
+		if( skippable > 0 ){skippable--;e=e->n;continue;}
 		if( write(fd,e->e,sizeof(int)) == -1 ) return -1;
 		e=e->n;
+		i++;
 	}
 
 	return (ssize_t)sizeof(struct oGraph);
