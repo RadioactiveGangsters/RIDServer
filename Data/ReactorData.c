@@ -9,6 +9,9 @@ static Trie* FlowTable;
 static Trie* TemperatureTable;
 static Trie* FullnessTable;
 static Trie* PressureTable;
+static int Templock, Radlock, Fulllock, Presslock, Flowlock;
+iSensor *TempSens, *RadSens, *FlowSens, *PressSens;
+bSensor *FullSens;
 
 /**	
  *	Simulates all Radiation Sensors 
@@ -40,6 +43,26 @@ static void SimulateRadiation(Trie*const sensorbox)
 		
 		// Get new value and set as current value
 		newValue = (isensor->value) + fx;
+
+		if( (newValue < 150) && (!(singlerandom(10) == 10)) ) newValue += 10; 
+		
+		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Radlock && (RadSens == isensor) ) 
+		{
+			Radlock = 0;
+			RadSens = 0;
+		}
+		else if( (newValue < isensor->lbound) && Radlock && !(RadSens == isensor) ) newValue += 30;
+		else if( (newValue > isensor->ubound) && Radlock && !(RadSens == isensor) ) newValue -= 30;
+		else if( (newValue < isensor->lbound) && !Radlock )
+		{
+			Radlock = 1;
+			RadSens = isensor;
+		}
+		else if((newValue > isensor->ubound) && !Radlock)
+		{
+			Radlock = 1;
+		}
+
 		isensor->value = newValue;
 		PushS(sensor);
 	}
@@ -91,6 +114,7 @@ static void SimulateTemperature(Trie*const sensorbox)
 	{
 		int newValue, averageRadiation, averageFlow;
 		Sensor*const sensor = sensorbox->e;
+		
 		iSensor*const isensor = (iSensor*)sensor;
 		int*p = malloc(sizeof*p);
 		
@@ -107,7 +131,28 @@ static void SimulateTemperature(Trie*const sensorbox)
 		averageFlow = getAverageValue(FlowTable);
 		
 		// Get new value and set as current value
-		newValue = (isensor->value) + ((averageRadiation/85) + (multirandom(1)) - (averageFlow/57));
+		newValue = (isensor->value) + ((averageRadiation/85) + (multirandom(1)) - (averageFlow/50));
+		
+		if( (newValue < 18) && (!(singlerandom(10) == 10)) ) newValue += 2; 
+
+		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Templock && (TempSens == isensor) ) 
+		{
+			Templock = 0;
+			TempSens = 0;
+		}
+		else if( (newValue < isensor->lbound) && Templock && !(TempSens == isensor) ) newValue += 10;
+		else if( (newValue > isensor->ubound) && Templock && !(TempSens == isensor) ) newValue -= 10;
+		else if( (newValue < isensor->lbound) && !Templock )
+		{
+			Templock = 1;
+			TempSens = isensor;
+		}
+		else if((newValue > isensor->ubound) && !Radlock)
+		{
+			Templock = 1;
+			TempSens = isensor;
+		}
+
 		isensor->value = newValue;
 		PushS(sensor);
 	}
@@ -206,6 +251,23 @@ static void SimulatePressure(Trie*const sensorbox)
 					( singlerandom(1200) * averageTemperature * ((amountFnSet1 / 2) + 1) ) - 
 					( singlerandom(1200) * (averageFlow / 20) * ((amountFnSet2 / 2) + 1) ) );	
 		
+		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Presslock && (PressSens == isensor) ) 
+		{
+			Presslock = 0;
+			PressSens = 0;
+		}
+		else if( (newValue < isensor->lbound) && Presslock && !(PressSens == isensor) ) newValue += 10000;
+		else if( (newValue > isensor->ubound) && Presslock && !(PressSens == isensor) ) newValue -= 10000;
+		else if( (newValue < isensor->lbound) && !Presslock )
+		{
+			Presslock = 1;
+			PressSens = isensor;
+		}
+		else if((newValue > isensor->ubound) && !Presslock)
+		{
+			Presslock = 1;
+		}
+
 		isensor->value = newValue;
 		PushS(sensor);
 	}
@@ -224,7 +286,12 @@ static void*Simulator(void*const rawtable)
 	}
 	{
 		Trie*const db = rawtable;
-		
+		Templock = 0;
+		Radlock = 0;
+		Fulllock = 0;
+		Presslock = 0;
+		Flowlock = 0;
+				
 		if(interval)
 		{
 			// Get all tables			

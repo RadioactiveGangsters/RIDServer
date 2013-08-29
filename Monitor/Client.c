@@ -191,8 +191,6 @@ static void*_iLoop(void*const c)
 							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ig->name);
 							break;
 						}
-						destroyiGraph(ig);
-						
 						sendPacket(client,p);
 						destroyiGraph(ig);
 						break;
