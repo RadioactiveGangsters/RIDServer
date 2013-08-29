@@ -142,7 +142,7 @@ static void*_iLoop(void*const c)
 		while(true)
 		{
 			opcode ch=OPC_UNDEFINED;
-			if(read(client->fd, &ch, 1)!=1)
+			if(read(tunnel->fd, &ch, 1)!=1)
 			{
 				Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY,"client disconnected");
 				// TODO: cleanup
@@ -191,6 +191,8 @@ static void*_iLoop(void*const c)
 							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ig->name);
 							break;
 						}
+						destroyiGraph(ig);
+						
 						sendPacket(client,p);
 						destroyiGraph(ig);
 						break;

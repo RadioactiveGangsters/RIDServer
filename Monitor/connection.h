@@ -29,4 +29,6 @@
 
 int AcceptClients(void);
 
+void forClients(void*(*)(Client const*const,void*),void*);
+
 #endif

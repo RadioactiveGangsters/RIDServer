@@ -1,5 +1,9 @@
 #include "connection.h"
 
+#include "../Util/LinkedList.h"
+
+static LLNODE*clients;
+
 void*socklisten(void*connection)
 {
 	if(!connection)
@@ -30,10 +34,29 @@ void*socklisten(void*connection)
 				Log(LOGT_NETWORK,LOGL_SERIOUS_ERROR,"Out of memory!");
 				pthread_exit(NULL);
 			}
+			if(clients==NULL)
+			{
+				clients=lle(c);
+			}
+			else
+			{
+				lladd(clients,c);
+			}
 		}
 	}
 	free(connection);
 	pthread_exit(NULL);
+}
+
+void forClients(void*(*cb)(Client const*const,void*),void*userdata)
+{
+	if(cb==NULL){return;}
+	LLNODE*e=clients;
+	while(e)
+	{
+		cb(e->e,userdata);
+		e=e->n;
+	}
 }
 
 int AcceptClients(void)
