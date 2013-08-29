@@ -31,7 +31,7 @@ void AlarmDetection(Sensor* sn)
 		bSensor* bsn = (bSensor*) sn;
 		 
 		if(bsn->value)
-		{		
+		{
 			//sendAlarm(bsn->alarm);	
 			Sensor_enqueue(sn);
 			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,bsn->alarm);
