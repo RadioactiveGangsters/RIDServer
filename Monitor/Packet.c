@@ -53,6 +53,8 @@ Packet*makeGraph(Sensor const*const s)
 		if(!p) return NULL;
 		memcpy(p,&g,sizeof*p);
 
+		if(p->qlen>20){p->qlen=20;}
+
 		return(Packet*)p;
 		
 	}
