@@ -65,20 +65,23 @@ ssize_t writeLogin(const int fd, struct LoginPacket*p)
 	if(!fd)return -1;
 	if(!p)return -1;
 	if(p->base.op!=OPC_LOGIN)return -1;
-	if( write(fd,&p->base.op,sizeof(opcode)) == -1 ) return -1;
-	if( write(fd,&p->zero,sizeof(int)) == -1 ) return -1;
+	if( write(fd,&p->base.op,sizeof(uint8_t)) == -1 ) return -1;
+	if( write(fd,&p->zero,sizeof(uint32_t)) == -1 ) return -1;
 	return (ssize_t)sizeof(struct LoginPacket);
 }
 
 ssize_t writeUpdate(const int fd, struct Update*packet)
 {
+	uint32_t x;
 	if(!fd)return -1;
 	if(!packet) return -1;
 	if(packet->base.op==OPC_UNDEFINED)return -1;
-	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
-	if( write(fd,&packet->unit,sizeof(int)) == -1 ) return -1;
-	if( write(fd,&packet->sensorlen,sizeof(int)) == -1 ) return -1;
-	if( write(fd,packet->sensors,sizeof(int)*packet->sensorlen) == -1 ) return -1;
+	if( write(fd,&packet->base.op,sizeof(uint8_t)) == -1 ) return -1;
+	if( write(fd,&packet->unit,sizeof(uint32_t)) == -1 ) return -1;
+	x=htonl(packet->sensorlen);
+	if( write(fd,&x,sizeof(uint32_t)) == -1 ) return -1;
+	// TODO: htons sensorsdata in fillarray
+	if( write(fd,packet->sensors,sizeof(uint32_t)*packet->sensorlen) == -1 ) return -1;
 
 	// TODO: recalculate size
 	return (ssize_t)sizeof*packet;
@@ -92,10 +95,10 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	if(!packet)return -1;
 	if(packet->base.op==OPC_UNDEFINED)return -1;
 
-	if( write(fd,&packet->base.op,sizeof(opcode)) == -1 ) return -1;
-	if( write(fd,&packet->unit,sizeof(int)) == -1 ) return -1;
+	if( write(fd,&packet->base.op,sizeof(uint8_t)) == -1 ) return -1;
+	if( write(fd,&packet->unit,sizeof(uint32_t)) == -1 ) return -1;
 	//if( write(fd,&packet->name,sizeof(char)*packet->namelen) == -1 ) return -1;
-	if( write(fd,&packet->qlen,sizeof(int)) == -1 ) return -1;
+	if( write(fd,&packet->qlen,sizeof(uint32_t)) == -1 ) return -1;
 	
 	e=packet->queue;
 	skippable=AutoQcount(e)-packet->qlen;
@@ -103,7 +106,7 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	{
 		// TODO: binary sensors?
 		if( skippable > 0 ){skippable--;e=e->n;continue;}
-		if( write(fd,e->e,sizeof(int)) == -1 ) return -1;
+		if( write(fd,&e->e,sizeof(uint32_t)) == -1 ) return -1;
 		e=e->n;
 		i++;
 	}

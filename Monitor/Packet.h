@@ -71,8 +71,8 @@ struct Update
 {
 	Packet base;
 	unittype unit;
-	int sensorlen;
-	int*sensors;
+	uint32_t sensorlen;
+	uint32_t*sensors;
 };
 
 Packet*makePing(void);

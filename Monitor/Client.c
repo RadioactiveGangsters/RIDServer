@@ -63,7 +63,7 @@ static void _writePacket(const int fd,Packet*const p)
 
 static void fillarray(Trie const*const table,int*array,unsigned int*i)
 {
-	int v=0;
+	uint32_t v=0;
 	if(!table)return;
 	if(!array)return;
 	if(!i)return;
@@ -84,7 +84,7 @@ static void fillarray(Trie const*const table,int*array,unsigned int*i)
 			break;
 		}
 	}
-	array[*i]=v;
+	array[*i]=htonl(v);
 	*i=*i+1;
 }
 
@@ -95,8 +95,8 @@ static void sendupdates(Trie*const table, Client*const client)
 		struct Update u=
 		{
 			.base={.op=OPC_UNDEFINED,},
-			.unit=unitbystring(table->id),
-			.sensorlen=triecount(table->e),
+			.unit=ntohl(unitbystring(table->id)),
+			.sensorlen=ntohl(triecount(table->e)),
 			.sensors=NULL,
 		},*p=malloc(sizeof*p);
 
@@ -142,7 +142,7 @@ static void*_iLoop(void*const c)
 		while(true)
 		{
 			opcode ch=OPC_UNDEFINED;
-			if(read(tunnel->fd, &ch, 1)!=1)
+			if(read(client->fd, &ch, 1)!=1)
 			{
 				Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY,"client disconnected");
 				// TODO: cleanup
