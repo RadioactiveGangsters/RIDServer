@@ -75,12 +75,23 @@ struct Update
 	int*sensors;
 };
 
+struct Alarm
+{
+	Packet base;
+	unittype unit;
+	int currentvalue;
+	int counteractiontype;
+	int sensornumber;
+};
+
 Packet*makePing(void);
 Packet*makeLogin(void);
 Packet*makeGraph(Sensor const*const);
+Packet*makeAlarm(Sensor* sn, int actnr);
 
 ssize_t writeUpdate(const int, struct Update*);
 ssize_t writeGraph(const int,struct oGraph*);
+ssize_t writeAlarm(const int,struct Alarm*);
 ssize_t writeLogin(const int,struct LoginPacket*);
 
 struct iGraph*readGraph(const int);
@@ -93,5 +104,6 @@ void destroyoGraph(struct oGraph*);
 void destroyiBounds(struct iBounds*);
 void destroyiValue(struct iValue*);
 void destroyUpdate(struct Update*);
+void destroyAlarm(struct Alarm*);
 void destroyLogin(struct LoginPacket*);
 #endif

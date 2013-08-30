@@ -3,9 +3,9 @@
 static queue q={.array=NULL,.first=-1,.last=-1,.count=0,.size=0}; 
 
 void AlarmDetection(Sensor* sn)
-{
-			
+{		
 	if(!sn)return;
+
 	// Integer Sensor
 	if(sn->type == integersensor)
 	{
@@ -13,13 +13,13 @@ void AlarmDetection(Sensor* sn)
 		
 		if(isn->value > isn->ubound)
 		{
-			//sendAlarm(isn->ualarm);
+			sendAlarm(sn, getCounterActionNr(unitbystring(sn->name), true));
 			Sensor_enqueue(sn);
 			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s (%d > %d)", sn->name ,isn->ualarm, isn->value, isn->ubound);
 		} 
 		else if (isn->value < isn->lbound)
 		{
-			//sendAlarm(isn->lalarm);
+			sendAlarm(sn, getCounterActionNr(unitbystring(sn->name), false));
 			Sensor_enqueue(sn);
 			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s (%d < %d)", sn->name ,isn->lalarm, isn->value, isn->lbound);
 		}
@@ -32,7 +32,7 @@ void AlarmDetection(Sensor* sn)
 		 
 		if(bsn->value)
 		{
-			//sendAlarm(bsn->alarm);	
+			sendAlarm(sn, getCounterActionNr(unitbystring(sn->name), true));
 			Sensor_enqueue(sn);
 			Log(LOGT_SERVER, LOGL_ALARM, "%s: %s", sn->name ,bsn->alarm);
 		}
@@ -69,20 +69,20 @@ Sensor* Sensor_dequeue()
 	else return NULL;
 }
 
-//void warn(Client*c)
-//{
-	//TODO: makepkt
-
-
-	//c->sendpacket(pp);
-
-	//TODO: freepkt
-//}
-
-void sendAlarm(Sensor*fb)
+void sendAlarm(Sensor* sn, int actnr)
 {
-	if(!fb)return;
-//	forClient(&warn);
+	if(!sn)return;
+	struct Alarmdata newalarm =
+	{
+		.sn=sn,
+		.actnr=actnr,
+	};
+	forClients(&mysender, &newalarm);
+}
+
+int getCounterActionNr(unittype sensor, bool toohigh)
+{
+	return ((sensor-1)*2 + toohigh?1:2);
 }
 
 

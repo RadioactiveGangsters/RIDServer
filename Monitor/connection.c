@@ -59,6 +59,15 @@ void forClients(void*(*cb)(Client const*const,void*),void*userdata)
 	}
 }
 
+void* mysender(Client const*const client, void*sndata)
+{
+	if(!client)return;
+	if(!sndata)return;
+	struct Alarmdata *newalarm = sndata;
+	Packet*p = makeAlarm(newalarm->sn, newalarm->actnr);
+	sendPacket(client,p);
+}
+
 int AcceptClients(void)
 {
 	#ifdef _WIN32

@@ -11,6 +11,7 @@
 	#include <unistd.h>
 #endif
 #include "../System/Log.h"
+#include "../Data/sensor.h"
 
 Packet*makePing(void)
 {
@@ -56,7 +57,29 @@ Packet*makeGraph(Sensor const*const s)
 		if(p->qlen>20){p->qlen=20;}
 
 		return(Packet*)p;
-		
+	}
+}
+
+Packet*makeAlarm(Sensor* sn, int actnr)
+{
+	if(!sn || !sn->delta || !actnr)
+	{
+		return NULL;
+	}
+	{
+		struct Alarm const a=
+		{
+			.base = {.op=OPC_ALARM,},
+			.unit = unitbystring(sn->unit),
+			.currentvalue = ((sn->type==integersensor)?((iSensor*)sn)->value:(int)((bSensor*)sn)->value),
+			.counteractiontype = actnr,
+			.sensornumber = getSensorNumberOf(sn->name),
+		};
+		struct Alarm*const p=malloc(sizeof*p);
+		if(!p) return NULL;
+		memcpy(p,&a,sizeof*p);
+
+		return(Packet*)p;
 	}
 }
 
@@ -81,6 +104,20 @@ ssize_t writeUpdate(const int fd, struct Update*packet)
 	if( write(fd,packet->sensors,sizeof(int)*packet->sensorlen) == -1 ) return -1;
 
 	// TODO: recalculate size
+	return (ssize_t)sizeof*packet;
+}
+
+ssize_t writeAlarm(const int fd, struct Alarm*packet)
+{
+	if(!fd)return -1;
+	if(!packet) return -1;
+	if(packet->base.op==OPC_UNDEFINED)return -1;
+	if( write(fd,&packet->base.op,sizeof(uint8_t)) == -1 ) return -1;
+	if( write(fd,&packet->unit,sizeof(uint32_t)) == -1 ) return -1;
+	if( write(fd,&packet->currentvalue,sizeof(uint32_t)) == -1 ) return -1;
+	if( write(fd,&packet->counteractiontype,sizeof(uint32_t)) == -1 ) return -1;
+	if( write(fd,&packet->sensornumber,sizeof(uint32_t)) == -1 ) return -1; 
+
 	return (ssize_t)sizeof*packet;
 }
 
@@ -294,6 +331,12 @@ void destroyUpdate(struct Update*u)
 	u=NULL;
 }
 
+void destroyAlarm(struct Alarm*a)
+{
+	free(a);
+	a=NULL;
+}
+
 void destroyiGraph(struct iGraph*g)
 {
 	free(g->name);
@@ -323,4 +366,3 @@ void destroyiValue(struct iValue*v)
 	free(v);
 	v=NULL;
 }
-

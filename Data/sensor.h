@@ -52,6 +52,7 @@ bool binaryflux();
 int integerflux(int const);
 void ResetSensor(Sensor*const);
 void DestroySensor(Sensor*const);
+int getSensorNumberOf(char const*const name);
 
 iSensor*
 makeiSensor(

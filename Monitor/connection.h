@@ -26,9 +26,11 @@
 #include "../System/Log.h"
 #include "../Util/Path.h"
 #include "../deps/iniparser/src/iniparser.h"
+#include "../System/Alarm.h"
 
 int AcceptClients(void);
 
 void forClients(void*(*)(Client const*const,void*),void*);
+void* mysender(Client const*const, void*);
 
 #endif
