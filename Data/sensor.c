@@ -48,6 +48,23 @@ void DestroySensor(Sensor*const s)
 	free(s);
 }
 
+int getSensorNumberOf(char const*const name)
+{
+	char c = 0;
+	int i = strlen(name), result = 0, magnitude = 1;
+	do
+	{
+		c = name[--i];
+		if(c > 47 && c < 58)
+		{
+			result += (c-48) * magnitude;
+			magnitude *= 10;
+		}
+	}
+	while(i>0);
+	return result;
+}
+
 bSensor* makebSensor(
 	char const*const name,
 	char const*const unit,

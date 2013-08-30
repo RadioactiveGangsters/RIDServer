@@ -27,6 +27,12 @@ static void _writePacket(const int fd,Packet*const p)
 		switch(p->op)
 		{
 			case OPC_ALARM:
+			{
+				struct Alarm*a=(struct Alarm*)p;
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writeAlarm for %d: %d",a->unit,packsize=writeAlarm(fd,a));
+				destroyAlarm(a);
+				break;
+			}
 			case OPC_UPDATE:
 			{
 				struct Update*u=(struct Update*)p;
