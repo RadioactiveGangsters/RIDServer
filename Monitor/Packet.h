@@ -48,8 +48,8 @@ struct iGraph
 struct oGraph
 {
 	Packet base;
-	unittype unit;
-	int qlen;
+	uint32_t unit;
+	uint32_t qlen;
 	const AutoQ*queue;
 };
 
@@ -63,14 +63,13 @@ struct iBounds
 struct iValue
 {
 	Packet base;
-	char*name;
 	int value;
 };
 
 struct Update
 {
 	Packet base;
-	unittype unit;
+	uint32_t unit;
 	uint32_t sensorlen;
 	uint32_t*sensors;
 };

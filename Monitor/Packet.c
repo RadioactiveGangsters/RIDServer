@@ -46,8 +46,8 @@ Packet*makeGraph(Sensor const*const s)
 		struct oGraph const g=
 		{
 			.base={.op=OPC_GRAPH,},
-			.unit=unitbystring(s->unit),// FIXME: all units
-			.qlen=AutoQcount(s->delta),
+			.unit=htonl(unitbystring(s->unit)),// FIXME: all units
+			.qlen=htonl(AutoQcount(s->delta)),
 			.queue=s->delta,
 		};
 		struct oGraph*const p=malloc(sizeof*p);
@@ -95,16 +95,14 @@ ssize_t writeLogin(const int fd, struct LoginPacket*p)
 
 ssize_t writeUpdate(const int fd, struct Update*packet)
 {
-	uint32_t x;
 	if(!fd)return -1;
 	if(!packet) return -1;
 	if(packet->base.op==OPC_UNDEFINED)return -1;
 	if( write(fd,&packet->base.op,sizeof(uint8_t)) == -1 ) return -1;
 	if( write(fd,&packet->unit,sizeof(uint32_t)) == -1 ) return -1;
-	x=htonl(packet->sensorlen);
-	if( write(fd,&x,sizeof(uint32_t)) == -1 ) return -1;
+	if( write(fd,&packet->sensorlen,sizeof(uint32_t)) == -1 ) return -1;
 	// TODO: htons sensorsdata in fillarray
-	if( write(fd,packet->sensors,sizeof(uint32_t)*packet->sensorlen) == -1 ) return -1;
+	if( write(fd,packet->sensors,sizeof(uint32_t)*ntohl(packet->sensorlen)) == -1 ) return -1;
 
 	// TODO: recalculate size
 	return (ssize_t)sizeof*packet;
@@ -138,8 +136,8 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	if( write(fd,&packet->qlen,sizeof(uint32_t)) == -1 ) return -1;
 	
 	e=packet->queue;
-	skippable=AutoQcount(e)-packet->qlen;
-	while(e && i<packet->qlen)
+	skippable=AutoQcount(e)-htonl(packet->qlen);
+	while(e && i<htonl(packet->qlen))
 	{
 		// TODO: binary sensors?
 		if( skippable > 0 ){skippable--;e=e->n;continue;}
@@ -268,44 +266,13 @@ struct iValue*readValue(const int source)
 	struct iValue v=
 	{
 		.base={.op=OPC_UNDEFINED,},
-		.name=NULL,
 		.value=INT_MIN,
 	},*p=malloc(sizeof*p);
 	size_t wanted;
-	uint32_t namelen,value;
-	char*sensor;
+	uint32_t value;
 
 	if(!p)return NULL;
 	memcpy(p,&v,sizeof*p);
-
-	wanted=sizeof(int);
-	if(recv(source,&namelen,wanted,MSG_WAITALL)==-1)
-	{
-		return p;
-	}
-	namelen=ntohl(namelen);
-
-	if(namelen<1)
-	{
-		return p;
-	}
-
-	wanted=sizeof(char)*namelen;
-	sensor=malloc(wanted+sizeof(char));
-	if(!sensor)
-	{
-		free(p);
-		return NULL;
-	}
-	{unsigned int i;for(i=(unsigned int)wanted+1;--i;)
-	{
-		sensor[i]=0;
-	}}
-
-	if(recv(source,sensor,wanted,MSG_WAITALL)==-1)
-	{
-		return p;
-	}
 
 	wanted=sizeof(int);
 	if(recv(source,&value,wanted,MSG_WAITALL)==-1)
@@ -315,7 +282,6 @@ struct iValue*readValue(const int source)
 	value=ntohl(value);
 
 	p->base.op=OPC_VALUE;
-	p->name=sensor;
 	p->value=(int)value;
 	return p;
 }
@@ -364,8 +330,6 @@ void destroyiBounds(struct iBounds*b)
 
 void destroyiValue(struct iValue*v)
 {
-	free(v->name);
-	v->name=NULL;
 	free(v);
 	v=NULL;
 }

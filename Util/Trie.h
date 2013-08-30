@@ -21,6 +21,7 @@ Trie*trieadd(Trie*const,char*const,void*const);
 Trie*trielink(Trie*const root,Trie*const e);
 Trie*trierm(Trie*const root,char const*const id);
 void fortrie(Trie*const,void(*)(Trie*const));
+void xfortrie(Trie*const,void(*)(Trie*const,void*),void*);
 int countTrie(Trie*const trie);
 void*findinTrie(Trie const*const table,char const*const name);
 

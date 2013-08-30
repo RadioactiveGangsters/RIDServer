@@ -67,7 +67,7 @@ static void _writePacket(const int fd,Packet*const p)
 	}
 }
 
-static void fillarray(Trie const*const table,int*array,unsigned int*i)
+static void fillarray(Trie const*const table,uint32_t*array,unsigned int*i)
 {
 	uint32_t v=0;
 	if(!table)return;
@@ -90,7 +90,7 @@ static void fillarray(Trie const*const table,int*array,unsigned int*i)
 			break;
 		}
 	}
-	array[*i]=htonl(v);
+	array[*i]=ntohl(v);
 	*i=*i+1;
 }
 
@@ -101,15 +101,15 @@ static void sendupdates(Trie*const table, Client*const client)
 		struct Update u=
 		{
 			.base={.op=OPC_UNDEFINED,},
-			.unit=ntohl(unitbystring(table->id)),
-			.sensorlen=ntohl(triecount(table->e)),
+			.unit=htonl(unitbystring(table->id)),
+			.sensorlen=htonl(triecount(table->e)),
 			.sensors=NULL,
 		},*p=malloc(sizeof*p);
 
 		if(!p)return;
 		memcpy(p,&u,sizeof*p);
 		{
-			int*sensorarray=malloc(sizeof(int)*p->sensorlen);
+			uint32_t*sensorarray=malloc(sizeof(uint32_t)*ntohl(p->sensorlen));
 			unsigned int i=0;
 			if(!p)
 			{
@@ -132,6 +132,12 @@ static void passclient(Trie*const table,Client*const client,void(*cb)(Trie*const
 	passclient(table->l,client,cb);
 	passclient(table->g,client,cb);
 	cb(table,client);
+}
+
+static void setFlow(Trie*const sensorbox,void*rawvalue)
+{
+	((iSensor*)sensorbox)->value=*(int*)rawvalue;
+	Log(LOGT_CLIENT,LOGL_DEBUG,"set a flow");
 }
 
 static void*_iLoop(void*const c)
@@ -197,7 +203,6 @@ static void*_iLoop(void*const c)
 							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ig->name);
 							break;
 						}
-						destroyiGraph(ig);
 						
 						sendPacket(client,p);
 						destroyiGraph(ig);
@@ -259,18 +264,12 @@ static void*_iLoop(void*const c)
 							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
 							continue;
 						}
-						Log(LOGT_CLIENT,LOGL_DEBUG,"read value packet concerning %s (%d)",iv->name,iv->value);
-						s = findSensor(iv->name);
-						if(!s)
-						{
-							Log(LOGT_CLIENT,LOGL_BUG,"but that sensor does not exist");
-							continue;
-						}
-						
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read value packet: %d",iv->value);
 						if(!(iv->value < 1))
 						{
+							xfortrie(findinTrie(Tables(),"Flow"),&setFlow,&iv->value);
 							((iSensor*)s)->value = iv->value;
-							Log(LOGT_CLIENT,LOGL_DEBUG,"%s value have been changed(VALUE: %d)",s->name,((iSensor*)s)->value);
+							Log(LOGT_CLIENT,LOGL_DEBUG,"flow value have been changed(VALUE: %d)",((iSensor*)s)->value);
 						} 
 						else Log(LOGT_CLIENT,LOGL_CLIENT_ACTIVITY,"VALUE seems to be invalid");
 						destroyiValue(iv);

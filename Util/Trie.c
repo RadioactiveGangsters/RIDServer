@@ -155,6 +155,13 @@ void fortrie(Trie*const trie,void(*cb)(Trie*const))
 	cb(trie);
 }
 
+void xfortrie(Trie*const trie,void(*cb)(Trie*const,void*),void*userdata)
+{
+	if(!trie)return;
+	xfortrie(trie->l,cb,userdata);
+	xfortrie(trie->g,cb,userdata);
+	cb(trie,userdata);
+}
 
 /**	Returns the amount of objects in the trie */
 int countTrie(Trie*const trie)
