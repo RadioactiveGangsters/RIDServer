@@ -54,7 +54,7 @@ Packet*makeGraph(Sensor const*const s)
 		if(!p) return NULL;
 		memcpy(p,&g,sizeof*p);
 
-		if(ntohl(p->qlen)>20){p->qlen=htonl(20);}
+		if(ntohl(p->qlen)>64){p->qlen=htonl(64);}
 
 		return(Packet*)p;
 	}
@@ -136,15 +136,15 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	if( write(fd,&packet->qlen,sizeof(uint32_t)) == -1 ) return -1;
 	
 	e=packet->queue;
-	skippable=AutoQcount(e)-htonl(packet->qlen);
-	while(e && i<htonl(packet->qlen))
+	//skippable=AutoQcount(e)-htonl(packet->qlen);
+	while(e && i<ntohl(packet->qlen))
 	{
 		uint32_t v;
-		if( skippable > 0 ){skippable--;e=e->n;continue;}
+		//if( skippable > 0 ){skippable--;e=e->n;continue;}
 		v=htonl(*(int*)e->e);
 		if( write(fd,&v,sizeof(uint32_t)) == -1 ) return -1;
 		e=e->n;
-		i++;
+		//i++;
 	}
 
 	return (ssize_t)sizeof(struct oGraph);

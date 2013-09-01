@@ -148,16 +148,15 @@ static void*_iLoop(void*const c)
 	}
 	else
 	{
-		bool debug=false;
+		bool debug=false,connected=true;
 		Client*client=c;
 		Log(LOGT_NETWORK,LOGL_DEBUG, "waiting for input");
-		while(true)
+		while(connected)
 		{
 			opcode ch=OPC_UNDEFINED;
 			if(read(client->fd, &ch, 1)!=1)
 			{
 				Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY,"client disconnected");
-				// TODO: cleanup
 				break;
 			}
 			else
@@ -187,7 +186,8 @@ static void*_iLoop(void*const c)
 						if(!ig)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
-							goto dead;
+							connected=false;
+							break;
 						}
 						if(ig->base.op==OPC_UNDEFINED)
 						{
@@ -216,7 +216,8 @@ static void*_iLoop(void*const c)
 						if(ia==NULL)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
-							goto dead;
+							connected=false;
+							break;
 						}
 						if(ia->base.op==OPC_UNDEFINED)
 						{
@@ -244,7 +245,8 @@ static void*_iLoop(void*const c)
 						if(!ib)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
-							goto dead;
+							connected=false;
+							break;
 						}
 						if(ib->base.op==OPC_UNDEFINED)
 						{
@@ -284,7 +286,8 @@ static void*_iLoop(void*const c)
 						if(!iv)
 						{
 							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
-							goto dead;
+							connected=false;
+							break;
 						}
 						if(iv->base.op==OPC_UNDEFINED)
 						{
@@ -311,13 +314,15 @@ static void*_iLoop(void*const c)
 					}
 					case OPC_UNDEFINED:
 						Log(LOGT_NETWORK,LOGL_ERROR,"Client violates protocol");
-						goto dead;
+						connected=false;
 						break;
 				}
 			}
 			sleep(1);
 		}
 		dead:;
+		// TODO: clear queue
+		shutdown(client->fd,SHUT_RDRW);
 
 	}
 	pthread_exit(NULL);
