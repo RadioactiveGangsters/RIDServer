@@ -155,7 +155,7 @@ static void SimulateTemperature(Trie*const sensorbox)
 			TempSens = isensor;
 		}
 		
-		Log(LOGT_SERVER, LOGL_DEBUG, "%s: %d",sensor->name,newValue);
+		//Log(LOGT_SERVER, LOGL_DEBUG, "%s: %d",sensor->name,newValue);
 		isensor->value = newValue;
 		PushS(sensor);
 	}
