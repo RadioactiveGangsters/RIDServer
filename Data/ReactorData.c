@@ -4,11 +4,11 @@
 static volatile bool stopsimulation=false;
 //unsigned int _seed;
 static int interval;
-static volatile Trie* RadiationTable;
-static volatile Trie* FlowTable;
-static volatile Trie* TemperatureTable;
-static volatile Trie* FullnessTable;
-static volatile Trie* PressureTable;
+static Trie* RadiationTable;
+static Trie* FlowTable;
+static Trie* TemperatureTable;
+static Trie* FullnessTable;
+static Trie* PressureTable;
 static int Templock, Radlock, Fulllock, Presslock, Flowlock;
 iSensor *TempSens, *RadSens, *FlowSens, *PressSens;
 bSensor *FullSens;

@@ -27,6 +27,6 @@ Trie const*Sensortable(char const*const);
 
 Sensor* findSensor(char const*const);
 
-volatile Trie*Tables(void);
+Trie*Tables(void);
 
 #endif

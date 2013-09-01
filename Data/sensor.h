@@ -30,7 +30,7 @@ typedef struct
 typedef struct
 {
 	Sensor base;
-	bool value;
+	volatile bool value;
 	char alarm[SENSOR_HALARMLEN];
 } bSensor;
 
@@ -38,9 +38,9 @@ typedef struct
 {
 	Sensor base;
 	int startvalue;
-	int value;
-	int lbound;
-	int ubound;
+	volatile int value;
+	volatile int lbound;
+	volatile int ubound;
 	char lalarm[SENSOR_HALARMLEN];
 	char ualarm[SENSOR_HALARMLEN];
 	bool lboundcross;

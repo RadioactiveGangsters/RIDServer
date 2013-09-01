@@ -1,6 +1,6 @@
 #include "Database.h"
 
-static volatile Trie*db;
+static Trie*db;
 
 static volatile LLNODE*subs;
 
@@ -207,7 +207,7 @@ Trie const*Sensortable(char const*const type)
 	}
 }
 
-volatile Trie*Tables(void)
+Trie*Tables(void)
 {
 	return db;
 }
