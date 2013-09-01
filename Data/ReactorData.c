@@ -2,7 +2,7 @@
 
 //static LLNODE*threads = NULL;
 static volatile bool stopsimulation=false;
-unsigned int _seed;
+//unsigned int _seed;
 static int interval;
 static Trie* RadiationTable;
 static Trie* FlowTable;
@@ -38,13 +38,14 @@ static void SimulateRadiation(Trie*const sensorbox)
 		*p = isensor->value;
 		sensor->delta = AutoQadd(sensor->delta, p);
 		
-		srand(_seed=(unsigned)rand());
-		fx = ((rand()%(39))-20);
+		//srand(_seed=(unsigned)rand());
+		//fx = ((rand()%(39))-20);
+		fx = multirandom(19)+1;
 		
 		// Get new value and set as current value
 		newValue = (isensor->value) + fx;
 
-		if( (newValue < 150) && (!(singlerandom(10) == 10)) ) newValue += 10; 
+		if( (newValue < 80) && (!(singlerandom(10) == 10)) ) newValue += 20; 
 		
 		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Radlock && (RadSens == isensor) ) 
 		{
@@ -131,9 +132,10 @@ static void SimulateTemperature(Trie*const sensorbox)
 		averageFlow = getAverageValue(FlowTable);
 		
 		// Get new value and set as current value
-		newValue = (isensor->value) + ((averageRadiation/85) + (multirandom(1)) - (averageFlow/50));
+		newValue = (isensor->value) + ((averageRadiation/83) + (multirandom(2)-1) - (averageFlow/49));
 		
-		if( (newValue < 18) && (!(singlerandom(10) == 10)) ) newValue += 2; 
+		if( (newValue < 18) && (!(singlerandom(10) == 10)) ) newValue += singlerandom(10); 
+		if( (newValue > 70) && (!(singlerandom(10) == 10)) ) newValue -= singlerandom(10); 
 
 		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Templock && (TempSens == isensor) ) 
 		{
@@ -152,7 +154,8 @@ static void SimulateTemperature(Trie*const sensorbox)
 			Templock = 1;
 			TempSens = isensor;
 		}
-
+		
+		Log(LOGT_SERVER, LOGL_DEBUG, "%s: %d",sensor->name,newValue);
 		isensor->value = newValue;
 		PushS(sensor);
 	}
