@@ -15,6 +15,7 @@
 	#include <netinet/in.h>
 
 #endif
+
 #include "../System/Log.h"
 #include "../Data/Database.h"
 
@@ -136,6 +137,7 @@ static void passclient(Trie*const table,Client*const client,void(*cb)(Trie*const
 
 static void setFlow(Trie*const sensorbox,void*rawvalue)
 {
+	if(sensorbox==NULL){return;}
 	((iSensor*)sensorbox)->value=*(int*)rawvalue;
 	Log(LOGT_CLIENT,LOGL_DEBUG,"set a flow");
 }
@@ -298,8 +300,6 @@ static void*_iLoop(void*const c)
 						if(!(iv->value < 1))
 						{
 							xfortrie(findinTrie(Tables(),"Flow"),&setFlow,&iv->value);
-							((iSensor*)s)->value = iv->value;
-							Log(LOGT_CLIENT,LOGL_DEBUG,"flow value have been changed(VALUE: %d)",((iSensor*)s)->value);
 						} 
 						else Log(LOGT_CLIENT,LOGL_CLIENT_ACTIVITY,"VALUE seems to be invalid");
 						destroyiValue(iv);
@@ -322,7 +322,9 @@ static void*_iLoop(void*const c)
 		}
 		dead:;
 		// TODO: clear queue
-		shutdown(client->fd,SHUT_RDRW);
+		shutdown(client->fd,SHUT_RDWR);
+		close(client->fd);
+		client->relinquish_monitor(client);
 
 	}
 	pthread_exit(NULL);
@@ -356,7 +358,7 @@ static void*_oLoop(void*const c)
 	pthread_exit(NULL);
 }
 
-Client*SpawnClient(const int fd)
+Client*SpawnClient(const int fd,void(*const relinquish_monitor)(Client*const))
 {
 	pthread_t iloop=0,oloop=0;
 	Client c=
@@ -364,6 +366,7 @@ Client*SpawnClient(const int fd)
 		.fd=fd,
 		.iloop=iloop,
 		.oloop=oloop,
+		.relinquish_monitor=relinquish_monitor,
 		._queue=NULL,
 	},*p=malloc(sizeof*p);
 	if(!p)return NULL;

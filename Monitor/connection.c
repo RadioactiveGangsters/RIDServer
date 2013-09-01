@@ -2,7 +2,12 @@
 
 #include "../Util/LinkedList.h"
 
-static LLNODE*clients;
+volatile static LLNODE*clients;
+
+static void relinquish_monitor(Client*self)
+{
+	llrm(clients,self);
+}
 
 void*socklisten(void*connection)
 {
@@ -28,7 +33,7 @@ void*socklisten(void*connection)
 			}
 			Log(LOGT_NETWORK,LOGL_CLIENT_ACTIVITY, "Client connected");       
 
-			c=SpawnClient(client_sockfd);
+			c=SpawnClient(client_sockfd,&relinquish_monitor);
 			if(!c)
 			{
 				Log(LOGT_NETWORK,LOGL_SERIOUS_ERROR,"Out of memory!");

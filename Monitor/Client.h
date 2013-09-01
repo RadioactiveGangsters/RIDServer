@@ -25,14 +25,17 @@
 #include "../Data/Database.h"
 #include "../Util/queue.h"
 
-typedef struct
+typedef struct Client Client;
+
+struct Client
 {
 	const int fd;
 	pthread_t iloop, oloop;
+	void(*const relinquish_monitor)(Client*const);
 	queue*_queue;
-} Client;
+};
 
-Client*SpawnClient(const int);
+Client*SpawnClient(const int,void(*const relinquish_monitor)(Client*const));
 
 void sendPacket(Client*const,Packet*const);
 

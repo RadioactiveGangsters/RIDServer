@@ -1,8 +1,8 @@
 #include "Database.h"
 
-static Trie*db;
+static volatile Trie*db;
 
-static LLNODE*subs;
+static volatile LLNODE*subs;
 
 void PushS(Sensor*const s)
 {
@@ -207,7 +207,7 @@ Trie const*Sensortable(char const*const type)
 	}
 }
 
-Trie*Tables(void)
+volatile Trie*Tables(void)
 {
 	return db;
 }
