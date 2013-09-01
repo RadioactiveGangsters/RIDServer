@@ -29,14 +29,14 @@ static void _writePacket(const int fd,Packet*const p)
 			case OPC_ALARM:
 			{
 				struct Alarm*a=(struct Alarm*)p;
-				Log(LOGT_CLIENT,LOGL_DEBUG,"writeAlarm for %d: %d",a->unit,packsize=writeAlarm(fd,a));
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writeAlarm for %d: %d",ntohl(a->unit),packsize=writeAlarm(fd,a));
 				destroyAlarm(a);
 				break;
 			}
 			case OPC_UPDATE:
 			{
 				struct Update*u=(struct Update*)p;
-				Log(LOGT_CLIENT,LOGL_DEBUG,"writeUpdate for %d: %d",u->unit,packsize=writeUpdate(fd,u));
+				Log(LOGT_CLIENT,LOGL_DEBUG,"writeUpdate for %d: %d",ntohl(u->unit),packsize=writeUpdate(fd,u));
 				destroyUpdate(u);
 				break;
 			}
@@ -208,6 +208,32 @@ static void*_iLoop(void*const c)
 						destroyiGraph(ig);
 						break;
 					}
+					case OPC_ALARM:
+					{
+						struct iAlarm*ia;
+						Log(LOGT_CLIENT,LOGL_DEBUG,"Reading Alarm response");
+						ia=readAlarm(client->fd);
+						if(ia==NULL)
+						{
+							Log(LOGT_CLIENT,LOGL_SERIOUS_ERROR,"Out of memory!");
+							goto dead;
+						}
+						if(ia->base.op==OPC_UNDEFINED)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"Cannot read packet");
+							continue;
+						}
+						Log(LOGT_CLIENT,LOGL_DEBUG,"read alarm response requesting sensor %s.",ia->name);
+
+						s=findSensor(ia->name);
+						if(s==NULL)
+						{
+							Log(LOGT_CLIENT,LOGL_BUG,"requested sensor %s invalid.",ia->name);
+							break;
+						}
+
+						ResetSensor(s);
+					}
 					case OPC_BOUNDS:
 					{
 						struct iBounds*ib;
@@ -282,7 +308,6 @@ static void*_iLoop(void*const c)
 						passclient(db,client,&sendupdates);
 						break;
 					}
-					case OPC_ALARM:
 					case OPC_UNDEFINED:
 						Log(LOGT_NETWORK,LOGL_ERROR,"Client violates protocol");
 						goto dead;
@@ -292,6 +317,7 @@ static void*_iLoop(void*const c)
 			sleep(1);
 		}
 		dead:;
+
 	}
 	pthread_exit(NULL);
 }

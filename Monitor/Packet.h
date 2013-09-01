@@ -1,17 +1,10 @@
 #ifndef RPACKET_H
 #define RPACKET_H
 
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#ifdef _WIN32
-	#include <windows.h>
-#else
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <unistd.h>
-#endif
-#include "../System/Log.h"
+#include "stdint.h"
+#include "sys/types.h"
+
+#include "../Util/DeathRow.h"
 #include "../Data/sensor.h"
 
 typedef enum opcode
@@ -24,6 +17,7 @@ typedef enum opcode
 	OPC_ALARM,
 	OPC_BOUNDS,
 	OPC_VALUE,
+	#define OPC__MAXOPCODE OPC_VALUE
 } opcode;
 
 typedef struct
@@ -83,26 +77,37 @@ struct Alarm
 	uint32_t sensornumber;
 };
 
-Packet*makePing(void);
-Packet*makeLogin(void);
-Packet*makeGraph(Sensor const*const);
-Packet*makeAlarm(Sensor* sn, int actnr);
+struct iAlarm
+{
+	iPacket base;
+	char*name;
+};
 
-ssize_t writeUpdate(const int, struct Update*);
-ssize_t writeGraph(const int,struct oGraph*);
-ssize_t writeAlarm(const int,struct Alarm*);
-ssize_t writeLogin(const int,struct LoginPacket*);
+extern Packet*makePing(void);
+extern Packet*makeLogin(void);
+extern Packet*makeGraph(Sensor const*const);
+extern Packet*makeAlarm(Sensor* sn, int actnr);
 
-struct iGraph*readGraph(const int);
-struct iBounds*readBounds(const int);
-struct iValue*readValue(const int);
-struct Update*readUpdate(const int);
+extern ssize_t writeUpdate(const int, struct Update*);
+extern ssize_t writeGraph(const int,struct oGraph*);
+extern ssize_t writeAlarm(const int,struct Alarm*);
+extern ssize_t writeLogin(const int,struct LoginPacket*);
 
-void destroyiGraph(struct iGraph*);
-void destroyoGraph(struct oGraph*);
-void destroyiBounds(struct iBounds*);
-void destroyiValue(struct iValue*);
-void destroyUpdate(struct Update*);
-void destroyAlarm(struct Alarm*);
-void destroyLogin(struct LoginPacket*);
+extern struct iGraph*readGraph(const int);
+extern struct iBounds*readBounds(const int);
+extern struct iValue*readValue(const int);
+extern struct Update*readUpdate(const int);
+extern struct iAlarm*readAlarm(const int);
+
+extern iPacket*(*const readOpcode[OPC__MAXOPCODE+1])(const int);
+
+extern void destroyiGraph(struct iGraph*);
+extern void destroyoGraph(struct oGraph*);
+extern void destroyiBounds(struct iBounds*);
+extern void destroyiValue(struct iValue*);
+extern void destroyUpdate(struct Update*);
+extern void destroyAlarm(struct Alarm*);
+extern void destroyLogin(struct LoginPacket*);
+extern void destroyiAlarm(struct iAlarm*);
+
 #endif

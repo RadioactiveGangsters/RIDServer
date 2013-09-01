@@ -183,7 +183,7 @@ struct iGraph*readGraph(const int source)
 	wanted=(sizeof(char)*requestsize);
 	expected=(ssize_t)wanted;
 	sensor=malloc(wanted+sizeof(char));
-	if(!sensor)return NULL;
+	if(!sensor){free(p);return NULL;}
 	for(i=(unsigned int)wanted+1;--i;)
 	{
 		sensor[i]=0;
@@ -195,6 +195,45 @@ struct iGraph*readGraph(const int source)
 
 	p->base.op=OPC_GRAPH;
 	p->name=sensor;
+	return p;
+}
+
+struct iAlarm*readAlarm(const int source)
+{
+	struct iAlarm a=
+	{
+		.base={.op=OPC_UNDEFINED,},
+		.name=NULL,
+	},*p=malloc(sizeof*p);
+
+	uint32_t namelen;
+	size_t wanted;
+	ssize_t expected;
+	char*name;
+
+	if(p==NULL){return NULL;}
+	memcpy(p,&a,sizeof*p);
+	
+	wanted=sizeof(namelen);
+	expected=(ssize_t)wanted;
+
+	if(recv(source, &namelen, wanted, MSG_WAITALL)!=expected){return p;}
+	namelen=ntohl(namelen);
+
+	if(namelen<1){return p;}
+
+	wanted=sizeof(char)*namelen;
+	expected=(ssize_t)wanted;
+	if((name=calloc((size_t)namelen+1,sizeof(char)))==NULL)
+	{
+		free(p);
+		return NULL;
+	}
+	if(recv(source, name, wanted, MSG_WAITALL)!=expected){free(name);return p;}
+	
+	p->base.op=OPC_ALARM;
+	p->name=name;
+
 	return p;
 }
 
