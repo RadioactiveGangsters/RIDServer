@@ -4,11 +4,11 @@
 static volatile bool stopsimulation=false;
 //unsigned int _seed;
 static int interval;
-static Trie* RadiationTable;
-static Trie* FlowTable;
-static Trie* TemperatureTable;
-static Trie* FullnessTable;
-static Trie* PressureTable;
+static volatile Trie* RadiationTable;
+static volatile Trie* FlowTable;
+static volatile Trie* TemperatureTable;
+static volatile Trie* FullnessTable;
+static volatile Trie* PressureTable;
 static int Templock, Radlock, Fulllock, Presslock, Flowlock;
 iSensor *TempSens, *RadSens, *FlowSens, *PressSens;
 bSensor *FullSens;
@@ -45,7 +45,8 @@ static void SimulateRadiation(Trie*const sensorbox)
 		// Get new value and set as current value
 		newValue = (isensor->value) + fx;
 
-		if( (newValue < 80) && (!(singlerandom(10) == 10)) ) newValue += 20; 
+		if( (newValue < 80) && (!(singlerandom(10) == 10)) ) newValue += singlerandom(25); 
+		if( (newValue > 950) && (!(singlerandom(10) == 10)) ) newValue -= singlerandom(25); 
 		
 		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Radlock && (RadSens == isensor) ) 
 		{
@@ -134,8 +135,8 @@ static void SimulateTemperature(Trie*const sensorbox)
 		// Get new value and set as current value
 		newValue = (isensor->value) + ((averageRadiation/83) + (multirandom(2)-1) - (averageFlow/49));
 		
-		if( (newValue < 18) && (!(singlerandom(10) == 10)) ) newValue += singlerandom(10); 
-		if( (newValue > 70) && (!(singlerandom(10) == 10)) ) newValue -= singlerandom(10); 
+		if( (newValue < 18) && (!(singlerandom(12) == 12)) ) newValue += singlerandom(10); 
+		if( (newValue > 70) && (!(singlerandom(12) == 12)) ) newValue -= singlerandom(10); 
 
 		if( (newValue > isensor->lbound) && (newValue < isensor->ubound) && Templock && (TempSens == isensor) ) 
 		{
