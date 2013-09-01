@@ -28,7 +28,7 @@ typedef enum opcode
 
 typedef struct
 {
-	opcode op;
+	uint8_t op;
 } Packet;
 
 typedef Packet iPacket;
@@ -77,10 +77,10 @@ struct Update
 struct Alarm
 {
 	Packet base;
-	unittype unit;
-	int currentvalue;
-	int counteractiontype;
-	int sensornumber;
+	uint32_t unit;
+	uint32_t currentvalue;
+	uint32_t counteractiontype;
+	uint32_t sensornumber;
 };
 
 Packet*makePing(void);

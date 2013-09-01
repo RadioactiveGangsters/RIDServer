@@ -54,7 +54,7 @@ Packet*makeGraph(Sensor const*const s)
 		if(!p) return NULL;
 		memcpy(p,&g,sizeof*p);
 
-		if(p->qlen>20){p->qlen=20;}
+		if(ntohl(p->qlen)>20){p->qlen=htonl(20);}
 
 		return(Packet*)p;
 	}
@@ -70,10 +70,10 @@ Packet*makeAlarm(Sensor* sn, int actnr)
 		struct Alarm const a=
 		{
 			.base = {.op=OPC_ALARM,},
-			.unit = unitbystring(sn->unit),
-			.currentvalue = ((sn->type==integersensor)?((iSensor*)sn)->value:(int)((bSensor*)sn)->value),
-			.counteractiontype = actnr,
-			.sensornumber = getSensorNumberOf(sn->name),
+			.unit = htonl(unitbystring(sn->unit)),
+			.currentvalue = htonl(((sn->type==integersensor)?((iSensor*)sn)->value:(int)((bSensor*)sn)->value)),
+			.counteractiontype = htonl(actnr),
+			.sensornumber = htonl(getSensorNumberOf(sn->name)),
 		};
 		struct Alarm*const p=malloc(sizeof*p);
 		if(!p) return NULL;
@@ -139,9 +139,10 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	skippable=AutoQcount(e)-htonl(packet->qlen);
 	while(e && i<htonl(packet->qlen))
 	{
-		// TODO: binary sensors?
+		uint32_t v;
 		if( skippable > 0 ){skippable--;e=e->n;continue;}
-		if( write(fd,&e->e,sizeof(uint32_t)) == -1 ) return -1;
+		v=htonl(*(int*)e->e);
+		if( write(fd,&v,sizeof(uint32_t)) == -1 ) return -1;
 		e=e->n;
 		i++;
 	}
