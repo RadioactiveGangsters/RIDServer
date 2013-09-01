@@ -233,6 +233,7 @@ static void*_iLoop(void*const c)
 						}
 
 						ResetSensor(s);
+						break;
 					}
 					case OPC_BOUNDS:
 					{
