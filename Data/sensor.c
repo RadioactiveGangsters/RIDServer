@@ -4,8 +4,6 @@
 #include <string.h>
 #include <math.h>
 
-static unsigned int _sensseed;
-
 #ifndef S_SPLINT_S
 unittype unitbystring(char const id[static 2])
 #else
@@ -51,7 +49,7 @@ void DestroySensor(Sensor*const s)
 int getSensorNumberOf(char const*const name)
 {
 	char c = 0;
-	int i = strlen(name), result = 0, magnitude = 1;
+	int i = (int)strlen(name), result = 0, magnitude = 1;
 	do
 	{
 		c = name[--i];
@@ -72,7 +70,7 @@ bSensor* makebSensor(
 {
 	int*ptrtomyint=malloc(sizeof(int));
 	*ptrtomyint=false;
-
+	{
 	Sensor base=
 	{
 		.name="genericb",
@@ -100,6 +98,7 @@ bSensor* makebSensor(
 
 		memcpy(p, &s, sizeof*p);
 		return p;
+	}
 	}
 }
 

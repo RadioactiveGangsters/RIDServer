@@ -8,7 +8,7 @@ void PushS(Sensor*const s)
 {
 	if(!subs)return;
 	{
-		LLNODE*x=subs;
+		volatile LLNODE*x=subs;
 		do
 		{
 			((SensorCB*)x->e)->cb(s);
@@ -36,7 +36,7 @@ void const* Sub(void(*cb)(Sensor*))
 		}
 		else
 		{
-			lladd(subs, p);
+			lladd((LLNODE*)subs, p);
 		}
 		return p;
 	}
@@ -44,7 +44,7 @@ void const* Sub(void(*cb)(Sensor*))
 
 void UnSub(void const*const ticket)
 {
-	LLNODE*h=llrm(subs, ticket);
+	volatile LLNODE*h=llrm((LLNODE*)subs, ticket);
 	if(h)
 	{
 		free(h->e);

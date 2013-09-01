@@ -46,8 +46,8 @@ Packet*makeGraph(Sensor const*const s)
 		struct oGraph const g=
 		{
 			.base={.op=OPC_GRAPH,},
-			.unit=htonl(unitbystring(s->unit)),// FIXME: all units
-			.qlen=htonl(AutoQcount(s->delta)),
+			.unit=htonl((uint32_t)unitbystring(s->unit)),// FIXME: all units
+			.qlen=htonl((uint32_t)AutoQcount(s->delta)),
 			.queue=s->delta,
 		};
 		struct oGraph*const p=malloc(sizeof*p);
@@ -71,9 +71,9 @@ Packet*makeAlarm(Sensor* sn, int actnr)
 		{
 			.base = {.op=OPC_ALARM,},
 			.unit = htonl(unitbystring(sn->unit)),
-			.currentvalue = htonl(((sn->type==integersensor)?((iSensor*)sn)->value:(int)((bSensor*)sn)->value)),
-			.counteractiontype = htonl(actnr),
-			.sensornumber = htonl(getSensorNumberOf(sn->name)),
+			.currentvalue = htonl((uint32_t)((sn->type==integersensor)?((iSensor*)sn)->value:(int)((bSensor*)sn)->value)),
+			.counteractiontype = htonl((uint32_t)actnr),
+			.sensornumber = htonl((uint32_t)getSensorNumberOf(sn->name)),
 		};
 		struct Alarm*const p=malloc(sizeof*p);
 		if(!p) return NULL;
@@ -125,7 +125,7 @@ ssize_t writeAlarm(const int fd, struct Alarm*packet)
 ssize_t writeGraph(const int fd,struct oGraph*packet)
 {
 	AutoQ const*e;
-	int i=0,skippable=0;
+	int i=0;
 	if(!fd)return -1;
 	if(!packet)return -1;
 	if(packet->base.op==OPC_UNDEFINED)return -1;
@@ -136,15 +136,13 @@ ssize_t writeGraph(const int fd,struct oGraph*packet)
 	if( write(fd,&packet->qlen,sizeof(uint32_t)) == -1 ) return -1;
 	
 	e=packet->queue;
-	//skippable=AutoQcount(e)-htonl(packet->qlen);
-	while(e && i<ntohl(packet->qlen))
+	while(e && i<(int)ntohl(packet->qlen))
 	{
 		uint32_t v;
-		//if( skippable > 0 ){skippable--;e=e->n;continue;}
-		v=htonl(*(int*)e->e);
+		v=htonl(*(uint32_t*)e->e);
 		if( write(fd,&v,sizeof(uint32_t)) == -1 ) return -1;
 		e=e->n;
-		//i++;
+		i++;
 	}
 
 	return (ssize_t)sizeof(struct oGraph);

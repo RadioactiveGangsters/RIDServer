@@ -69,15 +69,28 @@ Sensor* Sensor_dequeue()
 	else return NULL;
 }
 
+static void mysender(Client*const client, void*sndata)
+{
+	if(!client)return;
+	if(!sndata)return;
+	{
+	struct Alarmdata *newalarm = sndata;
+	Packet*p = makeAlarm(newalarm->sn, newalarm->actnr);
+	sendPacket(client,p);
+	}
+}
+
 void sendAlarm(Sensor* sn, int actnr)
 {
 	if(!sn)return;
+	{
 	struct Alarmdata newalarm =
 	{
 		.sn=sn,
 		.actnr=actnr,
 	};
 	forClients(&mysender, &newalarm);
+	}
 }
 
 int getCounterActionNr(unittype sensor, bool toohigh)

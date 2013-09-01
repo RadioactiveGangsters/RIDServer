@@ -164,7 +164,7 @@ static void*_iLoop(void*const c)
 			else
 			{
 				Packet*p;
-				Sensor const* s;
+				Sensor*s;
 				if(debug)ch-=48;
 				Log(LOGT_NETWORK,LOGL_DEBUG, "Client send: %c (%d)", ch, ch);
 				switch(ch)
@@ -320,7 +320,6 @@ static void*_iLoop(void*const c)
 			}
 			sleep(1);
 		}
-		dead:;
 		// TODO: clear queue
 		shutdown(client->fd,SHUT_RDWR);
 		close(client->fd);

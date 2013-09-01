@@ -30,7 +30,6 @@
 
 int AcceptClients(void);
 
-void forClients(void*(*)(Client const*const,void*),void*);
-void* mysender(Client const*const, void*);
+void forClients(void(*)(Client*const,void*),void*);
 
 #endif

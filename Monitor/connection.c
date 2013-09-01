@@ -2,11 +2,13 @@
 
 #include "../Util/LinkedList.h"
 
-volatile static LLNODE*clients;
+static volatile LLNODE*clients;
 
 static void relinquish_monitor(Client*self)
 {
-	llrm(clients,self);
+	(void)llrm((LLNODE*)clients,self);
+	// TODO:  free client?
+	
 }
 
 void*socklisten(void*connection)
@@ -45,7 +47,7 @@ void*socklisten(void*connection)
 			}
 			else
 			{
-				lladd(clients,c);
+				lladd((LLNODE*)clients,c);
 			}
 		}
 	}
@@ -53,24 +55,15 @@ void*socklisten(void*connection)
 	pthread_exit(NULL);
 }
 
-void forClients(void*(*cb)(Client const*const,void*),void*userdata)
+void forClients(void(*cb)(Client*const,void*),void*userdata)
 {
+	volatile LLNODE*e=clients;
 	if(cb==NULL){return;}
-	LLNODE*e=clients;
 	while(e)
 	{
 		cb(e->e,userdata);
 		e=e->n;
 	}
-}
-
-void* mysender(Client const*const client, void*sndata)
-{
-	if(!client)return;
-	if(!sndata)return;
-	struct Alarmdata *newalarm = sndata;
-	Packet*p = makeAlarm(newalarm->sn, newalarm->actnr);
-	sendPacket(client,p);
 }
 
 int AcceptClients(void)
